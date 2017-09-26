@@ -31,7 +31,7 @@
 	<dependency>
 	    <groupId>net.sourceforge.owlapi</groupId>
 	    <artifactId>jfact</artifactId>
-	    <version>5.0.1</version>
+	    <version>1.2.4</version>
 	</dependency>
 	
 	<!-- https://mvnrepository.com/artifact/com.hermit-reasoner/org.semanticweb.hermit

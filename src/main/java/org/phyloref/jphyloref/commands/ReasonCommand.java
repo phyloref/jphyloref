@@ -19,7 +19,6 @@ import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.rdf.rdfxml.renderer.RDFXMLRenderer;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapi.util.InferredOntologyGenerator;
@@ -127,8 +126,8 @@ public class ReasonCommand implements Command {
 		for(OWLNamedIndividual node: individuals) {
 			System.out.print(" - " + node.getIRI().getFragment() + ": ");
 			
-			for(OWLClass cl: node.getClassesInSignature()) {
-				System.out.print(cl + ", ");
+			for(OWLClass cl: reasoner.getTypes(node, true).getFlattened()) {
+				System.out.print(cl + "; ");
 			}
 			System.out.println("");
 		}
