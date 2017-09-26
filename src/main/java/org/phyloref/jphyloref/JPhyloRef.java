@@ -9,6 +9,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.phyloref.jphyloref.commands.Command;
+import org.phyloref.jphyloref.commands.ReasonCommand;
 
 /**
  * Main class for JPhyloRef. Figures out what the user 
@@ -20,7 +21,8 @@ public class JPhyloRef
 	public static final String VERSION = "0.0.1-SNAPSHOT";
 	
 	private List<Command> commands = Arrays.asList(
-		(Command) new HelpCommand()
+		new HelpCommand(),
+		new ReasonCommand()
 	);
 	
     public static void main( String[] args )
@@ -88,9 +90,19 @@ public class JPhyloRef
 				cmd.addCommandLineOptions(opts);
 				
 				for(Option opt: opts.getOptions()) {
-					System.err.println("\t " + opt.getDescription());
+					String longOpt = "";
+					if(opt.getLongOpt() != null)
+						longOpt = ", " + opt.getLongOpt();
+					
+					System.err.println("    - "
+						+ opt.getOpt() + longOpt + ": "
+						+ opt.getDescription()
+					);
 				}
 			}
+			
+			// One final blank line, please.
+			System.err.println("");
 		}
     }
 }
