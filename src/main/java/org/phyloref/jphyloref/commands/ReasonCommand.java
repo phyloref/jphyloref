@@ -10,17 +10,22 @@ import java.util.Set;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
-import org.coode.owlapi.rdf.rdfxml.RDFXMLRenderer;
-import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.rdf.rdfxml.renderer.RDFXMLRenderer;
+import org.semanticweb.owlapi.reasoner.BufferingMode;
+import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapi.util.InferredOntologyGenerator;
+
+import uk.ac.manchester.cs.jfact.JFactReasoner;
+import uk.ac.manchester.cs.jfact.kernel.options.JFactReasonerConfiguration;
 
 /**
  * Reason over the provided ontology and provide both ABox and TBox.
@@ -75,10 +80,14 @@ public class ReasonCommand implements Command {
 		//JFactReasonerConfiguration config = new JFactReasonerConfiguration();
 		//JFactReasoner reasoner = new JFactReasoner(ontology, config, BufferingMode.BUFFERING);
 		
-		Reasoner reasoner = new Reasoner(ontology);
+		JFactReasonerConfiguration config = new JFactReasonerConfiguration();
+		JFactReasoner reasoner = new JFactReasoner(ontology, config, BufferingMode.BUFFERING);
+		
+		reasoner.precomputeInferences(InferenceType.CLASS_ASSERTIONS);
 		
 		System.err.println("Reasoning completed: " + reasoner);
 		
+		/*
 		// Write this into an ontology.
 		try {
 			PrintWriter writer;
@@ -88,7 +97,7 @@ public class ReasonCommand implements Command {
 			OWLOntology inferred_ontology = manager.createOntology();
 			
 			InferredOntologyGenerator generator = new InferredOntologyGenerator(reasoner);
-			generator.fillOntology(manager, inferred_ontology);
+			generator.fillOntology(manager.getOWLDataFactory(), inferred_ontology);
 			
 			System.err.println("Ontology inferred: " + inferred_ontology);
 			
@@ -103,7 +112,7 @@ public class ReasonCommand implements Command {
 			
 		} catch (OWLOntologyCreationException ex) {
 			System.err.println("Could not write create inferred ontology to write: " + ex);
-		}
+		}*/
 		
 		// Finally, tell us how each node was characterized.
 		IRI iri_Node = IRI.create("http://purl.obolibrary.org/obo/CDAO_0000140");
@@ -118,11 +127,9 @@ public class ReasonCommand implements Command {
 		for(OWLNamedIndividual node: individuals) {
 			System.out.print(" - " + node.getIRI().getFragment() + ": ");
 			
-			/*
 			for(OWLClass cl: node.getClassesInSignature()) {
 				System.out.print(cl + ", ");
 			}
-			*/
 			System.out.println("");
 		}
 	}
