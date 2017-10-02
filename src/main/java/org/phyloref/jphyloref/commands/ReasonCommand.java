@@ -1,11 +1,6 @@
 package org.phyloref.jphyloref.commands;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.util.Set;
 
 import org.apache.commons.cli.CommandLine;
@@ -13,7 +8,6 @@ import org.apache.commons.cli.Options;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -21,13 +15,17 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapi.reasoner.InferenceType;
-import org.semanticweb.owlapi.util.InferredOntologyGenerator;
 
 import uk.ac.manchester.cs.jfact.JFactReasoner;
 import uk.ac.manchester.cs.jfact.kernel.options.JFactReasonerConfiguration;
 
 /**
  * Reason over the provided ontology and provide both ABox and TBox.
+ * 
+ * Eventually, I'd like to set this up to output the complete reasoned ontology,
+ * so that we can poke at the result using rdflib in Python. For now, however, 
+ * it works as a simple proof-of-concept that phyloreferencing resolution is
+ * occuring.
  * 
  * @author Gaurav Vaidya <gaurav@ggvaidya.com>
  *
@@ -96,7 +94,10 @@ public class ReasonCommand implements Command {
 			OWLOntology inferred_ontology = manager.createOntology();
 			
 			InferredOntologyGenerator generator = new InferredOntologyGenerator(reasoner);
-			generator.fillOntology(manager.getOWLDataFactory(), inferred_ontology);
+			// generator.addGenerator(new InferredClassAssertionAxiomGenerator());
+			// generator.addGenerator(new InferredEquivalentDataPropertiesAxiomGenerator());
+			// generator.addGenerator(new InferredPropertyAssertionGenerator());
+			generator.fillOntology(manager, inferred_ontology);
 			
 			System.err.println("Ontology inferred: " + inferred_ontology);
 			
