@@ -3,6 +3,8 @@ package org.phyloref.jphyloref.commands;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -94,9 +96,8 @@ public class TestCommand implements Command {
 		JFactReasonerConfiguration config = new JFactReasonerConfiguration();
 		JFactReasoner reasoner = new JFactReasoner(ontology, config, BufferingMode.BUFFERING);
 		
-		reasoner.precomputeInferences(InferenceType.CLASS_ASSERTIONS);
-		
-		System.err.println("Precomputing complete.");
+		//reasoner.precomputeInferences(InferenceType.CLASS_ASSERTIONS);
+		// System.err.println("Precomputing complete.");
 
 		// Get a list of all phyloreferences. First, we need to know what a Phyloreference is.
 		IRI iri_class_Phyloreference = IRI.create("http://phyloinformatics.net/phyloref.owl#Phyloreference");
@@ -191,15 +192,30 @@ public class TestCommand implements Command {
 				result.addComment(new Comment("No matched nodes have a label"));
 				testFailed = true;
 			} else if(labels.size() > 1) {
-				result.addComment(new Comment("Nodes matched with multiple labels: " + labels.stream().map(literal -> literal.getLiteral()).collect(Collectors.joining("; "))));
-				testFailed = true;
+				// This is okay IF at least one of the nodes is named after this phyloreference.
+				
+				List<String> otherLabels = new LinkedList<>();
+				
+				int matchCount = 0;
+				for(OWLLiteral label: labels) {
+					if(label.getLiteral().equals(phylorefLabel)) matchCount++;
+					else otherLabels.add(label.getLiteral());
+				}
+				
+				String otherLabelsStr = otherLabels.stream().collect(Collectors.joining("; "));
+				
+				if(matchCount > 0) {
+					result.addComment(new Comment("Node matched on " + matchCount + " phylogenies; other labels found included: " + otherLabelsStr));
+				} else {
+					result.addComment(new Comment("Nodes matched with multiple labels: " + otherLabelsStr));
+					testFailed = true;
+				}
 			} else {
 				OWLLiteral onlyOne = labels.iterator().next();
 				String label = onlyOne.getLiteral();
 				
 				if(label.equals(phylorefLabel)) {
 					result.addComment(new Comment("Node label '" + label + "' matched phyloref label '" + phylorefLabel + "'"));
-					testFailed = false;
 				} else {
 					result.addComment(new Comment("Node label '" + label + "' did not match phyloref label '" + phylorefLabel + "'"));
 					testFailed = true;
