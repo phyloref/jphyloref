@@ -57,24 +57,27 @@ public class TestCommand implements Command {
 	public String getDescription() { return "Test the phyloreferences in the provided ontology to determine if they resolved correctly."; }
 	
 	public void addCommandLineOptions(Options opts) {
-		opts.addOption("i", "input", true, "The input ontology to read in RDF/XML");
+		opts.addOption("i", "input", true, "The input ontology to read in RDF/XML (can also be provided without the '-i')");
 	}
 	
 	/**
 	 * Execute this command with the provided command line options. 
 	 */
-	public void execute(CommandLine cmdLine) {
+	public void execute(CommandLine cmdLine) throws RuntimeException {
 		String str_input = cmdLine.getOptionValue("input");
 		
+		if(str_input == null && cmdLine.getArgList().size() > 1) {
+			// No 'input'? Maybe it's just provided as a left-over option?
+			str_input = cmdLine.getArgList().get(1); 
+		}
+		
 		if(str_input == null) {
-			System.err.println("Error: no input ontology specified (use '-i input.owl')");
-			return;
+			throw new RuntimeException("Error: no input ontology specified (use '-i input.owl')");
 		}
 		
 		File inputFile = new File(str_input);
 		if(!inputFile.exists() || !inputFile.canRead()) {
-			System.err.println("Error: cannot read from input ontology '" + str_input + "'");
-			return;
+			throw new RuntimeException("Error: cannot read from input ontology '" + str_input + "'");
 		}
 		
 		System.err.println("Input: " + str_input);
@@ -85,8 +88,7 @@ public class TestCommand implements Command {
 		try {
 			ontology = manager.loadOntologyFromOntologyDocument(inputFile);
 		} catch (OWLOntologyCreationException ex) {
-			System.err.println("Could not load ontology '" + inputFile + "': " + ex);
-			return;
+			throw new RuntimeException("Could not load ontology '" + inputFile + "': " + ex);
 		}
 		
 		// Ontology loaded.
@@ -128,6 +130,8 @@ public class TestCommand implements Command {
 		
 		// Loop
 		int testNumber = 0;
+		int countSuccess = 0;
+		int countFailure = 0;
 		for(OWLNamedIndividual phyloref: phylorefs) {
 			testNumber++;
 			TestResult result = new TestResult();
@@ -224,15 +228,22 @@ public class TestCommand implements Command {
 			
 			if(testFailed) {
 				// Yay, failure!
+				countFailure++;
 				result.setStatus(StatusValues.NOT_OK);
 				testSet.addTapLine(result);
 			} else {
 				// Oh no, success!
+				countSuccess++;
 				result.setStatus(StatusValues.OK);
 				testSet.addTapLine(result);
 			}
 		}
 		
 		System.out.println(tapProducer.dump(testSet));
+		System.err.println("Testset complete (" + countSuccess + " successes, " + countFailure + " failures): " + testSet);
+		
+		// Exit.
+		if(countSuccess == 0) System.exit(-1);
+		System.exit(countFailure);
 	}
 }
