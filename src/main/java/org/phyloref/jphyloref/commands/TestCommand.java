@@ -240,7 +240,7 @@ public class TestCommand implements Command {
 		}
 		
 		System.out.println(tapProducer.dump(testSet));
-		System.err.println("Testset complete (" + countSuccess + " successes, " + countFailure + " failures): " + testSet);
+		System.err.println("Testing complete:" + countSuccess + " successes, " + countFailure + " failures");
 		
 		// Exit.
 		if(countSuccess == 0) System.exit(-1);
