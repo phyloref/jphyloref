@@ -10,6 +10,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.phyloref.jphyloref.commands.Command;
 import org.phyloref.jphyloref.commands.ReasonCommand;
+import org.phyloref.jphyloref.commands.TestCommand;
 
 /**
  * Main class for JPhyloRef. Figures out what the user 
@@ -22,6 +23,7 @@ public class JPhyloRef
 	
 	private List<Command> commands = Arrays.asList(
 		new HelpCommand(),
+		new TestCommand(),
 		new ReasonCommand()
 	);
 	
@@ -32,7 +34,7 @@ public class JPhyloRef
     }
     
     public void execute(String[] args) {
-    	System.out.println("jphyloref/" + VERSION + "\n");
+    	System.err.println("jphyloref/" + VERSION + "\n");
         
         // Prepare to parse command line arguments.
         Options opts = new Options();

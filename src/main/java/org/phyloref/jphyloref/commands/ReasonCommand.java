@@ -74,45 +74,12 @@ public class ReasonCommand implements Command {
 		System.err.println("Loaded ontology: " + ontology);
 		
 		// Now to reason.
-		//JFactReasonerConfiguration config = new JFactReasonerConfiguration();
-		//JFactReasoner reasoner = new JFactReasoner(ontology, config, BufferingMode.BUFFERING);
-		
 		JFactReasonerConfiguration config = new JFactReasonerConfiguration();
 		JFactReasoner reasoner = new JFactReasoner(ontology, config, BufferingMode.BUFFERING);
 		
 		reasoner.precomputeInferences(InferenceType.CLASS_ASSERTIONS);
 		
-		System.err.println("Reasoning completed: " + reasoner);
-		
-		/*
-		// Write this into an ontology.
-		try {
-			PrintWriter writer;
-			if(str_output != null) writer = new PrintWriter(new BufferedWriter(new FileWriter(str_output)));
-			else writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
-			
-			OWLOntology inferred_ontology = manager.createOntology();
-			
-			InferredOntologyGenerator generator = new InferredOntologyGenerator(reasoner);
-			// generator.addGenerator(new InferredClassAssertionAxiomGenerator());
-			// generator.addGenerator(new InferredEquivalentDataPropertiesAxiomGenerator());
-			// generator.addGenerator(new InferredPropertyAssertionGenerator());
-			generator.fillOntology(manager, inferred_ontology);
-			
-			System.err.println("Ontology inferred: " + inferred_ontology);
-			
-			RDFXMLRenderer renderer = new RDFXMLRenderer(inferred_ontology, writer);
-			renderer.render();
-			writer.close();
-			
-			System.err.println("Inferred ontology written to output.");
-			
-		} catch(IOException ex) {
-			System.err.println("Could not write ontology: " + ex);
-			
-		} catch (OWLOntologyCreationException ex) {
-			System.err.println("Could not write create inferred ontology to write: " + ex);
-		}*/
+		System.err.println("Precomputing complete.");
 		
 		// Finally, tell us how each node was characterized.
 		IRI iri_Node = IRI.create("http://purl.obolibrary.org/obo/CDAO_0000140");
