@@ -130,7 +130,7 @@ public class TestCommand implements Command {
 		
 		// Get some additional properties.
 		OWLAnnotationProperty labelAnnotationProperty = manager.getOWLDataFactory().getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI());
-		OWLDataProperty tnrsMatchedNameProperty = manager.getOWLDataFactory().getOWLDataProperty(IRI.create("http://phylotastic.org/terms/tnrs.rdf#matchedName"));
+		OWLDataProperty identifiedAsTaxonNameProperty = manager.getOWLDataFactory().getOWLDataProperty(IRI.create("http://example.org/TBD#identifiedAsTaxonName"));
 		OWLObjectPropertyExpression inPhylogenyProperty = 
 			manager.getOWLDataFactory().getOWLObjectProperty(IRI.create("http://example.org/TBD#inPhylogeny"));
 		
@@ -226,14 +226,14 @@ public class TestCommand implements Command {
 					// The relation is Datatype(<node> tnrs:matchedName <value>)
 					matchedNamesByNode.put(
 						node, 
-						node.getDataPropertyValues(tnrsMatchedNameProperty, ontology)
+						node.getDataPropertyValues(identifiedAsTaxonNameProperty, ontology)
 					);
 				}
 				
 				// Okay, which labels do we have? We fail if we have more than one OWLLiteral
 				Set<OWLLiteral> labels = matchedNamesByNode.values().stream().flatMap(n -> n.stream()).collect(Collectors.toSet());
 				if(labels.isEmpty()) {
-					result.addComment(new Comment("No matched nodes have a label"));
+					result.addComment(new Comment("No matched nodes are identified to taxa"));
 					testFailed = true;
 				} else if(labels.size() > 1) {
 					// This is okay IF at least one of the nodes is named after this phyloreference.
@@ -249,9 +249,9 @@ public class TestCommand implements Command {
 					String otherLabelsStr = otherLabels.stream().collect(Collectors.joining("; "));
 					
 					if(matchCount > 0) {
-						result.addComment(new Comment("Node matched on " + matchCount + " phylogenies; other labels found included: " + otherLabelsStr));
+						result.addComment(new Comment("Node matched on " + matchCount + " phylogenies; other taxa found included: " + otherLabelsStr));
 					} else {
-						result.addComment(new Comment("Nodes matched with multiple labels: " + otherLabelsStr));
+						result.addComment(new Comment("Nodes matched with multiple taxa: " + otherLabelsStr));
 						testFailed = true;
 					}
 				} else {
@@ -259,9 +259,9 @@ public class TestCommand implements Command {
 					String label = onlyOne.getLiteral();
 					
 					if(label.equals(phylorefLabel)) {
-						result.addComment(new Comment("Node label '" + label + "' matched phyloref label '" + phylorefLabel + "'"));
+						result.addComment(new Comment("Node label '" + label + "' matched phyloref taxon '" + phylorefLabel + "'"));
 					} else {
-						result.addComment(new Comment("Node label '" + label + "' did not match phyloref label '" + phylorefLabel + "'"));
+						result.addComment(new Comment("Node label '" + label + "' did not match phyloref taxon '" + phylorefLabel + "'"));
 						testFailed = true;
 					}
 				}
