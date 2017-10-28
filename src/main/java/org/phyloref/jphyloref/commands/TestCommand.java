@@ -130,9 +130,9 @@ public class TestCommand implements Command {
 		
 		// Get some additional properties.
 		OWLAnnotationProperty labelAnnotationProperty = manager.getOWLDataFactory().getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI());
-		OWLDataProperty identifiedAsTaxonNameProperty = manager.getOWLDataFactory().getOWLDataProperty(IRI.create("http://example.org/TBD#identifiedAsTaxonName"));
+		OWLDataProperty identifiedAsTaxonNameProperty = manager.getOWLDataFactory().getOWLDataProperty(IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#matchedName"));
 		OWLObjectPropertyExpression inPhylogenyProperty = 
-			manager.getOWLDataFactory().getOWLObjectProperty(IRI.create("http://example.org/TBD#inPhylogeny"));
+			manager.getOWLDataFactory().getOWLObjectProperty(IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#inPhylogeny"));
 		
 		// Loop
 		int testNumber = 0;
@@ -163,7 +163,7 @@ public class TestCommand implements Command {
 				if(flag_debug_specifiers) {
 					// If no nodes were matched, was this because one or more of the specifiers
 					// couldn't be matched? Let's check!
-					OWLObjectProperty hasSpecifierProperty = manager.getOWLDataFactory().getOWLObjectProperty(IRI.create("http://example.org/TBD#hasSpecifier"));
+					OWLObjectProperty hasSpecifierProperty = manager.getOWLDataFactory().getOWLObjectProperty(IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#hasSpecifier"));
 					Set<OWLNamedIndividual> specifiers = reasoner.getObjectPropertyValues(phyloref, hasSpecifierProperty).getFlattened();
 					
 					for(OWLNamedIndividual specifier: specifiers) {
