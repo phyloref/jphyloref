@@ -1,7 +1,6 @@
 package org.phyloref.jphyloref.commands;
 
 import java.io.File;
-import java.lang.reflect.AnnotatedArrayType;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -9,21 +8,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.phyloref.jphyloref.helpers.OWLHelper;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
-import org.semanticweb.owlapi.model.OWLAnnotationValue;
-import org.semanticweb.owlapi.model.OWLAnnotationValueVisitor;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotationObjectVisitorEx;
+import org.semanticweb.owlapi.model.OWLAnnotationPropertyDomainAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotationPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
@@ -31,9 +32,8 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.rdf.util.RDFConstants;
+import org.semanticweb.owlapi.model.OWLSubAnnotationPropertyOfAxiom;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
-import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 import org.tap4j.model.Comment;
 import org.tap4j.model.Plan;
@@ -130,7 +130,7 @@ public class TestCommand implements Command {
 		
 		// Get some additional properties.
 		OWLAnnotationProperty labelAnnotationProperty = manager.getOWLDataFactory().getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI());
-		OWLDataProperty identifiedAsTaxonNameProperty = manager.getOWLDataFactory().getOWLDataProperty(IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#matchedName"));
+                OWLDataProperty matchedNameProperty = manager.getOWLDataFactory().getOWLDataProperty(IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#matchedName"));
 		OWLObjectPropertyExpression inPhylogenyProperty = 
 			manager.getOWLDataFactory().getOWLObjectProperty(IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#inPhylogeny"));
 		
@@ -225,45 +225,45 @@ public class TestCommand implements Command {
 					// What are the labels associated with these nodes?
 					// The relation is Datatype(<node> tnrs:matchedName <value>)
 					matchedNamesByNode.put(
-						node, 
-						node.getDataPropertyValues(identifiedAsTaxonNameProperty, ontology)
-					);
+                                            node,
+                                            node.getDataPropertyValues(matchedNameProperty, ontology)
+                                        );
 				}
-				
+                                
 				// Okay, which labels do we have? We fail if we have more than one OWLLiteral
 				Set<OWLLiteral> labels = matchedNamesByNode.values().stream().flatMap(n -> n.stream()).collect(Collectors.toSet());
 				if(labels.isEmpty()) {
-					result.addComment(new Comment("No matched nodes are identified to taxa"));
+					result.addComment(new Comment("No matched nodes have matched names: " + nodes));
 					testFailed = true;
 				} else if(labels.size() > 1) {
-					// This is okay IF at least one of the nodes is named after this phyloreference.
-					
-					List<String> otherLabels = new LinkedList<>();
-					
-					int matchCount = 0;
-					for(OWLLiteral label: labels) {
-						if(label.getLiteral().equals(phylorefLabel)) matchCount++;
-						else otherLabels.add(label.getLiteral());
-					}
-					
-					String otherLabelsStr = otherLabels.stream().collect(Collectors.joining("; "));
-					
-					if(matchCount > 0) {
-						result.addComment(new Comment("Node matched on " + matchCount + " phylogenies; other taxa found included: " + otherLabelsStr));
-					} else {
-						result.addComment(new Comment("Nodes matched with multiple taxa: " + otherLabelsStr));
-						testFailed = true;
-					}
+                                    // This is okay IF at least one of the nodes is named after this phyloreference.
+
+                                    List<String> otherLabels = new LinkedList<>();
+
+                                    int matchCount = 0;
+                                    for(OWLLiteral label: labels) {
+                                        if(label.getLiteral().equals(phylorefLabel)) matchCount++;
+                                        else otherLabels.add(label.getLiteral());
+                                    }
+
+                                    String otherLabelsStr = otherLabels.stream().collect(Collectors.joining("; "));
+
+                                    if(matchCount > 0) {
+                                        result.addComment(new Comment("Node matched on " + matchCount + " phylogenies; other matched names found included: " + otherLabelsStr));
+                                    } else {
+                                        result.addComment(new Comment("Nodes matched with multiple matched names: " + otherLabelsStr));
+                                        testFailed = true;
+                                    }
 				} else {
-					OWLLiteral onlyOne = labels.iterator().next();
-					String label = onlyOne.getLiteral();
-					
-					if(label.equals(phylorefLabel)) {
-						result.addComment(new Comment("Node label '" + label + "' matched phyloref taxon '" + phylorefLabel + "'"));
-					} else {
-						result.addComment(new Comment("Node label '" + label + "' did not match phyloref taxon '" + phylorefLabel + "'"));
-						testFailed = true;
-					}
+                                    OWLLiteral onlyOne = labels.iterator().next();
+                                    String label = onlyOne.getLiteral();
+
+                                    if(label.equals(phylorefLabel)) {
+                                        result.addComment(new Comment("Node matched name '" + label + "' matched phyloref label '" + phylorefLabel + "'"));
+                                    } else {
+                                        result.addComment(new Comment("Node matched name '" + label + "' did not match phyloref label '" + phylorefLabel + "'"));
+                                        testFailed = true;
+                                    }
 				}
 			}
 			
