@@ -130,7 +130,7 @@ public class TestCommand implements Command {
 		
 		// Get some additional properties.
 		OWLAnnotationProperty labelAnnotationProperty = manager.getOWLDataFactory().getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI());
-		OWLDataProperty identifiedAsTaxonNameProperty = manager.getOWLDataFactory().getOWLDataProperty(IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#matchedName"));
+		OWLDataProperty identifiedAsTaxonNameProperty = manager.getOWLDataFactory().getOWLDataProperty(IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#expected_phyloreference_named"));
 		OWLObjectPropertyExpression inPhylogenyProperty = 
 			manager.getOWLDataFactory().getOWLObjectProperty(IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#inPhylogeny"));
 		
