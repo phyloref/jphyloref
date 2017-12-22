@@ -1,7 +1,6 @@
 package org.phyloref.jphyloref.commands;
 
 import java.io.File;
-import java.lang.reflect.AnnotatedArrayType;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -15,15 +14,10 @@ import org.apache.commons.cli.Options;
 import org.phyloref.jphyloref.helpers.OWLHelper;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
-import org.semanticweb.owlapi.model.OWLAnnotationValue;
-import org.semanticweb.owlapi.model.OWLAnnotationValueVisitor;
-import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
@@ -31,9 +25,7 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.rdf.util.RDFConstants;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
-import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 import org.tap4j.model.Comment;
 import org.tap4j.model.Plan;
@@ -61,6 +53,12 @@ import uk.ac.manchester.cs.jfact.kernel.options.JFactReasonerConfiguration;
 public class TestCommand implements Command {
 	public String getName() { return "test"; }
 	public String getDescription() { return "Test the phyloreferences in the provided ontology to determine if they resolved correctly."; }
+	
+	// IRIs used in this command
+	private static IRI iri_class_Phyloreference = IRI.create("http://phyloinformatics.net/phyloref.owl#Phyloreference");
+	private static IRI iri_expected_phyloref_named = IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#expected_phyloreference_named");
+	private static IRI iri_in_phylogeny = IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#in_phylogeny");
+	private static IRI iri_has_specifier = IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#has_specifier");
 	
 	public void addCommandLineOptions(Options opts) {
 		opts.addOption("i", "input", true, "The input ontology to read in RDF/XML (can also be provided without the '-i')");
@@ -109,7 +107,7 @@ public class TestCommand implements Command {
 		JFactReasoner reasoner = new JFactReasoner(ontology, config, BufferingMode.BUFFERING);
 		
 		// Get a list of all phyloreferences. First, we need to know what a Phyloreference is.
-		IRI iri_class_Phyloreference = IRI.create("http://phyloinformatics.net/phyloref.owl#Phyloreference");
+		
 		Set<OWLEntity> optClassPhyloreference = ontology.getEntitiesInSignature(iri_class_Phyloreference);
 		if(optClassPhyloreference.isEmpty()) {
 			throw new RuntimeException("Class 'phyloref:Phyloreference' is not defined in ontology.");
@@ -130,9 +128,8 @@ public class TestCommand implements Command {
 		
 		// Get some additional properties.
 		OWLAnnotationProperty labelAnnotationProperty = manager.getOWLDataFactory().getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI());
-		OWLDataProperty identifiedAsTaxonNameProperty = manager.getOWLDataFactory().getOWLDataProperty(IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#expected_phyloreference_named"));
-		OWLObjectPropertyExpression inPhylogenyProperty = 
-			manager.getOWLDataFactory().getOWLObjectProperty(IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#inPhylogeny"));
+		OWLDataProperty identifiedAsTaxonNameProperty = manager.getOWLDataFactory().getOWLDataProperty(iri_expected_phyloref_named);
+		OWLObjectPropertyExpression inPhylogenyProperty = manager.getOWLDataFactory().getOWLObjectProperty(iri_in_phylogeny);
 		
 		// Loop
 		int testNumber = 0;
@@ -163,7 +160,7 @@ public class TestCommand implements Command {
 				if(flag_debug_specifiers) {
 					// If no nodes were matched, was this because one or more of the specifiers
 					// couldn't be matched? Let's check!
-					OWLObjectProperty hasSpecifierProperty = manager.getOWLDataFactory().getOWLObjectProperty(IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#hasSpecifier"));
+					OWLObjectProperty hasSpecifierProperty = manager.getOWLDataFactory().getOWLObjectProperty(iri_has_specifier);
 					Set<OWLNamedIndividual> specifiers = reasoner.getObjectPropertyValues(phyloref, hasSpecifierProperty).getFlattened();
 					
 					for(OWLNamedIndividual specifier: specifiers) {
