@@ -179,38 +179,6 @@ public class TestCommand implements Command {
                 Map<OWLNamedIndividual, Set<OWLLiteral>> expectedPhyloreferencesByNode = new HashMap<>();
 
                 for(OWLNamedIndividual node: nodes) {
-                    /*
-                    // Which phylogeny does this node belong to?
-                    OWLObjectPropertyExpression inPhylogenyProperty = dataFactory.getOWLObjectProperty(PhylorefHelper.IRI_PHYLOGENY_CONTAINING_NODE);                
-                    Set<OWLNamedIndividual> phylogenies = reasoner.getObjectPropertyValues(node, inPhylogenyProperty).getFlattened();
-                    
-                    // Check how many phylogenies this node is found in.
-                    
-                    if(phylogenies.isEmpty()) {
-                        // Node is not found in any phylogeny.
-                        // Every node should be a part of a phylogeny!
-                        
-                        result.addComment(new Comment("Node '" + node.getIRI().toString() + "' is not found in any phylogeny."));
-                        testFailed = true;
-                        break;
-                    }
-
-                    if(phylogenies.size() > 1) {
-                        // Node is found in more than one phylogeny.
-                        // Different phylogenies might share nodes with the same
-                        // properties, but the same *node* shouldn't be asserted
-                        // to belong to more than one phylogeny.
-                        
-                        result.addComment(new Comment(
-                            "Node '" + node.getIRI().toString() + "' is found in " + phylogenies.size() + " phylogenies: " +
-                            phylogenies.stream()
-                                .map(phylogeny -> phylogeny.asOWLNamedIndividual().getIRI().toString())
-                                .collect(Collectors.joining("; "))
-                        ));
-                        testFailed = true;
-                        break;
-                    }*/
-
                     // What are the expected phyloreferences associated with these nodes?
                     expectedPhyloreferencesByNode.put(
                         node, 
