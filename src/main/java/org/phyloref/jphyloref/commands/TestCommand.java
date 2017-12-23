@@ -1,19 +1,21 @@
 package org.phyloref.jphyloref.commands;
 
+import org.phyloref.jphyloref.helpers.PhylorefHelper;
+import org.phyloref.jphyloref.helpers.OWLHelper;
+
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
-import org.phyloref.jphyloref.helpers.OWLHelper;
-import org.phyloref.jphyloref.helpers.PhylorefHelper;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataProperty;
@@ -24,6 +26,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
+import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 import org.tap4j.model.Comment;
 import org.tap4j.model.Plan;
 import org.tap4j.model.TestResult;
@@ -31,7 +34,6 @@ import org.tap4j.model.TestSet;
 import org.tap4j.producer.TapProducer;
 import org.tap4j.producer.TapProducerFactory;
 import org.tap4j.util.StatusValues;
-
 import uk.ac.manchester.cs.jfact.JFactReasoner;
 import uk.ac.manchester.cs.jfact.kernel.options.JFactReasonerConfiguration;
 
@@ -48,52 +50,66 @@ import uk.ac.manchester.cs.jfact.kernel.options.JFactReasonerConfiguration;
  *
  */
 public class TestCommand implements Command {
+    /**
+     * This command is named "test". It should be 
+     * involved "java -jar jphyloref.jar test ..."
+     */
     @Override
-    public String getName() {
-        return "test";
-    }
-
-    @Override
-    public String getDescription() {
-        return "Test the phyloreferences in the provided ontology to determine if they resolved correctly.";
-    }
-
-    @Override
-    public void addCommandLineOptions(Options opts) {
-        opts.addOption("i", "input", true, "The input ontology to read in RDF/XML (can also be provided without the '-i')");
-        opts.addOption("debug_specifiers", false, "Identify unmatched specifiers");
+    public String getName() { 
+        return "test"; 
     }
     
     /**
-     * Execute this command with the provided command line options.
-     *
-     * @param cmdLine The command line provided to this command.
+     * @return A description of this command.
+     */
+    @Override
+    public String getDescription() { 
+        return "Test the phyloreferences in the provided ontology to determine if they resolved correctly."; 
+    }
+
+    /**
+     * Add command-line options specific to this command.
+     * 
+     * @param opts The command-line options to modify for this command.
+     */
+    @Override
+    public void addCommandLineOptions(Options opts) {
+        opts.addOption(
+            "i", "input", true, 
+            "The input ontology to read in RDF/XML (can also be provided without the '-i')"
+        );
+    }
+
+    /**
+     * Given an input ontology, reason over it and determine if nodes are
+     * identified correctly. It provides output using the Test Anything 
+     * Protocol (TAP: https://testanything.org/). 
+     * 
+     * @param cmdLine The command line options provided to this command.
      */
     @Override
     public void execute(CommandLine cmdLine) throws RuntimeException {
-        // Read command line arguments.
-        String str_debug_specifiers = cmdLine.getOptionValue("debug_specifiers");
-        boolean flag_debug_specifiers = (str_debug_specifiers != null);
-
+        // Determine which input ontology should be read, 
         String str_input = cmdLine.getOptionValue("input");
-        if (str_input == null && cmdLine.getArgList().size() > 1) {
+
+        if(str_input == null && cmdLine.getArgList().size() > 1) {
             // No 'input'? Maybe it's just provided as a left-over option?
-            str_input = cmdLine.getArgList().get(1);
+            str_input = cmdLine.getArgList().get(1); 
         }
-        if (str_input == null) {
+
+        if(str_input == null) {
             throw new RuntimeException("Error: no input ontology specified (use '-i input.owl')");
         }
 
         File inputFile = new File(str_input);
-        if (!inputFile.exists() || !inputFile.canRead()) {
+        if(!inputFile.exists() || !inputFile.canRead()) {
             throw new RuntimeException("Error: cannot read from input ontology '" + str_input + "'");
         }
 
-        System.err.println("Input: " + str_input);
+        System.err.println("Input: " + inputFile);
 
-        // Load the ontology into inputOntology.
+        // Load the ontology using OWLManager.
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-        OWLDataFactory dataFactory = manager.getOWLDataFactory();
         OWLOntology ontology;
         try {
             ontology = manager.loadOntologyFromOntologyDocument(inputFile);
@@ -104,127 +120,150 @@ public class TestCommand implements Command {
         // Ontology loaded.
         System.err.println("Loaded ontology: " + ontology);
 
-        // Now to reason.
+        // Reason over the loaded ontology.
         JFactReasonerConfiguration config = new JFactReasonerConfiguration();
         JFactReasoner reasoner = new JFactReasoner(ontology, config, BufferingMode.BUFFERING);
 
-        // Find all phyloreferences.
+        // Get a list of all phyloreferences.
         Set<OWLNamedIndividual> phylorefs = PhylorefHelper.getPhyloreferences(ontology, reasoner);
 
         // Okay, time to start testing! Each phyloreference counts as one test.
+        // TAP (https://testanything.org/) can be read by downstream software
+        // to determine which phyloreferences resolved correctly and which did not.
         TapProducer tapProducer = TapProducerFactory.makeTap13Producer();
         TestSet testSet = new TestSet();
         testSet.setPlan(new Plan(phylorefs.size()));
 
-        // Loop
+        // Get some additional properties.
+        OWLDataFactory dataFactory = manager.getOWLDataFactory();
+        
+        // Test each phyloreference individually.
         int testNumber = 0;
         int countSuccess = 0;
         int countFailure = 0;
-        for (OWLNamedIndividual phyloref : phylorefs) {
+        
+        for(OWLNamedIndividual phyloref: phylorefs) {
             testNumber++;
             TestResult result = new TestResult();
             result.setTestNumber(testNumber);
             boolean testFailed = false;
 
-            // Write out test information.
-            String phylorefLabel = OWLHelper.getLabel(phyloref, ontology).stream().distinct().sorted().collect(Collectors.joining("; "));
+            // Collect English labels for the phyloreference.
+            OWLAnnotationProperty labelAnnotationProperty = dataFactory.getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI());
+            Optional<String> opt_phylorefLabel = OWLHelper.getAnnotationLiteralsForEntity(
+                ontology, 
+                phyloref, 
+                labelAnnotationProperty, 
+                Arrays.asList("en")
+            ).stream().findFirst();
 
-            if (phylorefLabel.equals("")) {
+            String phylorefLabel;
+            if(opt_phylorefLabel.isPresent()) 
+                phylorefLabel = opt_phylorefLabel.get();
+            else 
                 phylorefLabel = phyloref.getIRI().toString();
-            }
             result.setDescription("Phyloreference '" + phylorefLabel + "'");
 
             // Which nodes are this phyloreference resolved to?
-            OWLClass phyloref_asClass = dataFactory.getOWLClass(phyloref.getIRI());
-            Set<OWLNamedIndividual> nodes = reasoner.getInstances(phyloref_asClass, false).getFlattened();
+            OWLClass phylorefAsClass = manager.getOWLDataFactory().getOWLClass(phyloref.getIRI()); 
+            Set<OWLNamedIndividual> nodes = reasoner.getInstances(phylorefAsClass, false).getFlattened();
 
-            if (nodes.isEmpty()) {
+            if(nodes.isEmpty()) {
+                // Phyloref resolved to no nodes at all.
                 result.setStatus(StatusValues.NOT_OK);
                 result.addComment(new Comment("No nodes matched"));
                 testFailed = true;
-
             } else {
-                // Each phyloref should only resolve to one node on each phylogeny. So let's
-                // map each phyloref to its phylogeny. Also, let's grab their labels while we're
-                // at it.
-                Map<OWLNamedIndividual, Set<OWLLiteral>> matchedNamesByNode = new HashMap<>();
+                // Make a list of every expected phyloreference for input node.
+                OWLDataProperty expectedPhyloreferenceNameProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_NAME_OF_EXPECTED_PHYLOREF);
+                Map<OWLNamedIndividual, Set<OWLLiteral>> expectedPhyloreferencesByNode = new HashMap<>();
 
-                for (OWLNamedIndividual node : nodes) {
+                for(OWLNamedIndividual node: nodes) {
+                    /*
                     // Which phylogeny does this node belong to?
-                    // The relation is Object(<phylogeny> tbd:nodes <node>)
-                    
-                    OWLObjectPropertyExpression inPhylogenyProperty = 
-                        manager.getOWLDataFactory().getOWLObjectProperty(IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#inPhylogeny"));
-                    OWLDataProperty matchedNameProperty = 
-                        manager.getOWLDataFactory().getOWLDataProperty(IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#matchedName"));
-                    
+                    OWLObjectPropertyExpression inPhylogenyProperty = dataFactory.getOWLObjectProperty(PhylorefHelper.IRI_PHYLOGENY_CONTAINING_NODE);                
                     Set<OWLNamedIndividual> phylogenies = reasoner.getObjectPropertyValues(node, inPhylogenyProperty).getFlattened();
-                    if (phylogenies.isEmpty()) {
+                    
+                    // Check how many phylogenies this node is found in.
+                    
+                    if(phylogenies.isEmpty()) {
+                        // Node is not found in any phylogeny.
+                        // Every node should be a part of a phylogeny!
+                        
                         result.addComment(new Comment("Node '" + node.getIRI().toString() + "' is not found in any phylogeny."));
                         testFailed = true;
                         break;
                     }
 
-                    if (phylogenies.size() > 1) {
+                    if(phylogenies.size() > 1) {
+                        // Node is found in more than one phylogeny.
+                        // Different phylogenies might share nodes with the same
+                        // properties, but the same *node* shouldn't be asserted
+                        // to belong to more than one phylogeny.
+                        
                         result.addComment(new Comment(
-                                "Node '" + node.getIRI().toString() + "' is found in " + phylogenies.size() + " phylogenies: "
-                                + phylogenies.stream()
-                                        .map(phylogeny -> phylogeny.asOWLNamedIndividual().getIRI().toString())
-                                        .collect(Collectors.joining("; "))
+                            "Node '" + node.getIRI().toString() + "' is found in " + phylogenies.size() + " phylogenies: " +
+                            phylogenies.stream()
+                                .map(phylogeny -> phylogeny.asOWLNamedIndividual().getIRI().toString())
+                                .collect(Collectors.joining("; "))
                         ));
                         testFailed = true;
                         break;
-                    }
+                    }*/
 
-                    // What are the labels associated with these nodes?
-                    // The relation is Datatype(<node> tnrs:matchedName <value>)
-                    matchedNamesByNode.put(
-                            node,
-                            node.getDataPropertyValues(matchedNameProperty, ontology)
+                    // What are the expected phyloreferences associated with these nodes?
+                    expectedPhyloreferencesByNode.put(
+                        node, 
+                        node.getDataPropertyValues(expectedPhyloreferenceNameProperty, ontology)
                     );
                 }
 
-                // Okay, which labels do we have? We fail if we have more than one OWLLiteral
-                Set<OWLLiteral> labels = matchedNamesByNode.values().stream().flatMap(n -> n.stream()).collect(Collectors.toSet());
-                if (labels.isEmpty()) {
-                    result.addComment(new Comment("No matched nodes have matched names: " + nodes));
+                // Flatten expected phyloreference names from each Node into a 
+                // single set of unique expected phyloreference names.
+                Set<OWLLiteral> distinctExpectedPhylorefNames = expectedPhyloreferencesByNode.values()
+                    .stream().flatMap(n -> n.stream())
+                    .collect(Collectors.toSet());
+                
+                // How many distinct expected phyloref names do we have?
+                if(distinctExpectedPhylorefNames.isEmpty()) {
+                    result.addComment(new Comment("None of the " + nodes.size() + " matched nodes are expected to resolve to phyloreferences"));
                     testFailed = true;
-                } else if (labels.size() > 1) {
-                    // This is okay IF at least one of the nodes is named after this phyloreference.
-
+                    
+                } else if(distinctExpectedPhylorefNames.size() > 1) {
+                    // This is okay IF at least one of the nodes is expected to resolve to this phyloreference.
                     List<String> otherLabels = new LinkedList<>();
 
                     int matchCount = 0;
-                    for (OWLLiteral label : labels) {
-                        if (label.getLiteral().equals(phylorefLabel)) {
-                            matchCount++;
-                        } else {
-                            otherLabels.add(label.getLiteral());
-                        }
+                    for(OWLLiteral label: distinctExpectedPhylorefNames) {
+                        if(label.getLiteral().equals(phylorefLabel)) matchCount++;
+                        else otherLabels.add(label.getLiteral());
                     }
 
                     String otherLabelsStr = otherLabels.stream().collect(Collectors.joining("; "));
 
-                    if (matchCount > 0) {
-                        result.addComment(new Comment("Node matched on " + matchCount + " phylogenies; other matched names found included: " + otherLabelsStr));
+                    if(matchCount > 0) {
+                        result.addComment(new Comment("Node matched on " + matchCount + " nodes; other nodes expected phyloreferences: " + otherLabelsStr));
                     } else {
-                        result.addComment(new Comment("Nodes matched with multiple matched names: " + otherLabelsStr));
+                        result.addComment(new Comment("Nodes matched with multiple taxa: " + otherLabelsStr));
                         testFailed = true;
                     }
+                    
                 } else {
-                    OWLLiteral onlyOne = labels.iterator().next();
+                    // We have exactly one expected phyloref name -- but is it the right one?
+                    OWLLiteral onlyOne = distinctExpectedPhylorefNames.iterator().next();
                     String label = onlyOne.getLiteral();
 
-                    if (label.equals(phylorefLabel)) {
-                        result.addComment(new Comment("Node matched name '" + label + "' matched phyloref label '" + phylorefLabel + "'"));
+                    if(label.equals(phylorefLabel)) {
+                        result.addComment(new Comment("Node label '" + label + "' matched phyloref taxon '" + phylorefLabel + "'"));
                     } else {
-                        result.addComment(new Comment("Node matched name '" + label + "' did not match phyloref label '" + phylorefLabel + "'"));
+                        result.addComment(new Comment("Node label '" + label + "' did not match phyloref taxon '" + phylorefLabel + "'"));
                         testFailed = true;
                     }
                 }
             }
 
-            if (testFailed) {
+            // Determine if this phyloreference has failed or succeeded.
+            if(testFailed) {
                 // Yay, failure!
                 countFailure++;
                 result.setStatus(StatusValues.NOT_OK);
@@ -240,10 +279,8 @@ public class TestCommand implements Command {
         System.out.println(tapProducer.dump(testSet));
         System.err.println("Testing complete:" + countSuccess + " successes, " + countFailure + " failures");
 
-        // Exit.
-        if (countSuccess == 0) {
-            System.exit(-1);
-        }
+        // Exit with error unless we have zero failures.
+        if(countSuccess == 0) System.exit(-1);
         System.exit(countFailure);
     }
 }
