@@ -188,9 +188,10 @@ public class TestCommand implements Command {
                     testFailed = true;
                 } else {
                     // Okay, the phyloreference didn't resolve, but now we know
-                    // why -- because these specifiers did not resolve.
+                    // why -- because these specifiers did not match.
+                    result.setStatus(StatusValues.NOT_OK);
                     result.addComment(new Comment("No nodes matched, but " + specifiers.size() + " specifiers did not match."));
-                    // We don't explicitly mark this as a test failure by itself.
+                    testFailed = true;
                 }
             } else {
                 // Make a list of every expected phyloreference for input node.
