@@ -26,6 +26,8 @@ public class PhylorefHelper {
     public static final IRI IRI_PHYLOREFERENCE = IRI.create("http://phyloinformatics.net/phyloref.owl#Phyloreference");
     public static final IRI IRI_PHYLOGENY_CONTAINING_NODE = IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#in_phylogeny");
     public static final IRI IRI_NAME_OF_EXPECTED_PHYLOREF = IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#expected_phyloreference_named");
+    public static final IRI IRI_PHYLOREF_UNMATCHED_SPECIFIER = IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#has_unmatched_specifier");
+    public static final IRI IRI_CLADE_DEFINITION = IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#clade_definition");
     
     public static Set<OWLNamedIndividual> getPhyloreferences(OWLOntology ontology, OWLReasoner reasoner) {
         // Get a list of all phyloreferences. First, we need to know what a Phyloreference is.

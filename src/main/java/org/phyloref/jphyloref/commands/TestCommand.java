@@ -21,6 +21,7 @@ import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -137,6 +138,13 @@ public class TestCommand implements Command {
         // Get some additional properties.
         OWLDataFactory dataFactory = manager.getOWLDataFactory();
         
+        // Get some properties ready before-hand so we don't have to reload
+        // them on every loop.
+        OWLAnnotationProperty labelAnnotationProperty = dataFactory.getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI());
+        OWLDataProperty expectedPhyloreferenceNameProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_NAME_OF_EXPECTED_PHYLOREF);
+        OWLObjectProperty unmatchedSpecifierProperty = dataFactory.getOWLObjectProperty(PhylorefHelper.IRI_PHYLOREF_UNMATCHED_SPECIFIER);
+        OWLDataProperty specifierDefinitionProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_CLADE_DEFINITION);
+        
         // Test each phyloreference individually.
         int testNumber = 0;
         int countSuccess = 0;
@@ -149,7 +157,6 @@ public class TestCommand implements Command {
             boolean testFailed = false;
 
             // Collect English labels for the phyloreference.
-            OWLAnnotationProperty labelAnnotationProperty = dataFactory.getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI());
             Optional<String> opt_phylorefLabel = OWLHelper.getAnnotationLiteralsForEntity(
                 ontology, 
                 phyloref, 
@@ -170,12 +177,23 @@ public class TestCommand implements Command {
 
             if(nodes.isEmpty()) {
                 // Phyloref resolved to no nodes at all.
-                result.setStatus(StatusValues.NOT_OK);
-                result.addComment(new Comment("No nodes matched"));
-                testFailed = true;
+                // But wait! Maybe that's because it has unmatched specifiers?
+                
+                Set<OWLNamedIndividual> specifiers = reasoner.getObjectPropertyValues(phyloref, unmatchedSpecifierProperty).getFlattened();
+                if(specifiers.isEmpty()) {
+                    // No unmatched specifiers (that we know about) and YET
+                    // the phyloreference failed to resolve.
+                    result.setStatus(StatusValues.NOT_OK);
+                    result.addComment(new Comment("No nodes matched, no known unmatched specifiers."));
+                    testFailed = true;
+                } else {
+                    // Okay, the phyloreference didn't resolve, but now we know
+                    // why -- because these specifiers did not resolve.
+                    result.addComment(new Comment("No nodes matched, but " + specifiers.size() + " specifiers did not match."));
+                    // We don't explicitly mark this as a test failure by itself.
+                }
             } else {
                 // Make a list of every expected phyloreference for input node.
-                OWLDataProperty expectedPhyloreferenceNameProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_NAME_OF_EXPECTED_PHYLOREF);
                 Map<OWLNamedIndividual, Set<OWLLiteral>> expectedPhyloreferencesByNode = new HashMap<>();
 
                 for(OWLNamedIndividual node: nodes) {
