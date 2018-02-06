@@ -143,7 +143,7 @@ public class TestCommand implements Command {
         OWLAnnotationProperty labelAnnotationProperty = dataFactory.getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI());
         OWLDataProperty expectedPhyloreferenceNameProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_NAME_OF_EXPECTED_PHYLOREF);
         OWLObjectProperty unmatchedSpecifierProperty = dataFactory.getOWLObjectProperty(PhylorefHelper.IRI_PHYLOREF_UNMATCHED_SPECIFIER);
-        OWLDataProperty specifierDefinitionProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_CLADE_DEFINITION);
+        // OWLDataProperty specifierDefinitionProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_CLADE_DEFINITION);
         
         // Test each phyloreference individually.
         int testNumber = 0;
@@ -171,28 +171,15 @@ public class TestCommand implements Command {
                 phylorefLabel = phyloref.getIRI().toString();
             result.setDescription("Phyloreference '" + phylorefLabel + "'");
 
-            // Which nodes are this phyloreference resolved to?
+            // Which nodes did this phyloreference resolved to?
             OWLClass phylorefAsClass = manager.getOWLDataFactory().getOWLClass(phyloref.getIRI()); 
             Set<OWLNamedIndividual> nodes = reasoner.getInstances(phylorefAsClass, false).getFlattened();
 
             if(nodes.isEmpty()) {
                 // Phyloref resolved to no nodes at all.
-                // But wait! Maybe that's because it has unmatched specifiers?
-                
-                Set<OWLNamedIndividual> specifiers = reasoner.getObjectPropertyValues(phyloref, unmatchedSpecifierProperty).getFlattened();
-                if(specifiers.isEmpty()) {
-                    // No unmatched specifiers (that we know about) and YET
-                    // the phyloreference failed to resolve.
-                    result.setStatus(StatusValues.NOT_OK);
-                    result.addComment(new Comment("No nodes matched, no known unmatched specifiers."));
-                    testFailed = true;
-                } else {
-                    // Okay, the phyloreference didn't resolve, but now we know
-                    // why -- because these specifiers did not match.
-                    result.setStatus(StatusValues.NOT_OK);
-                    result.addComment(new Comment("No nodes matched, but " + specifiers.size() + " specifiers did not match."));
-                    testFailed = true;
-                }
+                result.setStatus(StatusValues.NOT_OK);
+                result.addComment(new Comment("No nodes matched."));
+                testFailed = true;
             } else {
                 // Make a list of every expected phyloreference for input node.
                 Map<OWLNamedIndividual, Set<OWLLiteral>> expectedPhyloreferencesByNode = new HashMap<>();
@@ -213,7 +200,7 @@ public class TestCommand implements Command {
                 
                 // How many distinct expected phyloref names do we have?
                 if(distinctExpectedPhylorefNames.isEmpty()) {
-                    result.addComment(new Comment("None of the " + nodes.size() + " matched nodes are expected to resolve to phyloreferences"));
+                    result.addComment(new Comment("None of the " + nodes.size() + " resolved nodes are expected to resolve to phyloreferences."));
                     testFailed = true;
                     
                 } else if(distinctExpectedPhylorefNames.size() > 1) {
@@ -229,9 +216,9 @@ public class TestCommand implements Command {
                     String otherLabelsStr = otherLabels.stream().collect(Collectors.joining("; "));
 
                     if(matchCount > 0) {
-                        result.addComment(new Comment("Node matched on " + matchCount + " nodes; other nodes expected phyloreferences: " + otherLabelsStr));
+                        result.addComment(new Comment("Phyloreference resolved to " + matchCount + " nodes with the expected phyloreference label '" + phylorefLabel + "'; other nodes expected phyloreferences: " + otherLabelsStr));
                     } else {
-                        result.addComment(new Comment("Nodes matched with multiple taxa: " + otherLabelsStr));
+                        result.addComment(new Comment("Phyloreference did not resolve to the expected phyloreference label '" + phylorefLabel + "', but did resolve to multiple expected phyloreferences: " + otherLabelsStr));
                         testFailed = true;
                     }
                     
@@ -241,11 +228,22 @@ public class TestCommand implements Command {
                     String label = onlyOne.getLiteral();
 
                     if(label.equals(phylorefLabel)) {
-                        result.addComment(new Comment("Node label '" + label + "' matched phyloref taxon '" + phylorefLabel + "'"));
+                        result.addComment(new Comment("Resolved node label '" + label + "' identical to expected phyloreference label '" + phylorefLabel + "'"));
                     } else {
-                        result.addComment(new Comment("Node label '" + label + "' did not match phyloref taxon '" + phylorefLabel + "'"));
+                        result.addComment(new Comment("Resolved node label '" + label + "' differs from expected phyloreference label '" + phylorefLabel + "'"));
                         testFailed = true;
                     }
+                }
+            }
+            
+            // 
+            Set<OWLNamedIndividual> unmatched_specifiers = reasoner.getObjectPropertyValues(phyloref, unmatchedSpecifierProperty).getFlattened();
+            for(OWLNamedIndividual unmatched_specifier: unmatched_specifiers) {
+                Set<String> unmatched_specifier_label = OWLHelper.getAnnotationLiteralsForEntity(ontology, unmatched_specifier, labelAnnotationProperty, Arrays.asList("en"));
+                if(!unmatched_specifier_label.isEmpty()) {
+                    result.addComment(new Comment("Specifier '" + unmatched_specifier_label + "' is marked as unmatched."));
+                } else {
+                    result.addComment(new Comment("Specifier '" + unmatched_specifier.getIRI().getShortForm() + "' is marked as unmatched."));
                 }
             }
 
