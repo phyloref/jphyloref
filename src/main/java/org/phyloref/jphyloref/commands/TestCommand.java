@@ -55,6 +55,7 @@ public class TestCommand implements Command {
      * This command is named "test". It should be 
      * involved "java -jar jphyloref.jar test ..."
      */
+
     @Override
     public String getName() { 
         return "test"; 
