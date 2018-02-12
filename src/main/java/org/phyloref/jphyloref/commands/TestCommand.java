@@ -6,6 +6,7 @@ import org.phyloref.jphyloref.helpers.OWLHelper;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataProperty;
@@ -29,11 +31,13 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 import org.tap4j.model.Comment;
+import org.tap4j.model.Directive;
 import org.tap4j.model.Plan;
 import org.tap4j.model.TestResult;
 import org.tap4j.model.TestSet;
 import org.tap4j.producer.TapProducer;
 import org.tap4j.producer.TapProducerFactory;
+import org.tap4j.util.DirectiveValues;
 import org.tap4j.util.StatusValues;
 import uk.ac.manchester.cs.jfact.JFactReasoner;
 import uk.ac.manchester.cs.jfact.kernel.options.JFactReasonerConfiguration;
@@ -150,6 +154,8 @@ public class TestCommand implements Command {
         int testNumber = 0;
         int countSuccess = 0;
         int countFailure = 0;
+        int countTODO = 0;
+        int countSkipped = 0;
         
         for(OWLNamedIndividual phyloref: phylorefs) {
             testNumber++;
@@ -237,8 +243,21 @@ public class TestCommand implements Command {
                 }
             }
             
-            // 
-            Set<OWLNamedIndividual> unmatched_specifiers = reasoner.getObjectPropertyValues(phyloref, unmatchedSpecifierProperty).getFlattened();
+            // Look for all unmatched specifiers reported for this phyloreference
+            Set<OWLAxiom> axioms = phyloref.getReferencingAxioms(ontology);
+            Set<OWLNamedIndividual> unmatched_specifiers = new HashSet<>();
+            for(OWLAxiom axiom: axioms) {
+            	if(axiom.containsEntityInSignature(unmatchedSpecifierProperty)) {
+            		// This axiom references this phyloreference AND the unmatched specifier property!
+            		// Therefore, any NamedIndividuals that are not phyloref should be added to
+            		// unmatched_specifiers!
+            		for(OWLNamedIndividual ni: axiom.getIndividualsInSignature()) {
+            			if(ni != phyloref) unmatched_specifiers.add(ni);
+            		}
+            	}
+            }
+            
+            // Report all unmatched specifiers
             for(OWLNamedIndividual unmatched_specifier: unmatched_specifiers) {
                 Set<String> unmatched_specifier_label = OWLHelper.getAnnotationLiteralsForEntity(ontology, unmatched_specifier, labelAnnotationProperty, Arrays.asList("en"));
                 if(!unmatched_specifier_label.isEmpty()) {
@@ -250,10 +269,19 @@ public class TestCommand implements Command {
 
             // Determine if this phyloreference has failed or succeeded.
             if(testFailed) {
-                // Yay, failure!
-                countFailure++;
-                result.setStatus(StatusValues.NOT_OK);
-                testSet.addTapLine(result);
+            	if(unmatched_specifiers.isEmpty()) {
+	                // Yay, failure!
+	                countFailure++;
+	                result.setStatus(StatusValues.NOT_OK);
+	                testSet.addTapLine(result);
+            	} else {
+            		// Okay, it's a failure, but we do know that there are unmatched specifiers.
+            		// So mark it as a to-do.
+            		countTODO++;
+            		result.setStatus(StatusValues.NOT_OK);
+            		result.setDirective(new Directive(DirectiveValues.TODO, "Phyloreference could not be tested, as one or more specifiers did not match."));
+            		testSet.addTapLine(result);
+            	}
             } else {
                 // Oh no, success!
                 countSuccess++;
@@ -263,7 +291,7 @@ public class TestCommand implements Command {
         }
 
         System.out.println(tapProducer.dump(testSet));
-        System.err.println("Testing complete:" + countSuccess + " successes, " + countFailure + " failures");
+        System.err.println("Testing complete:" + countSuccess + " successes, " + countFailure + " failures, " + countTODO + " failures marked TODO, " + countSkipped + " skipped.");
 
         // Exit with error unless we have zero failures.
         if(countSuccess == 0) System.exit(-1);
