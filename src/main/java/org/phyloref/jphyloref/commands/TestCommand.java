@@ -6,6 +6,7 @@ import org.phyloref.jphyloref.helpers.OWLHelper;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -16,11 +17,13 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -28,11 +31,13 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 import org.tap4j.model.Comment;
+import org.tap4j.model.Directive;
 import org.tap4j.model.Plan;
 import org.tap4j.model.TestResult;
 import org.tap4j.model.TestSet;
 import org.tap4j.producer.TapProducer;
 import org.tap4j.producer.TapProducerFactory;
+import org.tap4j.util.DirectiveValues;
 import org.tap4j.util.StatusValues;
 import uk.ac.manchester.cs.jfact.JFactReasoner;
 import uk.ac.manchester.cs.jfact.kernel.options.JFactReasonerConfiguration;
@@ -54,6 +59,7 @@ public class TestCommand implements Command {
      * This command is named "test". It should be 
      * involved "java -jar jphyloref.jar test ..."
      */
+
     @Override
     public String getName() { 
         return "test"; 
@@ -137,10 +143,19 @@ public class TestCommand implements Command {
         // Get some additional properties.
         OWLDataFactory dataFactory = manager.getOWLDataFactory();
         
+        // Get some properties ready before-hand so we don't have to reload
+        // them on every loop.
+        OWLAnnotationProperty labelAnnotationProperty = dataFactory.getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI());
+        OWLDataProperty expectedPhyloreferenceNameProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_NAME_OF_EXPECTED_PHYLOREF);
+        OWLObjectProperty unmatchedSpecifierProperty = dataFactory.getOWLObjectProperty(PhylorefHelper.IRI_PHYLOREF_UNMATCHED_SPECIFIER);
+        // OWLDataProperty specifierDefinitionProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_CLADE_DEFINITION);
+        
         // Test each phyloreference individually.
         int testNumber = 0;
         int countSuccess = 0;
         int countFailure = 0;
+        int countTODO = 0;
+        int countSkipped = 0;
         
         for(OWLNamedIndividual phyloref: phylorefs) {
             testNumber++;
@@ -149,7 +164,6 @@ public class TestCommand implements Command {
             boolean testFailed = false;
 
             // Collect English labels for the phyloreference.
-            OWLAnnotationProperty labelAnnotationProperty = dataFactory.getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI());
             Optional<String> opt_phylorefLabel = OWLHelper.getAnnotationLiteralsForEntity(
                 ontology, 
                 phyloref, 
@@ -164,18 +178,17 @@ public class TestCommand implements Command {
                 phylorefLabel = phyloref.getIRI().toString();
             result.setDescription("Phyloreference '" + phylorefLabel + "'");
 
-            // Which nodes are this phyloreference resolved to?
+            // Which nodes did this phyloreference resolved to?
             OWLClass phylorefAsClass = manager.getOWLDataFactory().getOWLClass(phyloref.getIRI()); 
             Set<OWLNamedIndividual> nodes = reasoner.getInstances(phylorefAsClass, false).getFlattened();
 
             if(nodes.isEmpty()) {
                 // Phyloref resolved to no nodes at all.
                 result.setStatus(StatusValues.NOT_OK);
-                result.addComment(new Comment("No nodes matched"));
+                result.addComment(new Comment("No nodes matched."));
                 testFailed = true;
             } else {
                 // Make a list of every expected phyloreference for input node.
-                OWLDataProperty expectedPhyloreferenceNameProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_NAME_OF_EXPECTED_PHYLOREF);
                 Map<OWLNamedIndividual, Set<OWLLiteral>> expectedPhyloreferencesByNode = new HashMap<>();
 
                 for(OWLNamedIndividual node: nodes) {
@@ -194,7 +207,7 @@ public class TestCommand implements Command {
                 
                 // How many distinct expected phyloref names do we have?
                 if(distinctExpectedPhylorefNames.isEmpty()) {
-                    result.addComment(new Comment("None of the " + nodes.size() + " matched nodes are expected to resolve to phyloreferences"));
+                    result.addComment(new Comment("None of the " + nodes.size() + " resolved nodes are expected to resolve to phyloreferences."));
                     testFailed = true;
                     
                 } else if(distinctExpectedPhylorefNames.size() > 1) {
@@ -210,9 +223,9 @@ public class TestCommand implements Command {
                     String otherLabelsStr = otherLabels.stream().collect(Collectors.joining("; "));
 
                     if(matchCount > 0) {
-                        result.addComment(new Comment("Node matched on " + matchCount + " nodes; other nodes expected phyloreferences: " + otherLabelsStr));
+                        result.addComment(new Comment("Phyloreference resolved to " + matchCount + " nodes with the expected phyloreference label '" + phylorefLabel + "'; other nodes expected phyloreferences: " + otherLabelsStr));
                     } else {
-                        result.addComment(new Comment("Nodes matched with multiple taxa: " + otherLabelsStr));
+                        result.addComment(new Comment("Phyloreference did not resolve to the expected phyloreference label '" + phylorefLabel + "', but did resolve to multiple expected phyloreferences: " + otherLabelsStr));
                         testFailed = true;
                     }
                     
@@ -222,20 +235,53 @@ public class TestCommand implements Command {
                     String label = onlyOne.getLiteral();
 
                     if(label.equals(phylorefLabel)) {
-                        result.addComment(new Comment("Node label '" + label + "' matched phyloref taxon '" + phylorefLabel + "'"));
+                        result.addComment(new Comment("Resolved node label '" + label + "' identical to expected phyloreference label '" + phylorefLabel + "'"));
                     } else {
-                        result.addComment(new Comment("Node label '" + label + "' did not match phyloref taxon '" + phylorefLabel + "'"));
+                        result.addComment(new Comment("Resolved node label '" + label + "' differs from expected phyloreference label '" + phylorefLabel + "'"));
                         testFailed = true;
                     }
+                }
+            }
+            
+            // Look for all unmatched specifiers reported for this phyloreference
+            Set<OWLAxiom> axioms = phyloref.getReferencingAxioms(ontology);
+            Set<OWLNamedIndividual> unmatched_specifiers = new HashSet<>();
+            for(OWLAxiom axiom: axioms) {
+            	if(axiom.containsEntityInSignature(unmatchedSpecifierProperty)) {
+            		// This axiom references this phyloreference AND the unmatched specifier property!
+            		// Therefore, any NamedIndividuals that are not phyloref should be added to
+            		// unmatched_specifiers!
+            		for(OWLNamedIndividual ni: axiom.getIndividualsInSignature()) {
+            			if(ni != phyloref) unmatched_specifiers.add(ni);
+            		}
+            	}
+            }
+            
+            // Report all unmatched specifiers
+            for(OWLNamedIndividual unmatched_specifier: unmatched_specifiers) {
+                Set<String> unmatched_specifier_label = OWLHelper.getAnnotationLiteralsForEntity(ontology, unmatched_specifier, labelAnnotationProperty, Arrays.asList("en"));
+                if(!unmatched_specifier_label.isEmpty()) {
+                    result.addComment(new Comment("Specifier '" + unmatched_specifier_label + "' is marked as unmatched."));
+                } else {
+                    result.addComment(new Comment("Specifier '" + unmatched_specifier.getIRI().getShortForm() + "' is marked as unmatched."));
                 }
             }
 
             // Determine if this phyloreference has failed or succeeded.
             if(testFailed) {
-                // Yay, failure!
-                countFailure++;
-                result.setStatus(StatusValues.NOT_OK);
-                testSet.addTapLine(result);
+            	if(unmatched_specifiers.isEmpty()) {
+	                // Yay, failure!
+	                countFailure++;
+	                result.setStatus(StatusValues.NOT_OK);
+	                testSet.addTapLine(result);
+            	} else {
+            		// Okay, it's a failure, but we do know that there are unmatched specifiers.
+            		// So mark it as a to-do.
+            		countTODO++;
+            		result.setStatus(StatusValues.NOT_OK);
+            		result.setDirective(new Directive(DirectiveValues.TODO, "Phyloreference could not be tested, as one or more specifiers did not match."));
+            		testSet.addTapLine(result);
+            	}
             } else {
                 // Oh no, success!
                 countSuccess++;
@@ -245,7 +291,7 @@ public class TestCommand implements Command {
         }
 
         System.out.println(tapProducer.dump(testSet));
-        System.err.println("Testing complete:" + countSuccess + " successes, " + countFailure + " failures");
+        System.err.println("Testing complete:" + countSuccess + " successes, " + countFailure + " failures, " + countTODO + " failures marked TODO, " + countSkipped + " skipped.");
 
         // Exit with error unless we have zero failures.
         if(countSuccess == 0) System.exit(-1);
