@@ -28,9 +28,9 @@ public final class OWLHelper {
         return cache_labelProperty;
     }
     
-    public static Set<String> getLabel(OWLNamedIndividual individual, OWLOntology ontology) {
+    public static Set<String> getLabelsInEnglish(OWLNamedIndividual individual, OWLOntology ontology) {
         OWLAnnotationProperty labelProperty = getLabelProperty(ontology);
-        return OWLHelper.getAnnotationLiteralsForEntity(ontology, individual, labelProperty, Arrays.asList("en"));
+        return OWLHelper.getAnnotationLiteralsForEntity(ontology, individual, labelProperty, Arrays.asList("", "en"));
     }
     
     public static Map<String, Set<String>> getAnnotationLiteralsForEntity(OWLOntology ontology, OWLEntity entity, OWLAnnotationProperty annotationProperty) {

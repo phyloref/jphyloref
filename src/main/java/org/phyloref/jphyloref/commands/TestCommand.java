@@ -146,7 +146,7 @@ public class TestCommand implements Command {
         // Get some properties ready before-hand so we don't have to reload
         // them on every loop.
         OWLAnnotationProperty labelAnnotationProperty = dataFactory.getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI());
-        OWLDataProperty expectedPhyloreferenceNameProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_NAME_OF_EXPECTED_PHYLOREF);
+        OWLDataProperty expectedPhyloreferenceNamedProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_NAME_OF_EXPECTED_PHYLOREF);
         OWLObjectProperty unmatchedSpecifierProperty = dataFactory.getOWLObjectProperty(PhylorefHelper.IRI_PHYLOREF_UNMATCHED_SPECIFIER);
         // OWLDataProperty specifierDefinitionProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_CLADE_DEFINITION);
         
@@ -188,59 +188,53 @@ public class TestCommand implements Command {
                 result.addComment(new Comment("No nodes matched."));
                 testFailed = true;
             } else {
-                // Make a list of every expected phyloreference for input node.
-                Map<OWLNamedIndividual, Set<OWLLiteral>> expectedPhyloreferencesByNode = new HashMap<>();
-
+                // Look for nodes where either its label or its expected phyloreference label
+                // is equal to the phyloreference we are currently processing.
+            	Set<String> nodeLabelsWithExpectedPhylorefs = new HashSet<>();
+            	Set<String> nodeLabelsWithoutExpectedPhylorefs = new HashSet<>();
+            	
                 for(OWLNamedIndividual node: nodes) {
-                    // What are the expected phyloreferences associated with these nodes?
-                    expectedPhyloreferencesByNode.put(
-                        node, 
-                        node.getDataPropertyValues(expectedPhyloreferenceNameProperty, ontology)
-                    );
+                	// Get a list of all expected phyloreference labels from the OWL file.
+                	Set<String> expectedPhylorefsNamed = node.getDataPropertyValues(expectedPhyloreferenceNamedProperty, ontology)
+                		.stream()
+                		.map(literal -> literal.getLiteral()) // We ignore languages for now.
+                		.collect(Collectors.toSet());
+                	
+                	// Add the label of the node as well.
+                	Set<String> nodeLabels = OWLHelper.getLabelsInEnglish(node, ontology);
+                	expectedPhylorefsNamed.addAll(nodeLabels);
+                	
+                	// Build a new node label that describes this node.
+                	String nodeLabel = new StringBuilder()
+                		.append("[")
+                		.append(String.join(", ", expectedPhylorefsNamed))
+                		.append("]")
+                		.toString();
+                	
+                	// Does this node have an expected phyloreference identical to the phyloref being tested?
+                	if(expectedPhylorefsNamed.contains(phylorefLabel)) {
+                		nodeLabelsWithExpectedPhylorefs.add(nodeLabel);
+                	} else {
+                		nodeLabelsWithoutExpectedPhylorefs.add(nodeLabel);
+                	}
                 }
-
-                // Flatten expected phyloreference names from each Node into a 
-                // single set of unique expected phyloreference names.
-                Set<OWLLiteral> distinctExpectedPhylorefNames = expectedPhyloreferencesByNode.values()
-                    .stream().flatMap(n -> n.stream())
-                    .collect(Collectors.toSet());
                 
-                // How many distinct expected phyloref names do we have?
-                if(distinctExpectedPhylorefNames.isEmpty()) {
-                    result.addComment(new Comment("None of the " + nodes.size() + " resolved nodes are expected to resolve to phyloreferences."));
+                // What happened?
+                if(!nodeLabelsWithExpectedPhylorefs.isEmpty() && !nodeLabelsWithoutExpectedPhylorefs.isEmpty()) {
+                	// We found nodes that expected this phyloref, as well as nodes that did not -- success!
+                	result.addComment(new Comment("The following nodes were matched and expected this phyloreference: " + String.join("; ", nodeLabelsWithExpectedPhylorefs)));
+                	result.addComment(new Comment("Also, the following nodes were matched but did not expect this phyloreference: " + String.join("; ", nodeLabelsWithoutExpectedPhylorefs)));
+                } else if(!nodeLabelsWithExpectedPhylorefs.isEmpty()) {
+                	// We only found nodes that expected this phyloref -- success!
+                	result.addComment(new Comment("The following nodes were matched and expected this phyloreference: " + String.join("; ", nodeLabelsWithExpectedPhylorefs)));
+                } else if(!nodeLabelsWithoutExpectedPhylorefs.isEmpty()) {
+                	// We only have nodes that did not expect this phyloref -- failure!
+                	result.addComment(new Comment("The following nodes were matched but did not expect this phyloreference: " + String.join("; ", nodeLabelsWithoutExpectedPhylorefs)));
                     testFailed = true;
-                    
-                } else if(distinctExpectedPhylorefNames.size() > 1) {
-                    // This is okay IF at least one of the nodes is expected to resolve to this phyloreference.
-                    List<String> otherLabels = new LinkedList<>();
-
-                    int matchCount = 0;
-                    for(OWLLiteral label: distinctExpectedPhylorefNames) {
-                        if(label.getLiteral().equals(phylorefLabel)) matchCount++;
-                        else otherLabels.add(label.getLiteral());
-                    }
-
-                    String otherLabelsStr = otherLabels.stream().collect(Collectors.joining("; "));
-
-                    if(matchCount > 0) {
-                        result.addComment(new Comment("Phyloreference resolved to " + matchCount + " nodes with the expected phyloreference label '" + phylorefLabel + "'; other nodes expected phyloreferences: " + otherLabelsStr));
-                    } else {
-                        result.addComment(new Comment("Phyloreference did not resolve to the expected phyloreference label '" + phylorefLabel + "', but did resolve to multiple expected phyloreferences: " + otherLabelsStr));
-                        testFailed = true;
-                    }
-                    
                 } else {
-                    // We have exactly one expected phyloref name -- but is it the right one?
-                    OWLLiteral onlyOne = distinctExpectedPhylorefNames.iterator().next();
-                    String label = onlyOne.getLiteral();
-
-                    if(label.equals(phylorefLabel)) {
-                        result.addComment(new Comment("Resolved node label '" + label + "' identical to expected phyloreference label '" + phylorefLabel + "'"));
-                    } else {
-                        result.addComment(new Comment("Resolved node label '" + label + "' differs from expected phyloreference label '" + phylorefLabel + "'"));
-                        testFailed = true;
-                    }
-                }
+                	// No nodes matched. This should have been caught earlier, but just in case.
+                	throw new RuntimeException("No nodes were matched, which should have been caught earlier. Programmer error!");
+                }                
             }
             
             // Look for all unmatched specifiers reported for this phyloreference
