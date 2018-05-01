@@ -1,30 +1,24 @@
 package org.phyloref.jphyloref.commands;
 
-import org.phyloref.jphyloref.helpers.PhylorefHelper;
-import org.phyloref.jphyloref.helpers.OWLHelper;
-
 import java.io.File;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
+import org.phyloref.jphyloref.helpers.OWLHelper;
+import org.phyloref.jphyloref.helpers.PhylorefHelper;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataProperty;
-import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -39,24 +33,24 @@ import org.tap4j.producer.TapProducer;
 import org.tap4j.producer.TapProducerFactory;
 import org.tap4j.util.DirectiveValues;
 import org.tap4j.util.StatusValues;
+
 import uk.ac.manchester.cs.jfact.JFactReasoner;
 import uk.ac.manchester.cs.jfact.kernel.options.JFactReasonerConfiguration;
 
 /**
  * Test whether the phyloreferences in the provided ontology resolve correctly.
+ * This currently supports RDF/XML input only, but we will eventually modify
+ * this to support PHYX files directly.
  *
- * At the moment, this works on OWL ontologies, but there's really no reason we
- * couldn't test the labeled.json file directly! Maybe at a later date?
- *
- * I can't resist using the Test Anything Protocol here, which has nice
- * libraries in both Python and Java.
+ * I use the Test Anything Protocol here, which has nice libraries in both 
+ * Python and Java.
  *
  * @author Gaurav Vaidya <gaurav@ggvaidya.com>
  *
  */
 public class TestCommand implements Command {
     /**
-     * This command is named "test". It should be 
+     * This command is named Test. It should be 
      * involved "java -jar jphyloref.jar test ..."
      */
 
@@ -66,6 +60,8 @@ public class TestCommand implements Command {
     }
     
     /**
+     * A description of the Test command.
+     * 
      * @return A description of this command.
      */
     @Override
@@ -74,7 +70,8 @@ public class TestCommand implements Command {
     }
 
     /**
-     * Add command-line options specific to this command.
+     * Add command-line options specific to this command. There is only one:
+     * -i or --input can be used to set the RDF/XML file to read.
      * 
      * @param opts The command-line options to modify for this command.
      */
@@ -178,7 +175,7 @@ public class TestCommand implements Command {
                 phylorefLabel = phyloref.getIRI().toString();
             result.setDescription("Phyloreference '" + phylorefLabel + "'");
 
-            // Which nodes did this phyloreference resolved to?
+            // Which nodes did this phyloreference resolve to?
             OWLClass phylorefAsClass = manager.getOWLDataFactory().getOWLClass(phyloref.getIRI()); 
             Set<OWLNamedIndividual> nodes = reasoner.getInstances(phylorefAsClass, false).getFlattened();
 
