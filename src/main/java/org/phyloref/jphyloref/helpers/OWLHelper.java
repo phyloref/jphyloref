@@ -43,7 +43,7 @@ public final class OWLHelper {
      */
     public static Set<String> getLabelsInEnglish(OWLNamedIndividual individual, OWLOntology ontology) {
         OWLAnnotationProperty labelProperty = getLabelProperty(ontology);
-        return OWLHelper.getAnnotationLiteralsForEntity(ontology, individual, labelProperty, Arrays.asList("", "en"));
+        return OWLHelper.getAnnotationLiteralsForEntity(ontology, individual, labelProperty, Arrays.asList("en"));
     }
     
     /**
