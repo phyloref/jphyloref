@@ -16,7 +16,14 @@ import java.util.stream.Collectors;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotationObjectVisitor;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAnnotationPropertyDomainAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotationPropertyRangeAxiom;
+import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -24,11 +31,12 @@ import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLSubAnnotationPropertyOfAxiom;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
+import org.semanticweb.owlapi.util.AutoIRIMapper;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 import org.tap4j.model.Comment;
 import org.tap4j.model.Directive;
@@ -84,6 +92,10 @@ public class TestCommand implements Command {
             "i", "input", true, 
             "The input ontology to read in RDF/XML (can also be provided without the '-i')"
         );
+        opts.addOption(
+    		"nr", "no-reasoner", false,
+    		"Turn off reasoning (all tests will fail!)"
+		);
     }
 
     /**
@@ -97,6 +109,7 @@ public class TestCommand implements Command {
     public void execute(CommandLine cmdLine) throws RuntimeException {
         // Determine which input ontology should be read, 
         String str_input = cmdLine.getOptionValue("input");
+        boolean flag_no_reasoner = cmdLine.hasOption("no-reasoner"); 
 
         if(str_input == null && cmdLine.getArgList().size() > 1) {
             // No 'input'? Maybe it's just provided as a left-over option?
@@ -114,8 +127,14 @@ public class TestCommand implements Command {
 
         System.err.println("Input: " + inputFile);
 
-        // Load the ontology using OWLManager.
+        // Set up an OWL Ontology Manager to work with.
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+        
+        // Is purl.obolibrary.org down? No worries, we store local copies of all our ontologies!
+        AutoIRIMapper mapper = new AutoIRIMapper(new File("ontologies"), true);
+        manager.addIRIMapper(mapper);
+        
+        // Load the ontology using OWLManager.
         OWLOntology ontology;
         try {
             ontology = manager.loadOntologyFromOntologyDocument(inputFile);
@@ -126,12 +145,18 @@ public class TestCommand implements Command {
         // Ontology loaded.
         System.err.println("Loaded ontology: " + ontology);
 
-        // Reason over the loaded ontology.
+        // Reason over the loaded ontology -- but only if the user wants that!
         JFactReasonerConfiguration config = new JFactReasonerConfiguration();
-        JFactReasoner reasoner = new JFactReasoner(ontology, config, BufferingMode.BUFFERING);
-
+        JFactReasoner reasoner = null;
+        Set<OWLNamedIndividual> phylorefs;
+        
         // Get a list of all phyloreferences.
-        Set<OWLNamedIndividual> phylorefs = PhylorefHelper.getPhyloreferences(ontology, reasoner);
+        if(flag_no_reasoner) {
+        	phylorefs = PhylorefHelper.getPhyloreferences(ontology);
+        } else {
+        	reasoner = new JFactReasoner(ontology, config, BufferingMode.BUFFERING);
+        	phylorefs = PhylorefHelper.getPhyloreferences(ontology, reasoner);
+        }
 
         // Okay, time to start testing! Each phyloreference counts as one test.
         // TAP (https://testanything.org/) can be read by downstream software
@@ -180,7 +205,12 @@ public class TestCommand implements Command {
 
             // Which nodes did this phyloreference resolved to?
             OWLClass phylorefAsClass = manager.getOWLDataFactory().getOWLClass(phyloref.getIRI()); 
-            Set<OWLNamedIndividual> nodes = reasoner.getInstances(phylorefAsClass, false).getFlattened();
+            Set<OWLNamedIndividual> nodes;
+            if(reasoner == null) {
+            	nodes = new HashSet();
+            } else {
+            	nodes = reasoner.getInstances(phylorefAsClass, false).getFlattened();
+            }
 
             if(nodes.isEmpty()) {
                 // Phyloref resolved to no nodes at all.

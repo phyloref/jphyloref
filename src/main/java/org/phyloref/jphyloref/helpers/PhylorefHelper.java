@@ -5,8 +5,13 @@
  */
 package org.phyloref.jphyloref.helpers;
 
+import java.util.HashSet;
 import java.util.Set;
+
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -29,6 +34,34 @@ public class PhylorefHelper {
     public static final IRI IRI_PHYLOREF_UNMATCHED_SPECIFIER = IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#has_unmatched_specifier");
     public static final IRI IRI_CLADE_DEFINITION = IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#clade_definition");
     
+    public static Set<OWLNamedIndividual> getPhyloreferences(OWLOntology ontology) {
+        // Get a list of all phyloreferences. First, we need to know what a Phyloreference is.
+        Set<OWLEntity> set_phyloref_Phyloreference = ontology.getEntitiesInSignature(IRI_PHYLOREFERENCE);
+        if (set_phyloref_Phyloreference.isEmpty()) {
+            throw new RuntimeException("Class 'phyloref:Phyloreference' is not defined in ontology.");
+        }
+        if (set_phyloref_Phyloreference.size() > 1) {
+            throw new RuntimeException("Class 'phyloref:Phyloreference' is defined multiple times in ontology.");
+        }
+
+        OWLClass phyloref_Phyloreference = set_phyloref_Phyloreference.iterator().next().asOWLClass();
+        Set<OWLNamedIndividual> phylorefs = new HashSet<>();
+        Set<OWLClassAssertionAxiom> classAssertions = ontology.getAxioms(AxiomType.CLASS_ASSERTION);
+        
+        for(OWLClassAssertionAxiom classAssertion: classAssertions) {
+        	// Does this assertion involve class:Phyloreference and a named individual?
+        	if(
+        		classAssertion.getIndividual().isNamed() &&
+        		classAssertion.getClassesInSignature().contains(phyloref_Phyloreference)
+        	) {
+        		// If so, then the individuals are phyloreferences!
+        		phylorefs.add(classAssertion.getIndividual().asOWLNamedIndividual());
+        	}
+        }
+        
+        return phylorefs;
+    }
+    
     public static Set<OWLNamedIndividual> getPhyloreferences(OWLOntology ontology, OWLReasoner reasoner) {
         // Get a list of all phyloreferences. First, we need to know what a Phyloreference is.
         Set<OWLEntity> set_phyloref_Phyloreference = ontology.getEntitiesInSignature(IRI_PHYLOREFERENCE);
@@ -39,8 +72,8 @@ public class PhylorefHelper {
             throw new RuntimeException("Class 'phyloref:Phyloreference' is defined multiple times in ontology.");
         }
 
-        OWLEntity phyloref_Phyloreference = set_phyloref_Phyloreference.iterator().next();
-        return reasoner.getInstances(phyloref_Phyloreference.asOWLClass(), true).getFlattened();
+        OWLClass phyloref_Phyloreference = set_phyloref_Phyloreference.iterator().next().asOWLClass();
+        return reasoner.getInstances(phyloref_Phyloreference, true).getFlattened();
     }
     
 }
