@@ -135,6 +135,7 @@ public class TestCommand implements Command {
 
         // Is purl.obolibrary.org down? No worries, we store local copies of all our ontologies!
         AutoIRIMapper mapper = new AutoIRIMapper(new File("ontologies"), true);
+        System.err.println("Found local ontologies: " + mapper.getOntologyIRIs());
         manager.addIRIMapper(mapper);
 
         // Load the ontology using OWLManager.
