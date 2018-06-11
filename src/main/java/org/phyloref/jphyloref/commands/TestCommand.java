@@ -248,6 +248,11 @@ public class TestCommand implements Command {
                 		.append("]")
                 		.toString();
 
+                	// Is this blank? If so, let's use the node's IRI as its label so we can debug issues with resolution.
+                	if(expectedPhylorefsNamed.isEmpty()) {
+                		nodeLabel = node.getIRI().toString();
+                	}
+
                 	// Does this node have an expected phyloreference identical to the phyloref being tested?
                 	if(expectedPhylorefsNamed.contains(phylorefLabel)) {
                 		nodeLabelsWithExpectedPhylorefs.add(nodeLabel);
