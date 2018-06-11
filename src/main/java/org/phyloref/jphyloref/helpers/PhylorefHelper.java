@@ -34,6 +34,11 @@ public class PhylorefHelper {
     public static final IRI IRI_PHYLOREF_UNMATCHED_SPECIFIER = IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#has_unmatched_specifier");
     public static final IRI IRI_CLADE_DEFINITION = IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#clade_definition");
     
+    /**
+     * Get a list of phyloreferences in this ontology. This method does not use
+     * the reasoner, and so will only find individuals asserted to have a type
+     * of phyloref:Phyloreference.
+     */
     public static Set<OWLNamedIndividual> getPhyloreferences(OWLOntology ontology) {
         // Get a list of all phyloreferences. First, we need to know what a Phyloreference is.
         Set<OWLEntity> set_phyloref_Phyloreference = ontology.getEntitiesInSignature(IRI_PHYLOREFERENCE);
@@ -49,19 +54,24 @@ public class PhylorefHelper {
         Set<OWLClassAssertionAxiom> classAssertions = ontology.getAxioms(AxiomType.CLASS_ASSERTION);
         
         for(OWLClassAssertionAxiom classAssertion: classAssertions) {
-        	// Does this assertion involve class:Phyloreference and a named individual?
-        	if(
-        		classAssertion.getIndividual().isNamed() &&
-        		classAssertion.getClassesInSignature().contains(phyloref_Phyloreference)
-        	) {
-        		// If so, then the individuals are phyloreferences!
-        		phylorefs.add(classAssertion.getIndividual().asOWLNamedIndividual());
-        	}
+            // Does this assertion involve class:Phyloreference and a named individual?
+            if(
+                classAssertion.getIndividual().isNamed() &&
+                classAssertion.getClassesInSignature().contains(phyloref_Phyloreference)
+            ) {
+                // If so, then the individual is a phyloreferences!
+                phylorefs.add(classAssertion.getIndividual().asOWLNamedIndividual());
+            }
         }
-        
+
         return phylorefs;
     }
-    
+ 
+    /**
+     * Get a list of phyloreferences in this ontology. This method uses the
+     * reasoner, and so will find all individuals determined to be of 
+     * type phyloref:Phyloreference.
+     */   
     public static Set<OWLNamedIndividual> getPhyloreferences(OWLOntology ontology, OWLReasoner reasoner) {
         // Get a list of all phyloreferences. First, we need to know what a Phyloreference is.
         Set<OWLEntity> set_phyloref_Phyloreference = ontology.getEntitiesInSignature(IRI_PHYLOREFERENCE);
