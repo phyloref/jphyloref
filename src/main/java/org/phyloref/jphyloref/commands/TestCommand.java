@@ -64,32 +64,32 @@ import uk.ac.manchester.cs.jfact.kernel.options.JFactReasonerConfiguration;
  */
 public class TestCommand implements Command {
     /**
-     * This command is named "test". It should be 
+     * This command is named "test". It should be
      * involved "java -jar jphyloref.jar test ..."
      */
 
     @Override
-    public String getName() { 
-        return "test"; 
+    public String getName() {
+        return "test";
     }
-    
+
     /**
      * @return A description of this command.
      */
     @Override
-    public String getDescription() { 
-        return "Test the phyloreferences in the provided ontology to determine if they resolved correctly."; 
+    public String getDescription() {
+        return "Test the phyloreferences in the provided ontology to determine if they resolved correctly.";
     }
 
     /**
      * Add command-line options specific to this command.
-     * 
+     *
      * @param opts The command-line options to modify for this command.
      */
     @Override
     public void addCommandLineOptions(Options opts) {
         opts.addOption(
-            "i", "input", true, 
+            "i", "input", true,
             "The input ontology to read in RDF/XML (can also be provided without the '-i')"
         );
         opts.addOption(
@@ -100,20 +100,20 @@ public class TestCommand implements Command {
 
     /**
      * Given an input ontology, reason over it and determine if nodes are
-     * identified correctly. It provides output using the Test Anything 
-     * Protocol (TAP: https://testanything.org/). 
-     * 
+     * identified correctly. It provides output using the Test Anything
+     * Protocol (TAP: https://testanything.org/).
+     *
      * @param cmdLine The command line options provided to this command.
      */
     @Override
     public void execute(CommandLine cmdLine) throws RuntimeException {
-        // Determine which input ontology should be read, 
+        // Determine which input ontology should be read
         String str_input = cmdLine.getOptionValue("input");
-        boolean flag_no_reasoner = cmdLine.hasOption("no-reasoner"); 
+        boolean flag_no_reasoner = cmdLine.hasOption("no-reasoner");
 
         if(str_input == null && cmdLine.getArgList().size() > 1) {
             // No 'input'? Maybe it's just provided as a left-over option?
-            str_input = cmdLine.getArgList().get(1); 
+            str_input = cmdLine.getArgList().get(1);
         }
 
         if(str_input == null) {
@@ -129,11 +129,11 @@ public class TestCommand implements Command {
 
         // Set up an OWL Ontology Manager to work with.
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-        
+
         // Is purl.obolibrary.org down? No worries, we store local copies of all our ontologies!
         AutoIRIMapper mapper = new AutoIRIMapper(new File("ontologies"), true);
         manager.addIRIMapper(mapper);
-        
+
         // Load the ontology using OWLManager.
         OWLOntology ontology;
         try {
@@ -149,7 +149,7 @@ public class TestCommand implements Command {
         JFactReasonerConfiguration config = new JFactReasonerConfiguration();
         JFactReasoner reasoner = null;
         Set<OWLNamedIndividual> phylorefs;
-        
+
         // Get a list of all phyloreferences.
         if(flag_no_reasoner) {
         	phylorefs = PhylorefHelper.getPhyloreferences(ontology);
@@ -174,14 +174,14 @@ public class TestCommand implements Command {
         OWLDataProperty expectedPhyloreferenceNameProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_NAME_OF_EXPECTED_PHYLOREF);
         OWLObjectProperty unmatchedSpecifierProperty = dataFactory.getOWLObjectProperty(PhylorefHelper.IRI_PHYLOREF_UNMATCHED_SPECIFIER);
         // OWLDataProperty specifierDefinitionProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_CLADE_DEFINITION);
-        
+
         // Test each phyloreference individually.
         int testNumber = 0;
         int countSuccess = 0;
         int countFailure = 0;
         int countTODO = 0;
         int countSkipped = 0;
-        
+
         for(OWLNamedIndividual phyloref: phylorefs) {
             testNumber++;
             TestResult result = new TestResult();
@@ -190,21 +190,21 @@ public class TestCommand implements Command {
 
             // Collect English labels for the phyloreference.
             Optional<String> opt_phylorefLabel = OWLHelper.getAnnotationLiteralsForEntity(
-                ontology, 
-                phyloref, 
-                labelAnnotationProperty, 
+                ontology,
+                phyloref,
+                labelAnnotationProperty,
                 Arrays.asList("en")
             ).stream().findFirst();
 
             String phylorefLabel;
-            if(opt_phylorefLabel.isPresent()) 
+            if(opt_phylorefLabel.isPresent())
                 phylorefLabel = opt_phylorefLabel.get();
-            else 
+            else
                 phylorefLabel = phyloref.getIRI().toString();
             result.setDescription("Phyloreference '" + phylorefLabel + "'");
 
             // Which nodes did this phyloreference resolved to?
-            OWLClass phylorefAsClass = manager.getOWLDataFactory().getOWLClass(phyloref.getIRI()); 
+            OWLClass phylorefAsClass = manager.getOWLDataFactory().getOWLClass(phyloref.getIRI());
             Set<OWLNamedIndividual> nodes;
             if(reasoner == null) {
             	nodes = new HashSet();
@@ -224,22 +224,22 @@ public class TestCommand implements Command {
                 for(OWLNamedIndividual node: nodes) {
                     // What are the expected phyloreferences associated with these nodes?
                     expectedPhyloreferencesByNode.put(
-                        node, 
+                        node,
                         node.getDataPropertyValues(expectedPhyloreferenceNameProperty, ontology)
                     );
                 }
 
-                // Flatten expected phyloreference names from each Node into a 
+                // Flatten expected phyloreference names from each Node into a
                 // single set of unique expected phyloreference names.
                 Set<OWLLiteral> distinctExpectedPhylorefNames = expectedPhyloreferencesByNode.values()
                     .stream().flatMap(n -> n.stream())
                     .collect(Collectors.toSet());
-                
+
                 // How many distinct expected phyloref names do we have?
                 if(distinctExpectedPhylorefNames.isEmpty()) {
                     result.addComment(new Comment("None of the " + nodes.size() + " resolved nodes are expected to resolve to phyloreferences."));
                     testFailed = true;
-                    
+
                 } else if(distinctExpectedPhylorefNames.size() > 1) {
                     // This is okay IF at least one of the nodes is expected to resolve to this phyloreference.
                     List<String> otherLabels = new LinkedList<>();
@@ -258,7 +258,7 @@ public class TestCommand implements Command {
                         result.addComment(new Comment("Phyloreference did not resolve to the expected phyloreference label '" + phylorefLabel + "', but did resolve to multiple expected phyloreferences: " + otherLabelsStr));
                         testFailed = true;
                     }
-                    
+
                 } else {
                     // We have exactly one expected phyloref name -- but is it the right one?
                     OWLLiteral onlyOne = distinctExpectedPhylorefNames.iterator().next();
@@ -272,7 +272,7 @@ public class TestCommand implements Command {
                     }
                 }
             }
-            
+
             // Look for all unmatched specifiers reported for this phyloreference
             Set<OWLAxiom> axioms = phyloref.getReferencingAxioms(ontology);
             Set<OWLNamedIndividual> unmatched_specifiers = new HashSet<>();
@@ -286,7 +286,7 @@ public class TestCommand implements Command {
             		}
             	}
             }
-            
+
             // Report all unmatched specifiers
             for(OWLNamedIndividual unmatched_specifier: unmatched_specifiers) {
                 Set<String> unmatched_specifier_label = OWLHelper.getAnnotationLiteralsForEntity(ontology, unmatched_specifier, labelAnnotationProperty, Arrays.asList("en"));
