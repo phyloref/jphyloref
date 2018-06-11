@@ -28,9 +28,12 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -167,7 +170,16 @@ public class TestCommand implements Command {
 
         // Get some additional properties.
         OWLDataFactory dataFactory = manager.getOWLDataFactory();
-        
+
+        OWLAnnotationProperty pso_holdsStatusInTime = dataFactory.getOWLAnnotationProperty(IRI.create("http://purl.org/spar/pso/holdsStatusInTime"));
+        OWLAnnotationProperty pso_withStatus = dataFactory.getOWLAnnotationProperty(IRI.create("http://purl.org/spar/pso/withStatus"));
+        OWLAnnotationProperty tvc_atTime = dataFactory.getOWLAnnotationProperty(IRI.create("http://www.essepuntato.it/2012/04/tvc/atTime"));
+        OWLDataProperty timeinterval_hasIntervalStartDate = dataFactory.getOWLDataProperty(IRI.create("http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#hasIntervalStartDate"));
+        OWLDataProperty timeinterval_hasIntervalEndDate = dataFactory.getOWLDataProperty(IRI.create("http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#hasIntervalEndDate"));
+
+        // System.err.println("Adding axiom hasIntervalStartDate: " + manager.addAxiom(ontology, dataFactory.getOWLDeclarationAxiom(timeinterval_hasIntervalStartDate)));
+//        System.err.println("Adding axiom hasIntervalEndDate: " + manager.addAxiom(ontology, dataFactory.getOWLDeclarationAxiom(timeinterval_hasIntervalEndDate)));
+
         // Get some properties ready before-hand so we don't have to reload
         // them on every loop.
         OWLAnnotationProperty labelAnnotationProperty = dataFactory.getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI());
@@ -296,6 +308,70 @@ public class TestCommand implements Command {
                     result.addComment(new Comment("Specifier '" + unmatched_specifier.getIRI().getShortForm() + "' is marked as unmatched."));
                 }
             }
+
+            // Retrieve holdsStatusInTime to determine the active status of this phyloreference.
+            Set<OWLAnnotation> holdsStatusInTime = phylorefAsClass.getAnnotations(ontology, pso_holdsStatusInTime);
+
+            // Instead of checking which time interval were are in, we take a simpler approach: we look for all
+    		// statuses that have a start date but not an end date, i.e. those which have yet to end.
+    		Set<IRI> statuses = new HashSet<>();
+            for(OWLAnnotation statusInTime: holdsStatusInTime) {
+            	Set<IRI> currentStatuses = new HashSet<>();
+        		boolean hasIntervalStartDate = false;
+        		boolean hasIntervalEndDate = false;
+
+            	for(OWLAnonymousIndividual indiv_statusInTime: statusInTime.getAnonymousIndividuals()) {
+            		System.err.println(" - statusInTime data prop assert axioms: " + ontology.getDataPropertyAssertionAxioms(indiv_statusInTime));
+
+            		// System.err.println(" - indiv_statusInTime: " + indiv_statusInTime);
+            		for(OWLAnnotationAssertionAxiom axiom: ontology.getAnnotationAssertionAxioms(indiv_statusInTime)) {
+            			/* System.err.println(
+        					"Processing axiom: " + axiom.getProperty() + " == " + pso_withStatus +
+        					" (" + axiom.getProperty().equals(pso_withStatus) + ")"
+            			);*/
+
+                		if(axiom.getProperty().equals(tvc_atTime)) {
+                			System.err.println("Axiom: " + axiom);
+
+                			for(OWLAnnotation annot: axiom.getAnnotations()) {
+                				System.err.println(" - axiom annotation: " + annot);
+                			}
+
+                			for(OWLAnonymousIndividual indiv_atTime: axiom.getValue().getAnonymousIndividuals()) {
+                				System.err.println(" - indiv_atTime: " + indiv_atTime);
+
+                				System.err.println(" - axioms: " + ontology.getAxioms(indiv_atTime));
+                				System.err.println(" - Signature: " + indiv_atTime.getSignature());
+                				System.err.println(" - data prop assert axioms: " + ontology.getDataPropertyAssertionAxioms(indiv_atTime));
+                				System.err.println(" - class assert axioms: " + ontology.getClassAssertionAxioms(indiv_atTime));
+
+                				for(OWLDataPropertyAssertionAxiom axiom_interval: ontology.getDataPropertyAssertionAxioms(indiv_atTime)) {
+                					System.err.println(" - axiom interval: " + axiom_interval);
+                					if(axiom_interval.getProperty().equals(timeinterval_hasIntervalStartDate)) {
+                						hasIntervalStartDate = true;
+                					}
+                					if(axiom_interval.getProperty().equals(timeinterval_hasIntervalEndDate)) {
+                						hasIntervalEndDate = true;
+                					}
+                				}
+                			}
+                		}
+
+                		else if(axiom.getProperty().equals(pso_withStatus)) {
+                			currentStatuses.add((IRI)axiom.getValue());
+                		} else {
+                			System.err.println("Unknown axiom: " + axiom);
+                		}
+                	}
+            	}
+
+        		// Did the current statuses have a start date but no end date, i.e. are they currently active?
+        		if(hasIntervalStartDate && !hasIntervalEndDate) {
+        			statuses.addAll(currentStatuses);
+        		}
+            }
+
+            System.err.println("Active statuses: " + statuses);
 
             // Determine if this phyloreference has failed or succeeded.
             if(testFailed) {
