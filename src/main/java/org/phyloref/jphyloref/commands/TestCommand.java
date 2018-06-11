@@ -349,7 +349,7 @@ public class TestCommand implements Command {
                 }
             }
 
-            System.err.println("Active statuses: " + statuses);
+            // System.err.println("Active statuses: " + statuses);
 
             // Based on the phyloreference status, we can determine whether or not
             // we expect the phyloreference to actually resolve: we do if there
