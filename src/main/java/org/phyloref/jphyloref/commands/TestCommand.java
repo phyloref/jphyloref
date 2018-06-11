@@ -19,25 +19,19 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLAnnotationObjectVisitor;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
-import org.semanticweb.owlapi.model.OWLAnnotationPropertyDomainAxiom;
-import org.semanticweb.owlapi.model.OWLAnnotationPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLObjectPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLSubAnnotationPropertyOfAxiom;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapi.util.AutoIRIMapper;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
@@ -56,10 +50,7 @@ import uk.ac.manchester.cs.jfact.kernel.options.JFactReasonerConfiguration;
 /**
  * Test whether the phyloreferences in the provided ontology resolve correctly.
  *
- * At the moment, this works on OWL ontologies, but there's really no reason we
- * couldn't test the labeled.json file directly! Maybe at a later date?
- *
- * I can't resist using the Test Anything Protocol here, which has nice
+ * Testing output is produced using the Test Anything Protocol, which has nice
  * libraries in both Python and Java.
  *
  * @author Gaurav Vaidya <gaurav@ggvaidya.com>
@@ -96,21 +87,21 @@ public class TestCommand implements Command {
             "The input ontology to read in RDF/XML (can also be provided without the '-i')"
         );
         opts.addOption(
-    		"nr", "no-reasoner", false,
-    		"Turn off reasoning (all tests will fail!)"
-		);
+            "nr", "no-reasoner", false,
+            "Turn off reasoning (all tests will fail!)"
+        );
     }
 
     /**
      * Given an input ontology, reason over it and determine if nodes are
-     * identified correctly. It provides output using the Test Anything
-     * Protocol (TAP: https://testanything.org/).
+     * identified correctly. It provides output on System.out using the 
+     * Test Anything Protocol (TAP: https://testanything.org/).
      *
      * @param cmdLine The command line options provided to this command.
      */
     @Override
     public void execute(CommandLine cmdLine) throws RuntimeException {
-        // Determine which input ontology should be read
+        // Extract command-line options
         String str_input = cmdLine.getOptionValue("input");
         boolean flag_no_reasoner = cmdLine.hasOption("no-reasoner");
 
@@ -123,6 +114,7 @@ public class TestCommand implements Command {
             throw new RuntimeException("Error: no input ontology specified (use '-i input.owl')");
         }
 
+        // Create File object to load
         File inputFile = new File(str_input);
         if(!inputFile.exists() || !inputFile.canRead()) {
             throw new RuntimeException("Error: cannot read from input ontology '" + str_input + "'");
@@ -133,7 +125,8 @@ public class TestCommand implements Command {
         // Set up an OWL Ontology Manager to work with.
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 
-        // Is purl.obolibrary.org down? No worries, we store local copies of all our ontologies!
+        // Is purl.obolibrary.org down? No worries, you can access local copies
+        // of your ontologies in the 'ontologies/' folder.
         AutoIRIMapper mapper = new AutoIRIMapper(new File("ontologies"), true);
         System.err.println("Found local ontologies: " + mapper.getOntologyIRIs());
         manager.addIRIMapper(mapper);
@@ -156,10 +149,10 @@ public class TestCommand implements Command {
 
         // Get a list of all phyloreferences.
         if(flag_no_reasoner) {
-        	phylorefs = PhylorefHelper.getPhyloreferences(ontology);
+            phylorefs = PhylorefHelper.getPhyloreferences(ontology);
         } else {
-        	reasoner = new JFactReasoner(ontology, config, BufferingMode.BUFFERING);
-        	phylorefs = PhylorefHelper.getPhyloreferences(ontology, reasoner);
+            reasoner = new JFactReasoner(ontology, config, BufferingMode.BUFFERING);
+            phylorefs = PhylorefHelper.getPhyloreferences(ontology, reasoner);
         }
 
         // Okay, time to start testing! Each phyloreference counts as one test.
@@ -169,33 +162,33 @@ public class TestCommand implements Command {
         TestSet testSet = new TestSet();
         testSet.setPlan(new Plan(phylorefs.size()));
 
-        // Get some additional properties.
+        // Preload some terms we need to use in the following code.
         OWLDataFactory dataFactory = manager.getOWLDataFactory();
 
+        // Terms associated with phyloreferences
+        OWLAnnotationProperty labelAnnotationProperty = dataFactory.getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI());
+        OWLDataProperty expectedPhyloreferenceNameProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_NAME_OF_EXPECTED_PHYLOREF);
+        OWLObjectProperty unmatchedSpecifierProperty = dataFactory.getOWLObjectProperty(PhylorefHelper.IRI_PHYLOREF_UNMATCHED_SPECIFIER);
+        // OWLDataProperty specifierDefinitionProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_CLADE_DEFINITION);
+
+        // Terms assocated with publication status
         OWLAnnotationProperty pso_holdsStatusInTime = dataFactory.getOWLAnnotationProperty(IRI.create("http://purl.org/spar/pso/holdsStatusInTime"));
         OWLAnnotationProperty pso_withStatus = dataFactory.getOWLAnnotationProperty(IRI.create("http://purl.org/spar/pso/withStatus"));
         OWLAnnotationProperty tvc_atTime = dataFactory.getOWLAnnotationProperty(IRI.create("http://www.essepuntato.it/2012/04/tvc/atTime"));
         OWLDataProperty timeinterval_hasIntervalStartDate = dataFactory.getOWLDataProperty(IRI.create("http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#hasIntervalStartDate"));
         OWLDataProperty timeinterval_hasIntervalEndDate = dataFactory.getOWLDataProperty(IRI.create("http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#hasIntervalEndDate"));
 
-        // System.err.println("Adding axiom hasIntervalStartDate: " + manager.addAxiom(ontology, dataFactory.getOWLDeclarationAxiom(timeinterval_hasIntervalStartDate)));
-//        System.err.println("Adding axiom hasIntervalEndDate: " + manager.addAxiom(ontology, dataFactory.getOWLDeclarationAxiom(timeinterval_hasIntervalEndDate)));
-
-        // Get some properties ready before-hand so we don't have to reload
-        // them on every loop.
-        OWLAnnotationProperty labelAnnotationProperty = dataFactory.getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI());
-        OWLDataProperty expectedPhyloreferenceNameProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_NAME_OF_EXPECTED_PHYLOREF);
-        OWLObjectProperty unmatchedSpecifierProperty = dataFactory.getOWLObjectProperty(PhylorefHelper.IRI_PHYLOREF_UNMATCHED_SPECIFIER);
-        // OWLDataProperty specifierDefinitionProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_CLADE_DEFINITION);
-
-        // Test each phyloreference individually.
+        // Count the number of test results.
         int testNumber = 0;
         int countSuccess = 0;
         int countFailure = 0;
         int countTODO = 0;
         int countSkipped = 0;
 
+        // Test each phyloreference individually.
         for(OWLNamedIndividual phyloref: phylorefs) {
+            // Prepare a TestResult object in which we can store the results of
+            // testing this particular phyloreference.
             testNumber++;
             TestResult result = new TestResult();
             result.setTestNumber(testNumber);
@@ -291,12 +284,12 @@ public class TestCommand implements Command {
             Set<OWLNamedIndividual> unmatched_specifiers = new HashSet<>();
             for(OWLAxiom axiom: axioms) {
             	if(axiom.containsEntityInSignature(unmatchedSpecifierProperty)) {
-            		// This axiom references this phyloreference AND the unmatched specifier property!
-            		// Therefore, any NamedIndividuals that are not phyloref should be added to
-            		// unmatched_specifiers!
-            		for(OWLNamedIndividual ni: axiom.getIndividualsInSignature()) {
-            			if(ni != phyloref) unmatched_specifiers.add(ni);
-            		}
+                    // This axiom references this phyloreference AND the unmatched specifier property!
+                    // Therefore, any NamedIndividuals that are not phyloref should be added to
+                    // unmatched_specifiers!
+                    for(OWLNamedIndividual ni: axiom.getIndividualsInSignature()) {
+                            if(ni != phyloref) unmatched_specifiers.add(ni);
+                    }
             	}
             }
 
@@ -314,85 +307,97 @@ public class TestCommand implements Command {
             Set<OWLAnnotation> holdsStatusInTime = phylorefAsClass.getAnnotations(ontology, pso_holdsStatusInTime);
 
             // Instead of checking which time interval were are in, we take a simpler approach: we look for all
-    		// statuses that have a start date but not an end date, i.e. those which have yet to end.
-    		Set<IRI> statuses = new HashSet<>();
+            // statuses that have a start date but not an end date, i.e. those which have yet to end.
+            Set<IRI> statuses = new HashSet<>();
             for(OWLAnnotation statusInTime: holdsStatusInTime) {
+                // Each statusInTime entry should have one status (pso:withStatus)
+                // and a number of time intervals (tvc:atTime). We collect all
+                // statusues and test to see if any of those time intervals are
+                // "incomplete", i.e. they have a start date but no end date.
             	Set<IRI> currentStatuses = new HashSet<>();
-        		boolean hasIntervalStartDate = false;
-        		boolean hasIntervalEndDate = false;
+                boolean hasIntervalStartDate = false;
+                boolean hasIntervalEndDate = false;
 
             	for(OWLAnonymousIndividual indiv_statusInTime: statusInTime.getAnonymousIndividuals()) {
-            		System.err.println(" - statusInTime data prop assert axioms: " + ontology.getDataPropertyAssertionAxioms(indiv_statusInTime));
+                    for(OWLAnnotationAssertionAxiom axiom: ontology.getAnnotationAssertionAxioms(indiv_statusInTime)) {
+                        if(axiom.getProperty().equals(tvc_atTime)) {
+                            for(OWLAnonymousIndividual indiv_atTime: axiom.getValue().getAnonymousIndividuals()) {
+                                for(OWLDataPropertyAssertionAxiom axiom_interval: ontology.getDataPropertyAssertionAxioms(indiv_atTime)) {
+                                    // Look for timeinterval:hasIntervalStartDate and timeinterval:hasIntervalEndDate data properties.
+                                    if(axiom_interval.getProperty().equals(timeinterval_hasIntervalStartDate)) {
+                                        hasIntervalStartDate = true;
+                                    }
+                                    if(axiom_interval.getProperty().equals(timeinterval_hasIntervalEndDate)) {
+                                        hasIntervalEndDate = true;
+                                    }
+                                }
+                            }
+                        }
 
-            		// System.err.println(" - indiv_statusInTime: " + indiv_statusInTime);
-            		for(OWLAnnotationAssertionAxiom axiom: ontology.getAnnotationAssertionAxioms(indiv_statusInTime)) {
-            			/* System.err.println(
-        					"Processing axiom: " + axiom.getProperty() + " == " + pso_withStatus +
-        					" (" + axiom.getProperty().equals(pso_withStatus) + ")"
-            			);*/
-
-                		if(axiom.getProperty().equals(tvc_atTime)) {
-                			System.err.println("Axiom: " + axiom);
-
-                			for(OWLAnnotation annot: axiom.getAnnotations()) {
-                				System.err.println(" - axiom annotation: " + annot);
-                			}
-
-                			for(OWLAnonymousIndividual indiv_atTime: axiom.getValue().getAnonymousIndividuals()) {
-                				System.err.println(" - indiv_atTime: " + indiv_atTime);
-
-                				System.err.println(" - axioms: " + ontology.getAxioms(indiv_atTime));
-                				System.err.println(" - Signature: " + indiv_atTime.getSignature());
-                				System.err.println(" - data prop assert axioms: " + ontology.getDataPropertyAssertionAxioms(indiv_atTime));
-                				System.err.println(" - class assert axioms: " + ontology.getClassAssertionAxioms(indiv_atTime));
-
-                				for(OWLDataPropertyAssertionAxiom axiom_interval: ontology.getDataPropertyAssertionAxioms(indiv_atTime)) {
-                					System.err.println(" - axiom interval: " + axiom_interval);
-                					if(axiom_interval.getProperty().equals(timeinterval_hasIntervalStartDate)) {
-                						hasIntervalStartDate = true;
-                					}
-                					if(axiom_interval.getProperty().equals(timeinterval_hasIntervalEndDate)) {
-                						hasIntervalEndDate = true;
-                					}
-                				}
-                			}
-                		}
-
-                		else if(axiom.getProperty().equals(pso_withStatus)) {
-                			currentStatuses.add((IRI)axiom.getValue());
-                		} else {
-                			System.err.println("Unknown axiom: " + axiom);
-                		}
-                	}
+                        else if(axiom.getProperty().equals(pso_withStatus)) {
+                            currentStatuses.add((IRI)axiom.getValue());
+                        } else {
+                            System.err.println("Unknown axiom: " + axiom);
+                            System.exit(-1);
+                        }
+                    }
             	}
 
-        		// Did the current statuses have a start date but no end date, i.e. are they currently active?
-        		if(hasIntervalStartDate && !hasIntervalEndDate) {
-        			statuses.addAll(currentStatuses);
-        		}
+                // Did the current statuses have a start date but no end date, i.e. are they currently active?
+                if(hasIntervalStartDate && !hasIntervalEndDate) {
+                    statuses.addAll(currentStatuses);
+                }
             }
 
             System.err.println("Active statuses: " + statuses);
+            
+            // Based on the phyloreference status, we can determine whether or not
+            // we expect the phyloreference to actually resolve: we do if there
+            // were no statuses, or if the statuses include submitted or published.
+            // In all other cases, we're not expecting the phyloreference to resolve.
+            boolean flag_expected_to_resolve = (
+                statuses.isEmpty() ||
+                statuses.contains(IRI.create("http://purl.org/spar/pso/submitted")) ||
+                statuses.contains(IRI.create("http://purl.org/spar/pso/published"))
+            );
 
             // Determine if this phyloreference has failed or succeeded.
             if(testFailed) {
             	if(unmatched_specifiers.isEmpty()) {
-	                // Yay, failure!
-	                countFailure++;
-	                result.setStatus(StatusValues.NOT_OK);
-	                testSet.addTapLine(result);
-            	} else {
-            		// Okay, it's a failure, but we do know that there are unmatched specifiers.
-            		// So mark it as a to-do.
-            		countTODO++;
+                    if(flag_expected_to_resolve) {
+                        // We expect this phyloreference to resolve. Report a failure.
+                        countFailure++;
+                        result.setStatus(StatusValues.NOT_OK);
+                        testSet.addTapLine(result);
+                    } else {
+                        // No, we do not expect this phyloreference to resolve. Report a TODO.
+                        countTODO++;
             		result.setStatus(StatusValues.NOT_OK);
-            		result.setDirective(new Directive(DirectiveValues.TODO, "Phyloreference could not be tested, as one or more specifiers did not match."));
+            		result.setDirective(new Directive(DirectiveValues.TODO, "Phyloreference did not resolve, but has status " + statuses));
             		testSet.addTapLine(result);
+                    }
+            	} else {
+                    // Okay, it's a failure, but we do know that there are unmatched specifiers.
+                    // So mark it as a to-do.
+                    countTODO++;
+                    result.setStatus(StatusValues.NOT_OK);
+                    result.setDirective(new Directive(DirectiveValues.TODO, "Phyloreference could not be tested, as one or more specifiers did not match."));
+                    if(!statuses.contains(IRI.create("http://purl.org/spar/pso/draft"))) {
+                        result.addComment(new Comment(
+                            "Since specifiers remain unmatched, this phyloreference should have a status of 'pso:draft' but instead its status is " + statuses
+                        ));
+                    }
+                    testSet.addTapLine(result);
             	}
             } else {
                 // Oh no, success!
                 countSuccess++;
                 result.setStatus(StatusValues.OK);
+                if(!flag_expected_to_resolve) {
+                    result.addComment(new Comment(
+                        "Phyloreference resolved correctly but was not expected to resolve; status should be changed to 'pso:submitted' from " + statuses
+                    ));
+                }
                 testSet.addTapLine(result);
             }
         }
