@@ -40,11 +40,11 @@ public class PhylorefHelper {
     public static final IRI IRI_CLADE_DEFINITION = IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#clade_definition");
 
     /**
-     * Get a list of phyloreferences in this ontology. This method does not use
+     * Get a list of phyloreferences in this ontology without reasoning. This method does not use
      * the reasoner, and so will only find individuals asserted to have a type
      * of phyloref:Phyloreference.
      */
-    public static Set<OWLNamedIndividual> getPhyloreferences(OWLOntology ontology) {
+    public static Set<OWLNamedIndividual> getPhyloreferencesWithoutReasoning(OWLOntology ontology) {
         // Get a list of all phyloreferences. First, we need to know what a Phyloreference is.
         Set<OWLEntity> set_phyloref_Phyloreference = ontology.getEntitiesInSignature(IRI_PHYLOREFERENCE);
         if (set_phyloref_Phyloreference.isEmpty()) {
@@ -76,8 +76,16 @@ public class PhylorefHelper {
      * Get a list of phyloreferences in this ontology. This method uses the
      * reasoner, and so will find all individuals determined to be of
      * type phyloref:Phyloreference.
+     * 
+     * @param ontology The OWL Ontology within with we should look for phylorefs
+     * @param reasoner The reasoner to use. May be null.
      */
     public static Set<OWLNamedIndividual> getPhyloreferences(OWLOntology ontology, OWLReasoner reasoner) {
+        // If no reasoner is provided, we can't find all individuals that are
+        // inferred to be phyloref:Phyloreference, but we can still find all
+        // individuals that are stated to be phyloref:Phyloreference. So let's do that!
+        if(reasoner == null) return PhylorefHelper.getPhyloreferencesWithoutReasoning(ontology);
+        
         // Get a list of all phyloreferences. First, we need to know what a Phyloreference is.
         Set<OWLEntity> set_phyloref_Phyloreference = ontology.getEntitiesInSignature(IRI_PHYLOREFERENCE);
         if (set_phyloref_Phyloreference.isEmpty()) {

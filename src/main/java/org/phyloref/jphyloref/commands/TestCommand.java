@@ -144,12 +144,8 @@ public class TestCommand implements Command {
         Set<OWLNamedIndividual> phylorefs;
 
         // Get a list of all phyloreferences.
-        if(flag_no_reasoner) {
-            phylorefs = PhylorefHelper.getPhyloreferences(ontology);
-        } else {
-            reasoner = new JFactReasoner(ontology, config, BufferingMode.BUFFERING);
-            phylorefs = PhylorefHelper.getPhyloreferences(ontology, reasoner);
-        }
+        if(!flag_no_reasoner) reasoner = new JFactReasoner(ontology, config, BufferingMode.BUFFERING);
+        phylorefs = PhylorefHelper.getPhyloreferences(ontology, reasoner);
 
         // Okay, time to start testing! Each phyloreference counts as one test.
         // TAP (https://testanything.org/) can be read by downstream software
