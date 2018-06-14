@@ -58,7 +58,7 @@ import uk.ac.manchester.cs.jfact.kernel.options.JFactReasonerConfiguration;
 public class TestCommand implements Command {
     /**
      * This command is named "test". It should be
-     * involved "java -jar jphyloref.jar test ..."
+     * invoked as "java -jar jphyloref.jar test ..."
      */
 
     @Override
@@ -112,15 +112,11 @@ public class TestCommand implements Command {
         }
 
         if(str_input == null) {
-            throw new RuntimeException("Error: no input ontology specified (use '-i input.owl')");
+            throw new IllegalArgumentException("Error: no input ontology specified (use '-i input.owl')");
         }
 
         // Create File object to load
         File inputFile = new File(str_input);
-        if(!inputFile.exists() || !inputFile.canRead()) {
-            throw new RuntimeException("Error: cannot read from input ontology '" + str_input + "'");
-        }
-
         System.err.println("Input: " + inputFile);
 
         // Set up an OWL Ontology Manager to work with.
@@ -270,9 +266,9 @@ public class TestCommand implements Command {
                 	// We only found nodes that expected this phyloref -- success!
                 	result.addComment(new Comment("The following nodes were matched and expected this phyloreference: " + String.join("; ", nodeLabelsWithExpectedPhylorefs)));
                 } else if(!nodeLabelsWithoutExpectedPhylorefs.isEmpty()) {
-                	// We only have nodes that did not expect this phyloref -- failure!
-                	result.addComment(new Comment("The following nodes were matched but did not expect this phyloreference: " + String.join("; ", nodeLabelsWithoutExpectedPhylorefs)));
-                    testFailed = true;
+                        // We only have nodes that did not expect this phyloref -- failure!
+                        result.addComment(new Comment("The following nodes were matched but did not expect this phyloreference: " + String.join("; ", nodeLabelsWithoutExpectedPhylorefs)));
+                        testFailed = true;
                 } else {
                 	// No nodes matched. This should have been caught earlier, but just in case.
                 	throw new RuntimeException("No nodes were matched, which should have been caught earlier. Programmer error!");
@@ -372,9 +368,9 @@ public class TestCommand implements Command {
                     } else {
                         // No, we do not expect this phyloreference to resolve. Report a TODO.
                         countTODO++;
-            		result.setStatus(StatusValues.NOT_OK);
-            		result.setDirective(new Directive(DirectiveValues.TODO, "Phyloreference did not resolve, but has status " + statuses));
-            		testSet.addTapLine(result);
+                        result.setStatus(StatusValues.NOT_OK);
+                        result.setDirective(new Directive(DirectiveValues.TODO, "Phyloreference did not resolve, but has status " + statuses));
+                        testSet.addTapLine(result);
                     }
             	} else {
                     // Okay, it's a failure, but we do know that there are unmatched specifiers.
