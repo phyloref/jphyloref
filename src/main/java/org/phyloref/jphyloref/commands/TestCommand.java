@@ -6,12 +6,12 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.phyloref.jphyloref.helpers.OWLHelper;
 import org.phyloref.jphyloref.helpers.PhylorefHelper;
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
@@ -19,6 +19,7 @@ import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
@@ -39,7 +40,6 @@ import org.tap4j.producer.TapProducer;
 import org.tap4j.producer.TapProducerFactory;
 import org.tap4j.util.DirectiveValues;
 import org.tap4j.util.StatusValues;
-
 import uk.ac.manchester.cs.jfact.JFactReasoner;
 import uk.ac.manchester.cs.jfact.kernel.options.JFactReasonerConfiguration;
 
@@ -204,10 +204,26 @@ public class TestCommand implements Command {
             // Which nodes did this phyloreference resolved to?
             OWLClass phylorefAsClass = manager.getOWLDataFactory().getOWLClass(phyloref.getIRI());
             Set<OWLNamedIndividual> nodes;
-            if(reasoner == null) {
-            	nodes = new HashSet();
-            } else {
+            if(reasoner != null) {
+                // Use the reasoner to determine which nodes are members of this phyloref as a class
             	nodes = reasoner.getInstances(phylorefAsClass, false).getFlattened();
+            } else {
+                // No reasoner? We can also determine which nodes have been directly stated to
+                // be members of this phyloref as a class. This allows us to read a pre-reasoned
+                // OWL file and test whether phyloreferences resolved as expected.
+                nodes = new HashSet<>();
+                Set<OWLClassAssertionAxiom> classAssertions = ontology.getAxioms(AxiomType.CLASS_ASSERTION);
+
+                for(OWLClassAssertionAxiom classAssertion: classAssertions) {
+                    // Does this assertion involve this phyloreference as a class and a named individual?
+                    if(
+                        classAssertion.getIndividual().isNamed() &&
+                        classAssertion.getClassesInSignature().contains(phylorefAsClass)
+                    ) {
+                        // If so, then the individual is a phyloreferences!
+                        nodes.add(classAssertion.getIndividual().asOWLNamedIndividual());
+                    }
+                }
             }
 
             if(nodes.isEmpty()) {
