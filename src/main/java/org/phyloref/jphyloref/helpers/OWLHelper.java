@@ -15,7 +15,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 /**
- * OWLHelper contains methods that make it that make it easy to access information encoded in OWL.
+ * OWLHelper contains methods simplify accessing information from the OWL API.
  * 
  * @author Gaurav Vaidya <gaurav@ggvaidya.com>
  *

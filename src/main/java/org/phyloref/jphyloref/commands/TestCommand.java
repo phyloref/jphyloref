@@ -51,7 +51,7 @@ import uk.ac.manchester.cs.jfact.kernel.options.JFactReasonerConfiguration;
 public class TestCommand implements Command {
     /**
      * This command is named Test. It should be 
-     * involved "java -jar jphyloref.jar test ..."
+     * invoked as "java -jar jphyloref.jar test ..."
      */
 
     @Override

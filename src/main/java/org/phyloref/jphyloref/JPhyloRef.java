@@ -37,9 +37,6 @@ public class JPhyloRef
 	 * @param args Command line arguments
 	 */
     public void execute(String[] args) {
-    	// Display version information.
-    	System.err.println("jphyloref/" + VERSION + "\n");
-        
         // Prepare to parse command line arguments.
         Options opts = new Options();
         for(Command cmd: commands) {
@@ -71,14 +68,12 @@ public class JPhyloRef
         			// Found a match!
         			cmd.execute(cmdLine);
         			System.exit(0);
-        			return;
         		}
         	}
         	
         	// Could not find any command.
         	System.err.println("Error: command '" + command + "' has not been implemented.");
         	System.exit(1);
-        	return;
         }
     }
     
@@ -112,13 +107,13 @@ public class JPhyloRef
 		/** Display a list of Commands that can be executed on the command line. */
 		public void execute(CommandLine cmdLine) {
 			// Display a synopsis.
-			System.err.println("Synopsis: jphyloref <command> <options>\n");
+			System.out.println("Synopsis: jphyloref <command> <options>\n");
 			
 			// Display a list of currently included Commands.
-			System.err.println("Where command is one of:");
+			System.out.println("Where command is one of:");
 			for(Command cmd: commands) {
 				// Display the description of the command.
-				System.err.println(" - " + cmd.getName() + ": " + cmd.getDescription());
+				System.out.println(" - " + cmd.getName() + ": " + cmd.getDescription());
 				
 				// Display all the command line options supported by that command.
 				Options opts = new Options();
@@ -129,7 +124,7 @@ public class JPhyloRef
 					if(opt.getLongOpt() != null)
 						longOpt = ", " + opt.getLongOpt();
 					
-					System.err.println("    - "
+					System.out.println("    - "
 						+ opt.getOpt() + longOpt + ": "
 						+ opt.getDescription()
 					);
@@ -137,7 +132,7 @@ public class JPhyloRef
 			}
 			
 			// One final blank line, please.
-			System.err.println("");
+			System.out.println("");
 		}
     }
 }

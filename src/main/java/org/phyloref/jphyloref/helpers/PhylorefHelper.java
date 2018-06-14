@@ -45,10 +45,10 @@ public class PhylorefHelper {
         // Get a list of all phyloreferences. First, we need to know what a Phyloreference is.
         Set<OWLEntity> set_phyloref_Phyloreference = ontology.getEntitiesInSignature(IRI_PHYLOREFERENCE);
         if (set_phyloref_Phyloreference.isEmpty()) {
-            throw new RuntimeException("Class " + IRI_PHYLOREFERENCE + " is not defined in ontology.");
+            throw new IllegalArgumentException("Class " + IRI_PHYLOREFERENCE + " is not defined in ontology.");
         }
         if (set_phyloref_Phyloreference.size() > 1) {
-            throw new RuntimeException("Class " + IRI_PHYLOREFERENCE + " is defined multiple times in ontology.");
+            throw new IllegalArgumentException("Class " + IRI_PHYLOREFERENCE + " is defined multiple times in ontology.");
         }
 
         // Get all instances of IRI_PHYLOREFERENCE.
