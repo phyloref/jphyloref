@@ -24,7 +24,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 public class PhylorefHelper {
     // IRIs used in this package.
 
-	/** IRI for OWL class Phyloreference */
+    /** IRI for OWL class Phyloreference */
     public static final IRI IRI_PHYLOREFERENCE = IRI.create("http://phyloinformatics.net/phyloref.owl#Phyloreference");
 
     /** IRI for the OWL object property indicating which phylogeny a node belongs to */
@@ -90,5 +90,4 @@ public class PhylorefHelper {
         OWLClass phyloref_Phyloreference = set_phyloref_Phyloreference.iterator().next().asOWLClass();
         return reasoner.getInstances(phyloref_Phyloreference, true).getFlattened();
     }
-
 }

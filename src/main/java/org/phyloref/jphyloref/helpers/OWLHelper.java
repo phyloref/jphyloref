@@ -21,7 +21,7 @@ import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
  *
  */
 public final class OWLHelper {
-	/** A variable we use to cache rdfs:label */ 
+    /** A variable we use to cache rdfs:label */ 
     private static OWLAnnotationProperty cache_labelProperty = null;
     
     /** 

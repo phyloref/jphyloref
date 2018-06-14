@@ -22,7 +22,6 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -227,51 +226,51 @@ public class TestCommand implements Command {
             	Set<String> nodeLabelsWithoutExpectedPhylorefs = new HashSet<>();
 
                 for(OWLNamedIndividual node: nodes) {
-                	// Get a list of all expected phyloreference labels from the OWL file.
-                	Set<String> expectedPhylorefsNamed = node.getDataPropertyValues(expectedPhyloreferenceNamedProperty, ontology)
-                		.stream()
-                		.map(literal -> literal.getLiteral()) // We ignore languages for now.
-                		.collect(Collectors.toSet());
+                    // Get a list of all expected phyloreference labels from the OWL file.
+                    Set<String> expectedPhylorefsNamed = node.getDataPropertyValues(expectedPhyloreferenceNamedProperty, ontology)
+                        .stream()
+                        .map(literal -> literal.getLiteral()) // We ignore languages for now.
+                        .collect(Collectors.toSet());
 
-                	// Add the label of the node as well.
-                	Set<String> nodeLabels = OWLHelper.getLabelsInEnglish(node, ontology);
-                	expectedPhylorefsNamed.addAll(nodeLabels);
+                    // Add the label of the node as well.
+                    Set<String> nodeLabels = OWLHelper.getLabelsInEnglish(node, ontology);
+                    expectedPhylorefsNamed.addAll(nodeLabels);
 
-                	// Build a new node label that describes this node.
-                	String nodeLabel = new StringBuilder()
-                		.append("[")
-                		.append(String.join(", ", expectedPhylorefsNamed))
-                		.append("]")
-                		.toString();
+                    // Build a new node label that describes this node.
+                    String nodeLabel = new StringBuilder()
+                        .append("[")
+                        .append(String.join(", ", expectedPhylorefsNamed))
+                        .append("]")
+                        .toString();
 
-                	// Is this blank? If so, let's use the node's IRI as its label so we can debug issues with resolution.
-                	if(expectedPhylorefsNamed.isEmpty()) {
-                		nodeLabel = node.getIRI().toString();
-                	}
+                    // Is this blank? If so, let's use the node's IRI as its label so we can debug issues with resolution.
+                    if(expectedPhylorefsNamed.isEmpty()) {
+                        nodeLabel = node.getIRI().toString();
+                    }
 
-                	// Does this node have an expected phyloreference identical to the phyloref being tested?
-                	if(expectedPhylorefsNamed.contains(phylorefLabel)) {
-                		nodeLabelsWithExpectedPhylorefs.add(nodeLabel);
-                	} else {
-                		nodeLabelsWithoutExpectedPhylorefs.add(nodeLabel);
-                	}
+                    // Does this node have an expected phyloreference identical to the phyloref being tested?
+                    if(expectedPhylorefsNamed.contains(phylorefLabel)) {
+                        nodeLabelsWithExpectedPhylorefs.add(nodeLabel);
+                    } else {
+                        nodeLabelsWithoutExpectedPhylorefs.add(nodeLabel);
+                    }
                 }
 
                 // What happened?
                 if(!nodeLabelsWithExpectedPhylorefs.isEmpty() && !nodeLabelsWithoutExpectedPhylorefs.isEmpty()) {
-                	// We found nodes that expected this phyloref, as well as nodes that did not -- success!
-                	result.addComment(new Comment("The following nodes were matched and expected this phyloreference: " + String.join("; ", nodeLabelsWithExpectedPhylorefs)));
-                	result.addComment(new Comment("Also, the following nodes were matched but did not expect this phyloreference: " + String.join("; ", nodeLabelsWithoutExpectedPhylorefs)));
+                    // We found nodes that expected this phyloref, as well as nodes that did not -- success!
+                    result.addComment(new Comment("The following nodes were matched and expected this phyloreference: " + String.join("; ", nodeLabelsWithExpectedPhylorefs)));
+                    result.addComment(new Comment("Also, the following nodes were matched but did not expect this phyloreference: " + String.join("; ", nodeLabelsWithoutExpectedPhylorefs)));
                 } else if(!nodeLabelsWithExpectedPhylorefs.isEmpty()) {
-                	// We only found nodes that expected this phyloref -- success!
-                	result.addComment(new Comment("The following nodes were matched and expected this phyloreference: " + String.join("; ", nodeLabelsWithExpectedPhylorefs)));
+                    // We only found nodes that expected this phyloref -- success!
+                    result.addComment(new Comment("The following nodes were matched and expected this phyloreference: " + String.join("; ", nodeLabelsWithExpectedPhylorefs)));
                 } else if(!nodeLabelsWithoutExpectedPhylorefs.isEmpty()) {
-                        // We only have nodes that did not expect this phyloref -- failure!
-                        result.addComment(new Comment("The following nodes were matched but did not expect this phyloreference: " + String.join("; ", nodeLabelsWithoutExpectedPhylorefs)));
-                        testFailed = true;
+                    // We only have nodes that did not expect this phyloref -- failure!
+                    result.addComment(new Comment("The following nodes were matched but did not expect this phyloreference: " + String.join("; ", nodeLabelsWithoutExpectedPhylorefs)));
+                    testFailed = true;
                 } else {
-                	// No nodes matched. This should have been caught earlier, but just in case.
-                	throw new RuntimeException("No nodes were matched, which should have been caught earlier. Programmer error!");
+                    // No nodes matched. This should have been caught earlier, but just in case.
+                    throw new RuntimeException("No nodes were matched, which should have been caught earlier. Programmer error!");
                 }
             }
 
@@ -284,7 +283,7 @@ public class TestCommand implements Command {
                     // Therefore, any NamedIndividuals that are not phyloref should be added to
                     // unmatched_specifiers!
                     for(OWLNamedIndividual ni: axiom.getIndividualsInSignature()) {
-                            if(ni != phyloref) unmatched_specifiers.add(ni);
+                        if(ni != phyloref) unmatched_specifiers.add(ni);
                     }
             	}
             }
