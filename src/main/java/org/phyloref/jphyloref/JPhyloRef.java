@@ -19,7 +19,7 @@ import org.phyloref.jphyloref.commands.TestCommand;
  */
 public class JPhyloRef {
     /** Version of JPhyloRef. */
-    public static final String VERSION = "0.0.1-SNAPSHOT";
+    public static final String VERSION = "0.1-SNAPSHOT";
 
     /** List of all commands included in JPhyloRef. */
     private List<Command> commands = Arrays.asList(
