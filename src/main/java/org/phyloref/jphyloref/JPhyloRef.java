@@ -104,6 +104,9 @@ public class JPhyloRef {
 
         /** Display a list of Commands that can be executed on the command line. */
         public void execute(CommandLine cmdLine) {
+					  // Display version number.
+						System.out.println("JPhyloRef/" + JPhyloRef.VERSION);
+
             // Display a synopsis.
             System.out.println("Synopsis: jphyloref <command> <options>\n");
 
