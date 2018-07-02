@@ -3,6 +3,7 @@
 Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
 ## [Unreleased]
+- Updated dependency to JFact 5.0.1, which necessitated some code changes.
 
 ## 0.2 - 2018-06-20
 - Added support for phyloreference statuses using the Publication Status Ontology
