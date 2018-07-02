@@ -10,7 +10,7 @@
     <name>jphyloref</name>
 
     <properties>
-        <mainClass>org.phyloref.jphyloref.JPhyloRef</mainClass>  
+        <mainClass>org.phyloref.jphyloref.JPhyloRef</mainClass>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -28,19 +28,19 @@
             <artifactId>commons-cli</artifactId>
             <version>1.4</version>
         </dependency>
-    
-        <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/jfact --> 
-	<dependency>
-	    <groupId>net.sourceforge.owlapi</groupId>
-	    <artifactId>jfact</artifactId>
-	    <version>1.2.4</version>
-	</dependency>
-	
-	<dependency>
+
+        <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/jfact -->
+      	<dependency>
+      	    <groupId>net.sourceforge.owlapi</groupId>
+      	    <artifactId>jfact</artifactId>
+      	    <version>5.0.1</version>
+      	</dependency>
+
+        <dependency>
             <groupId>org.tap4j</groupId>
             <artifactId>tap4j</artifactId>
             <version>4.2.1</version>
-	</dependency>
+        </dependency>
     </dependencies>
 
     <build>

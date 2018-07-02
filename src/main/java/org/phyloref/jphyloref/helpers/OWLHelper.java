@@ -12,6 +12,7 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.search.EntitySearcher;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 /**
@@ -89,8 +90,9 @@ public final class OWLHelper {
         Map<String, Set<String>> valuesByLanguage = new HashMap<>();
 
         // Go through all known annotations, looking for OWLLiterals.
-        for (OWLAnnotation annotation : entity.getAnnotations(ontology, annotationProperty)) {
-            if (annotation.getValue() instanceof OWLLiteral) {
+        EntitySearcher.getAnnotations(entity, ontology, annotationProperty)
+            .filter(annotation -> annotation.getValue() instanceof OWLLiteral)
+            .forEach(annotation -> {
                 OWLLiteral val = (OWLLiteral) annotation.getValue();
                 String lang = val.getLang();
 
@@ -100,8 +102,7 @@ public final class OWLHelper {
                 }
 
                 valuesByLanguage.get(lang).add(val.getLiteral());
-            }
-        }
+            });
 
         return valuesByLanguage;
     }

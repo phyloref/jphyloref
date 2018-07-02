@@ -29,6 +29,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
+import org.semanticweb.owlapi.search.EntitySearcher;
 import org.semanticweb.owlapi.util.AutoIRIMapper;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 import org.tap4j.model.Comment;
@@ -239,8 +240,7 @@ public class TestCommand implements Command {
 
                 for(OWLNamedIndividual node: nodes) {
                     // Get a list of all expected phyloreference labels from the OWL file.
-                    Set<String> expectedPhylorefsNamed = node.getDataPropertyValues(expectedPhyloreferenceNamedProperty, ontology)
-                        .stream()
+                    Set<String> expectedPhylorefsNamed = EntitySearcher.getDataPropertyValues(node, expectedPhyloreferenceNamedProperty, ontology)
                         .map(literal -> literal.getLiteral()) // We ignore languages for now.
                         .collect(Collectors.toSet());
 
@@ -287,7 +287,7 @@ public class TestCommand implements Command {
             }
 
             // Look for all unmatched specifiers reported for this phyloreference
-            Set<OWLAxiom> axioms = phyloref.getReferencingAxioms(ontology);
+            Set<OWLAxiom> axioms = EntitySearcher.getReferencingAxioms(phyloref, ontology).collect(Collectors.toSet());
             Set<OWLNamedIndividual> unmatched_specifiers = new HashSet<>();
             for(OWLAxiom axiom: axioms) {
             	if(axiom.containsEntityInSignature(unmatchedSpecifierProperty)) {
@@ -311,7 +311,7 @@ public class TestCommand implements Command {
             }
 
             // Retrieve holdsStatusInTime to determine the active status of this phyloreference.
-            Set<OWLAnnotation> holdsStatusInTime = phylorefAsClass.getAnnotations(ontology, pso_holdsStatusInTime);
+            Set<OWLAnnotation> holdsStatusInTime = EntitySearcher.getAnnotations(phylorefAsClass, ontology, pso_holdsStatusInTime).collect(Collectors.toSet());
 
             // Instead of checking which time interval were are in, we take a simpler approach: we look for all
             // statuses that have a start date but not an end date, i.e. those which have yet to end.
