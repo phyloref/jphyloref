@@ -12,6 +12,7 @@ import org.phyloref.jphyloref.helpers.OWLHelper;
 import org.phyloref.jphyloref.helpers.PhylorefHelper;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
+import org.semanticweb.owlapi.model.ClassExpressionType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
@@ -29,6 +30,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
+import org.semanticweb.owlapi.search.EntitySearcher;
 import org.semanticweb.owlapi.util.AutoIRIMapper;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 import org.tap4j.model.Comment;
@@ -156,6 +158,9 @@ public class TestCommand implements Command {
 
         // Preload some terms we need to use in the following code.
         OWLDataFactory dataFactory = manager.getOWLDataFactory();
+        
+        // Some classes we will use.
+        OWLClass classCDAONode = dataFactory.getOWLClass(PhylorefHelper.IRI_CDAO_NODE);
 
         // Terms associated with phyloreferences
         OWLAnnotationProperty labelAnnotationProperty = dataFactory.getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI());
@@ -205,8 +210,17 @@ public class TestCommand implements Command {
             OWLClass phylorefAsClass = manager.getOWLDataFactory().getOWLClass(phyloref.getIRI());
             Set<OWLNamedIndividual> nodes;
             if(reasoner != null) {
-                // Use the reasoner to determine which nodes are members of this phyloref as a class
-            	nodes = reasoner.getInstances(phylorefAsClass, false).getFlattened();
+            	// Use the reasoner to determine which nodes are members of this phyloref as a class
+            	nodes = reasoner.getInstances(phylorefAsClass, false).entities()
+	                // This includes the phyloreference itself. We only want to
+	                // look at phylogeny nodes here. So, let's filter down to named
+	                // individuals that are asserted to be cdao:Nodes.
+	                .filter(indiv -> EntitySearcher.getTypes(indiv, ontology).anyMatch(
+	                    type -> (!type.getClassExpressionType().equals(ClassExpressionType.OWL_CLASS)) ||
+	                			type.asOWLClass().getIRI().equals(PhylorefHelper.IRI_CDAO_NODE)
+	                ))
+	                .collect(Collectors.toSet());
+                ;
             } else {
                 // No reasoner? We can also determine which nodes have been directly stated to
                 // be members of this phyloref as a class. This allows us to read a pre-reasoned
@@ -239,8 +253,7 @@ public class TestCommand implements Command {
 
                 for(OWLNamedIndividual node: nodes) {
                     // Get a list of all expected phyloreference labels from the OWL file.
-                    Set<String> expectedPhylorefsNamed = node.getDataPropertyValues(expectedPhyloreferenceNamedProperty, ontology)
-                        .stream()
+                    Set<String> expectedPhylorefsNamed = EntitySearcher.getDataPropertyValues(node, expectedPhyloreferenceNamedProperty, ontology)
                         .map(literal -> literal.getLiteral()) // We ignore languages for now.
                         .collect(Collectors.toSet());
 
@@ -287,7 +300,7 @@ public class TestCommand implements Command {
             }
 
             // Look for all unmatched specifiers reported for this phyloreference
-            Set<OWLAxiom> axioms = phyloref.getReferencingAxioms(ontology);
+            Set<OWLAxiom> axioms = EntitySearcher.getReferencingAxioms(phyloref, ontology).collect(Collectors.toSet());
             Set<OWLNamedIndividual> unmatched_specifiers = new HashSet<>();
             for(OWLAxiom axiom: axioms) {
             	if(axiom.containsEntityInSignature(unmatchedSpecifierProperty)) {
@@ -311,7 +324,7 @@ public class TestCommand implements Command {
             }
 
             // Retrieve holdsStatusInTime to determine the active status of this phyloreference.
-            Set<OWLAnnotation> holdsStatusInTime = phylorefAsClass.getAnnotations(ontology, pso_holdsStatusInTime);
+            Set<OWLAnnotation> holdsStatusInTime = EntitySearcher.getAnnotations(phylorefAsClass, ontology, pso_holdsStatusInTime).collect(Collectors.toSet());
 
             // Instead of checking which time interval were are in, we take a simpler approach: we look for all
             // statuses that have a start date but not an end date, i.e. those which have yet to end.

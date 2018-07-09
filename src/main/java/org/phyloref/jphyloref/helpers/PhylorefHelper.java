@@ -23,6 +23,9 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
  */
 public class PhylorefHelper {
     // IRIs used in this package.
+    
+    /** IRI for OWL class Phylogeny */
+    public static final IRI IRI_CDAO_NODE = IRI.create("http://purl.obolibrary.org/obo/CDAO_0000140");
 
     /** IRI for OWL class Phyloreference */
     public static final IRI IRI_PHYLOREFERENCE = IRI.create("http://phyloinformatics.net/phyloref.owl#Phyloreference");
