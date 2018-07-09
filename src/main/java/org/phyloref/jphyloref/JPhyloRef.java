@@ -10,6 +10,7 @@ import org.apache.commons.cli.ParseException;
 import org.phyloref.jphyloref.commands.Command;
 import org.phyloref.jphyloref.commands.ReasonCommand;
 import org.phyloref.jphyloref.commands.TestCommand;
+import org.semanticweb.owlapi.util.VersionInfo;
 
 /**
  * Main class for JPhyloRef. Contains a list of Commands,
@@ -104,8 +105,8 @@ public class JPhyloRef {
 
         /** Display a list of Commands that can be executed on the command line. */
         public void execute(CommandLine cmdLine) {
-					  // Display version number.
-						System.out.println("JPhyloRef/" + JPhyloRef.VERSION);
+			// Display version number.
+			System.out.println("JPhyloRef/" + JPhyloRef.VERSION + " OWLAPI/" + VersionInfo.getVersionInfo().getVersion());
 
             // Display a synopsis.
             System.out.println("Synopsis: jphyloref <command> <options>\n");
