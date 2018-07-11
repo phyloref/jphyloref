@@ -41,6 +41,20 @@
             <artifactId>tap4j</artifactId>
             <version>4.2.1</version>
         </dependency>
+
+        <!-- For creating a webserver -->
+        <dependency>
+          	<groupId>org.nanohttpd</groupId>
+          	<artifactId>nanohttpd</artifactId>
+          	<version>2.3.1</version>
+        </dependency>
+
+        <!-- For reading and writing JSON-LD -->
+        <dependency>
+    		    <groupId>com.github.jsonld-java</groupId>
+    		    <artifactId>jsonld-java</artifactId>
+    		    <version>0.12.0</version>
+    		</dependency>
     </dependencies>
 
     <build>

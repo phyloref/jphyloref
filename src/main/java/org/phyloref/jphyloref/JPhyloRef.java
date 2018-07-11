@@ -10,6 +10,7 @@ import org.apache.commons.cli.ParseException;
 import org.phyloref.jphyloref.commands.Command;
 import org.phyloref.jphyloref.commands.ReasonCommand;
 import org.phyloref.jphyloref.commands.TestCommand;
+import org.phyloref.jphyloref.commands.WebserverCommand;
 import org.semanticweb.owlapi.util.VersionInfo;
 
 /**
@@ -26,6 +27,7 @@ public class JPhyloRef {
     private List<Command> commands = Arrays.asList(
         new HelpCommand(),
         new TestCommand(),
+        new WebserverCommand(),
         new ReasonCommand()
     );
 
