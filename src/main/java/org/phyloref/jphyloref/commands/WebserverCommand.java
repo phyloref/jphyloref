@@ -11,6 +11,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
+import org.json.JSONObject;
+import org.phyloref.jphyloref.JPhyloRef;
 import org.phyloref.jphyloref.helpers.OWLHelper;
 import org.phyloref.jphyloref.helpers.PhylorefHelper;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -35,6 +37,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapi.search.EntitySearcher;
 import org.semanticweb.owlapi.util.AutoIRIMapper;
+import org.semanticweb.owlapi.util.VersionInfo;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 import org.tap4j.model.Comment;
 import org.tap4j.model.Directive;
@@ -116,7 +119,20 @@ public class WebserverCommand implements Command {
 
       		System.out.println(">> Request received to '" + path + "': " + params);
 
-      		return newFixedLengthResponse(Status.NOT_FOUND, "text/plain", "There is no resource at '" + path + "'\n");
+  			  JSONObject response = new JSONObject("{'status': 'ok'}");
+
+      		if(path.equals("/version")) {
+        			String owlapiVersion = VersionInfo.getVersionInfo().getVersion();
+
+        			response.put("name", "JPhyloRef/" + JPhyloRef.VERSION + " OWLAPI/" + owlapiVersion);
+        			response.put("version", JPhyloRef.VERSION);
+        			response.put("owlapiVersion", owlapiVersion);
+        			return newFixedLengthResponse(Status.OK, "application/json", response.toString());
+      		} else {
+        			response.put("status", "error");
+        			response.put("error", "Path '" + path + "' could not be found.");
+        			return newFixedLengthResponse(Status.NOT_FOUND, "application/json", response.toString());
+      		}
     	}
     }
 
