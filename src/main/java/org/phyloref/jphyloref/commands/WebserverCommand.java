@@ -1,55 +1,42 @@
 package org.phyloref.jphyloref.commands;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.RDFHandler;
+import org.eclipse.rdf4j.rio.RDFHandlerException;
+import org.eclipse.rdf4j.rio.RDFParser;
+import org.eclipse.rdf4j.rio.Rio;
 import org.json.JSONObject;
+import org.openrdf.model.Resource;
+import org.openrdf.model.Value;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.SimpleValueFactory;
 import org.phyloref.jphyloref.JPhyloRef;
-import org.phyloref.jphyloref.helpers.OWLHelper;
-import org.phyloref.jphyloref.helpers.PhylorefHelper;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.ClassExpressionType;
+import org.semanticweb.owlapi.formats.RDFDocumentFormat;
+import org.semanticweb.owlapi.formats.RDFJsonLDDocumentFormat;
+import org.semanticweb.owlapi.io.FileDocumentSource;
+import org.semanticweb.owlapi.io.OWLOntologyLoaderMetaData;
+import org.semanticweb.owlapi.io.RDFResourceParseError;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLAnnotationProperty;
-import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLDataProperty;
-import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLNamedIndividual;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyLoaderConfiguration;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.reasoner.BufferingMode;
-import org.semanticweb.owlapi.search.EntitySearcher;
-import org.semanticweb.owlapi.util.AutoIRIMapper;
+import org.semanticweb.owlapi.rio.RioOWLRDFConsumerAdapter;
+import org.semanticweb.owlapi.util.AnonymousNodeChecker;
 import org.semanticweb.owlapi.util.VersionInfo;
-import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
-import org.tap4j.model.Comment;
-import org.tap4j.model.Directive;
-import org.tap4j.model.Plan;
-import org.tap4j.model.TestResult;
-import org.tap4j.model.TestSet;
-import org.tap4j.producer.TapProducer;
-import org.tap4j.producer.TapProducerFactory;
-import org.tap4j.util.DirectiveValues;
-import org.tap4j.util.StatusValues;
-import uk.ac.manchester.cs.jfact.JFactReasoner;
-import uk.ac.manchester.cs.jfact.kernel.options.JFactReasonerConfiguration;
+
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.Response.Status;
 
@@ -114,14 +101,173 @@ public class WebserverCommand implements Command {
 
     	@Override
     	public Response serve(IHTTPSession session) {
-      		String path = session.getUri();
+      		// Is there content in the body?
+    		Map<String, String> files = new HashMap<>();
+    		if(session.getMethod().equals(Method.PUT) || session.getMethod().equals(Method.POST)) {
+    			try {
+    				session.parseBody(files);
+    			} catch(IOException ex) {
+    				return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Server threw IOException: " + ex);
+    			} catch(ResponseException re) {
+    				return newFixedLengthResponse(re.getStatus(), MIME_PLAINTEXT, re.getMessage());
+    			}
+    		}
+
+      		// Get path and parameters.
+    		String path = session.getUri();
       		Map<String, List<String>> params = session.getParameters();
 
       		System.out.println(">> Request received to '" + path + "': " + params);
 
   			  JSONObject response = new JSONObject("{'status': 'ok'}");
 
-      		if(path.equals("/version")) {
+  			if(path.equals("/test")) {
+  				// If there are multiple 'jsonld' objects, we only read the first one.
+  				String filename = String.join("; ", params.get("jsonld"));
+  				File jsonldFile = new File(files.get("jsonld"));
+
+  				// Is there is a readable file on the file path?
+  				if(jsonldFile == null || !jsonldFile.canRead()) {
+  					response.put("status", "error");
+  					response.put("error", "Expected a form with a file upload in the 'jsonld' field, but no such field was found");
+  				}
+
+  				// We have a readable file! But is it JSON-LD?
+  				try {
+  					OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+  					OWLOntology ontology = manager.createOntology();
+  					OWLOntologyLoaderConfiguration config = new OWLOntologyLoaderConfiguration();
+  					AnonymousNodeChecker anonymousNodeChecker = new AnonymousNodeChecker() {
+  						/* Stolen from https://github.com/owlcs/owlapi/blob/master/rio/src/main/java/org/semanticweb/owlapi/rio/RioParserImpl.java */
+
+  						private boolean isAnonymous(String iri) {
+  							return iri.startsWith("_:");
+  						}
+
+						@Override
+						public boolean isAnonymousSharedNode(String iri) {
+							return isAnonymous(iri);
+						}
+
+						@Override
+						public boolean isAnonymousNode(String iri) {
+							return isAnonymous(iri);
+						}
+
+						@Override
+						public boolean isAnonymousNode(IRI iri) {
+							return isAnonymous(iri.toString());
+						}
+					};
+
+					RDFParser parser = Rio.createParser(RDFFormat.JSONLD);
+					RioOWLRDFConsumerAdapter rdfHandler = new RioOWLRDFConsumerAdapter(ontology, anonymousNodeChecker, config);
+					System.err.println("Created adapter of class " + rdfHandler.getClass() + ": " + rdfHandler.toString());
+
+					rdfHandler.setOntologyFormat(new RDFJsonLDDocumentFormat());
+
+					// parser.setRDFHandler(adapter);
+					parser.setRDFHandler(new org.eclipse.rdf4j.rio.RDFHandler() {
+						// So RioOWLRDFConsumerAdapter implements org.openrdf.rio.RDFHandler
+						// but the JSON-LD parser expects org.eclipse.rdf4j.rio.RDFHandler.
+						//
+						// This class translates between the two.
+
+						@Override
+						public void startRDF() throws RDFHandlerException {
+							rdfHandler.startRDF();
+						}
+
+						@Override
+						public void endRDF() throws RDFHandlerException {
+							rdfHandler.endRDF();
+						}
+
+						@Override
+						public void handleNamespace(String prefix, String uri) throws RDFHandlerException {
+							rdfHandler.handleNamespace(prefix, uri);
+						}
+
+						@Override
+						public void handleStatement(org.eclipse.rdf4j.model.Statement st) throws RDFHandlerException {
+							SimpleValueFactory svf = SimpleValueFactory.getInstance();
+
+							System.err.println("Translating statement " + st);
+
+							rdfHandler.handleStatement(svf.createStatement(
+								translateResource(st.getSubject()),
+								svf.createIRI(st.getPredicate().stringValue()),
+								translateValue(st.getObject())
+							));
+						}
+
+						private org.openrdf.model.Value translateValue(org.eclipse.rdf4j.model.Value value) {
+							SimpleValueFactory svf = SimpleValueFactory.getInstance();
+
+							if(value instanceof org.eclipse.rdf4j.model.BNode) {
+								org.eclipse.rdf4j.model.BNode bnode = (org.eclipse.rdf4j.model.BNode) value;
+
+								return (Value) svf.createBNode(bnode.getID());
+							}
+
+							if(value instanceof org.eclipse.rdf4j.model.IRI) {
+								org.eclipse.rdf4j.model.IRI iri = (org.eclipse.rdf4j.model.IRI) value;
+
+								return (Value) svf.createIRI(iri.stringValue());
+							}
+
+							if(value instanceof org.eclipse.rdf4j.model.Literal) {
+								org.eclipse.rdf4j.model.Literal literal = (org.eclipse.rdf4j.model.Literal) value;
+
+								return (Value) svf.createLiteral(literal.stringValue(), svf.createIRI(literal.getDatatype().stringValue()));
+							}
+
+							throw new RuntimeException("Unknown value type: " + value);
+						}
+
+						private org.openrdf.model.Resource translateResource(org.eclipse.rdf4j.model.Resource res) {
+							SimpleValueFactory svf = SimpleValueFactory.getInstance();
+
+							if(res instanceof org.eclipse.rdf4j.model.BNode) {
+								org.eclipse.rdf4j.model.BNode bnode = (org.eclipse.rdf4j.model.BNode) res;
+
+								return (Resource) svf.createBNode(bnode.getID());
+							}
+
+							if(res instanceof org.eclipse.rdf4j.model.IRI) {
+								org.eclipse.rdf4j.model.IRI iri = (org.eclipse.rdf4j.model.IRI) res;
+
+								return (Resource) svf.createIRI(iri.stringValue());
+							}
+
+							throw new RuntimeException("Unknown resource type: " + res);
+						}
+
+						@Override
+						public void handleComment(String comment) throws RDFHandlerException {
+							rdfHandler.handleComment(comment);
+						}
+					});
+
+  				parser.parse(new FileReader(jsonldFile), "http://example.org/jphyloref#");
+
+					/*
+					RioJsonLDParserFactory factory = new RioJsonLDParserFactory();
+					factory.createParser().parse(new FileDocumentSource(jsonldFile), ontology, config);
+  				*/
+
+  				response.put("ontology", ontology.toString());
+
+				} catch (OWLOntologyCreationException | IOException ex) {
+					response.put("status", "error");
+					response.put("error", "Exception thrown: " + ex.getMessage());
+					ex.printStackTrace();
+					return newFixedLengthResponse(Status.INTERNAL_ERROR, "application/json", response.toString());
+				}
+
+  				return newFixedLengthResponse(Status.OK, "application/json", response.toString());
+
+  			} else if(path.equals("/version")) {
         			String owlapiVersion = VersionInfo.getVersionInfo().getVersion();
 
         			response.put("name", "JPhyloRef/" + JPhyloRef.VERSION + " OWLAPI/" + owlapiVersion);

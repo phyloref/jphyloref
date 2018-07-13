@@ -49,7 +49,7 @@
           	<version>2.3.1</version>
         </dependency>
 
-        <!-- For writing JSONLD -->
+        <!-- For writing JSON -->
         <!-- https://mvnrepository.com/artifact/org.json/json -->
     		<dependency>
     		    <groupId>org.json</groupId>
@@ -58,11 +58,20 @@
     		</dependency>
 
         <!-- For reading and writing JSON-LD -->
+        <!-- https://mvnrepository.com/artifact/org.eclipse.rdf4j/rdf4j-rio-jsonld -->
         <dependency>
-          	<groupId>org.apache.commons</groupId>
-          	<artifactId>commons-rdf-jsonld-java</artifactId>
-          	<version>0.5.0</version>
+    		    <groupId>org.eclipse.rdf4j</groupId>
+    		    <artifactId>rdf4j-rio-jsonld</artifactId>
+    		    <version>2.3.2</version>
+            <scope>runtime</scope>
         </dependency>
+
+      	<dependency>
+      	    <groupId>org.eclipse.rdf4j</groupId>
+      	    <artifactId>rdf4j-rio-api</artifactId>
+      	    <version>2.3.2</version>
+      	</dependency>
+
     </dependencies>
 
     <build>
