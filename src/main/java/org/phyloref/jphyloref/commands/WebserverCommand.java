@@ -166,13 +166,23 @@ public class WebserverCommand implements Command {
 
 					rdfHandler.setOntologyFormat(new RDFJsonLDDocumentFormat());
 
-					// parser.setRDFHandler(adapter);
+          // We would like to use:
+          //  parser.setRDFHandler(adapter);
+          // Or alternatively:
+          //  RioJsonLDParserFactory factory = new RioJsonLDParserFactory();
+          //  factory.createParser().parse(new FileDocumentSource(jsonldFile), ontology, config);
+          //
+          // Unfortunately, RioOWLRDFConsumerAdapter implements org.openrdf.rio.RDFHandler
+          // while the JSON-LD parser expects org.eclipse.rdf4j.rio.RDFHandler. I've tried
+          // adding https://mvnrepository.com/artifact/org.openrdf.sesame/sesame-rio-jsonld,
+          // as version 2.9.0, 4.0.2 and 4.1.2, but neither version registers as a JSON-LD
+          // handler, giving the following error message:
+          //	Caused by: org.openrdf.rio.UnsupportedRDFormatException: Did not recognise RDF
+          //	format object JSON-LD (mimeTypes=application/ld+json; ext=jsonld)
+          // So as to keep moving, I've written a very hacky translator from
+          // an org.openrdf.rio.RDFHandler to an org.eclipse.rdf4j.rio.RDFHandler.
+          //
 					parser.setRDFHandler(new org.eclipse.rdf4j.rio.RDFHandler() {
-						// So RioOWLRDFConsumerAdapter implements org.openrdf.rio.RDFHandler
-						// but the JSON-LD parser expects org.eclipse.rdf4j.rio.RDFHandler.
-						//
-						// This class translates between the two.
-
 						@Override
 						public void startRDF() throws RDFHandlerException {
 							rdfHandler.startRDF();
@@ -250,12 +260,6 @@ public class WebserverCommand implements Command {
 					});
 
   				parser.parse(new FileReader(jsonldFile), "http://example.org/jphyloref#");
-
-					/*
-					RioJsonLDParserFactory factory = new RioJsonLDParserFactory();
-					factory.createParser().parse(new FileDocumentSource(jsonldFile), ontology, config);
-  				*/
-
   				response.put("ontology", ontology.toString());
 
 				} catch (OWLOntologyCreationException | IOException ex) {
