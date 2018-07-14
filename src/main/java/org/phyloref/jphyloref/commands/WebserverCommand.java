@@ -3,42 +3,44 @@ package org.phyloref.jphyloref.commands;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.eclipse.rdf4j.rio.RDFFormat;
-import org.eclipse.rdf4j.rio.RDFHandler;
 import org.eclipse.rdf4j.rio.RDFHandlerException;
 import org.eclipse.rdf4j.rio.RDFParser;
 import org.eclipse.rdf4j.rio.Rio;
 import org.json.JSONObject;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.SimpleValueFactory;
 import org.phyloref.jphyloref.JPhyloRef;
+import org.phyloref.jphyloref.helpers.PhylorefHelper;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.formats.RDFDocumentFormat;
 import org.semanticweb.owlapi.formats.RDFJsonLDDocumentFormat;
-import org.semanticweb.owlapi.io.FileDocumentSource;
-import org.semanticweb.owlapi.io.OWLOntologyLoaderMetaData;
-import org.semanticweb.owlapi.io.RDFResourceParseError;
+import org.semanticweb.owlapi.model.ClassExpressionType;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyLoaderConfiguration;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapi.rio.RioOWLRDFConsumerAdapter;
+import org.semanticweb.owlapi.search.EntitySearcher;
 import org.semanticweb.owlapi.util.AnonymousNodeChecker;
 import org.semanticweb.owlapi.util.VersionInfo;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.Response.Status;
+import uk.ac.manchester.cs.jfact.JFactReasoner;
+import uk.ac.manchester.cs.jfact.kernel.options.JFactReasonerConfiguration;
 
 /**
  * Sets up a webserver that allows reasoning over phyloreferences
@@ -261,6 +263,34 @@ public class WebserverCommand implements Command {
 
   				parser.parse(new FileReader(jsonldFile), "http://example.org/jphyloref#");
   				response.put("ontology", ontology.toString());
+  				
+  				// We have an ontology! Let's reason over it.
+  				Map<String, Set<String>> nodesPerPhylorefAsString = new HashMap<>();
+  				
+  				JFactReasonerConfiguration jfactConfig = new JFactReasonerConfiguration();
+  				JFactReasoner reasoner = new JFactReasoner(ontology, jfactConfig, BufferingMode.BUFFERING);
+  				for(OWLNamedIndividual phyloref: PhylorefHelper.getPhyloreferences(ontology, reasoner)) {
+  					IRI phylorefIRI = phyloref.getIRI();
+  					
+  		            OWLClass phylorefAsClass = manager.getOWLDataFactory().getOWLClass(phylorefIRI);
+  					Set<String> nodes = reasoner.getInstances(phylorefAsClass, false).entities()
+		                // This includes the phyloreference itself. We only want to
+		                // look at phylogeny nodes here. So, let's filter down to named
+		                // individuals that are asserted to be cdao:Nodes.
+		                .filter(indiv -> EntitySearcher.getTypes(indiv, ontology).anyMatch(
+		                    type -> (!type.getClassExpressionType().equals(ClassExpressionType.OWL_CLASS)) ||
+		                			type.asOWLClass().getIRI().equals(PhylorefHelper.IRI_CDAO_NODE)
+		                ))
+		                .map(indiv -> indiv.getIRI().getIRIString())
+		                .collect(Collectors.toSet());
+  					
+  					System.err.println("Phyloref '" + phylorefIRI + "' matched nodes: " + nodes.toString());
+  					
+  					nodesPerPhylorefAsString.put(phylorefIRI.getIRIString(), nodes);
+  				}
+  				
+  				// Record phyloreferences and matching nodes in JSON response.
+  				response.put("phylorefs", nodesPerPhylorefAsString);
 
 				} catch (OWLOntologyCreationException | IOException ex) {
 					response.put("status", "error");
