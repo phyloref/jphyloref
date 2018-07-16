@@ -2,6 +2,7 @@ package org.phyloref.jphyloref.commands;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -409,18 +410,29 @@ public class WebserverCommand implements Command {
   		System.out.println(">> Request received to '" + path + "': " + params);
 
 			if(path.equals("/reason")) {
-				// If there are multiple 'jsonld' objects, we only read the first one.
-				String filename = String.join("; ", params.get("jsonld"));
-				File jsonldFile = new File(files.get("jsonld"));
+        // We accept two kinds of inputs:
+        //  1. A form containing 'jsonld' as a JSON-LD string to process.
+        //  2. A form containing 'jsonldFile' as a JSON-LD file to read.
+        String filename;
+				File jsonldFile;
 
-				// Is there is a readable file on the file path?
-				if(jsonldFile == null || !jsonldFile.canRead()) {
-					response.put("status", "error");
-					response.put("error", "Expected a form with a file upload in the 'jsonld' field, but no such field was found");
-				}
+        try {
+          if(params.containsKey("jsonldFile")) {
+            filename = String.join("; ", params.get("jsonldFile"));
+            jsonldFile = new File(files.get("jsonldFile"));
+          } else if(params.containsKey("jsonld")) {
+            jsonldFile = File.createTempFile("jphyloref", null);
 
-				// We have a readable file! But is it JSON-LD?
-				try {
+            FileWriter writer = new FileWriter(jsonldFile);
+            writer.write(String.join(";", params.get("jsonld")));
+            writer.close();
+
+          } else {
+            response.put("status", "error");
+  					response.put("error", "Expected a form with a file upload in the 'jsonldFile' field or a JSON-LD string in the 'jsonld' field, but no such field was found");
+            return createResponse(Status.BAD_REQUEST, response);
+          }
+
           return createResponse(Status.OK, serveReason(jsonldFile));
 				} catch (OWLOntologyCreationException | IOException ex) {
 					response.put("status", "error");
