@@ -300,6 +300,9 @@ public class WebserverCommand implements Command {
       });
 
       // Setup ready; parse the file!
+      // We could jsonldFile.toURI().toString() as the file IRI, but this points
+      // to a temporary file on the server where the JSON-LD file was stored by
+      // NanoHTTPD.
       parser.parse(new FileReader(jsonldFile), "http://example.org/jphyloref#");
       response.put("ontology", ontology.toString());
 
