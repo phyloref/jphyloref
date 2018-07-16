@@ -46,252 +46,366 @@ import uk.ac.manchester.cs.jfact.kernel.options.JFactReasonerConfiguration;
  * Sets up a webserver that allows reasoning over phyloreferences
  * over HTTP.
  *
+ * At the moment, we implement a simple API, in which:
+ *  /version:   returns a JSON object with information on the version of
+ *              JPhyloRef and the reasoner being used.
+ *  /reason:    expects a form upload with a 'jsonld' element containing a file
+ *              upload of a JSON-LD file representing an ontology to test.
+ *              This command will reason over the ontology and return a JSON
+ *              dictionary, in which the keys are the IRIs for each phyloreference,
+ *              and the values are lists of the IRIs of each node matched by that
+ *              phyloreference.
+ *
  * @author Gaurav Vaidya <gaurav@ggvaidya.com>
  *
  */
 public class WebserverCommand implements Command {
+  /**
+   * This command is named "webserver". It should be
+   * invoked as "java -jar jphyloref.jar webserver ..."
+   */
+  @Override
+  public String getName() {
+    return "webserver";
+  }
+
+  /**
+   * A description of the Webserver command.
+   *
+   * @return A description of this command.
+   */
+  @Override
+  public String getDescription() {
+    return "Set up a webserver to allow reasoning of phyloreferences over HTTP.";
+  }
+
+  /**
+   * Add command-line options specific to this command.
+   *
+   * @param opts The command-line options to modify for this command.
+   */
+  @Override
+  public void addCommandLineOptions(Options opts) {
+    opts.addOption(
+      "h", "host", true,
+      "The hostname to listen to HTTP connections on (default: 'localhost')"
+    );
+    opts.addOption(
+      "p", "port", true,
+      "The TCP port to listen to HTTP connections on (default: 8080)"
+    );
+  }
+
+  /**
+   * Set up a webserver to listen on the provided hostname and port (or their defaults).
+   *
+   * @param cmdLine The command line options provided to this command.
+   */
+  @Override
+  public void execute(CommandLine cmdLine) throws RuntimeException {
+      String hostname = cmdLine.getOptionValue("host", "localhost");
+      String portString = cmdLine.getOptionValue("port", "8080");
+      int port = Integer.parseInt(portString);
+
+      try {
+        	Webserver webserver = new Webserver(this, hostname, port);
+        	while(webserver.isAlive()) {}
+      } catch(IOException ex) {
+          System.err.println("An error occurred while running webserver: " + ex);
+      }
+  }
+
+  /**
+   * The webserver we set up.
+   */
+  class Webserver extends fi.iki.elonen.NanoHTTPD {
     /**
-     * This command is named "webserver". It should be
-     * invoked as "java -jar jphyloref.jar webserver ..."
+     * We keep a copy of the WebserverCommand that invoked us, although we
+     * don't use this for now.
      */
-    @Override
-    public String getName() {
-        return "webserver";
-    }
+  	private final WebserverCommand cmd;
 
     /**
-     * A description of the Webserver command.
+     * Create and start the webserver. It starts in another thread, so
+     * execution will not stop.
      *
-     * @return A description of this command.
+     * @param cmd The WebserverCommand that created this Webserver.
+     * @param hostname The hostname under which this webserver should listen.
+     * @param port The port this webserver should listen to.
      */
-    @Override
-    public String getDescription() {
-        return "Set up a webserver to allow reasoning of phyloreferences over HTTP.";
+  	public Webserver(WebserverCommand cmd, String hostname, int port) throws IOException {
+  		super(hostname, port);
+
+  		this.cmd = cmd;
+
+  		start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
+  		System.out.println("Webserver started. Try accessing it at http://" + hostname + ":" + port + "/");
+  	}
+
+    /**
+     * Respond to a request for reasoning over a JSON-LD file (/reason).
+     */
+    public JSONObject serveReason(File jsonldFile) throws OWLOntologyCreationException, IOException {
+      JSONObject response = new JSONObject("{'status': 'ok'}");
+
+      // Prepare an ontology to fill with the provided JSON-LD file.
+      OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+      OWLOntology ontology = manager.createOntology();
+      OWLOntologyLoaderConfiguration config = new OWLOntologyLoaderConfiguration();
+
+      // Set up a RioOWLRDFConsumerAdapter that will take in RDF and will
+      // produce OWL to store in an ontology.
+      AnonymousNodeChecker anonymousNodeChecker = new AnonymousNodeChecker() {
+        /* Copied from https://github.com/owlcs/owlapi/blob/master/rio/src/main/java/org/semanticweb/owlapi/rio/RioParserImpl.java */
+
+        private boolean isAnonymous(String iri) {
+          return iri.startsWith("_:");
+        }
+
+        @Override
+        public boolean isAnonymousSharedNode(String iri) {
+          return isAnonymous(iri);
+        }
+
+        @Override
+        public boolean isAnonymousNode(String iri) {
+          return isAnonymous(iri);
+        }
+
+        @Override
+        public boolean isAnonymousNode(IRI iri) {
+          return isAnonymous(iri.toString());
+        }
+      };
+
+      RioOWLRDFConsumerAdapter rdfHandler = new RioOWLRDFConsumerAdapter(ontology, anonymousNodeChecker, config);
+      rdfHandler.setOntologyFormat(new RDFJsonLDDocumentFormat());
+
+      // Set up an RDF parser to read the JSON-LD file.
+      RDFParser parser = Rio.createParser(RDFFormat.JSONLD);
+
+      // We could connect the parser to the RioOWLRDFConsumerAdapter by saying:
+      //  parser.setRDFHandler(rdfHandler);
+      // Or alternatively:
+      //  RioJsonLDParserFactory factory = new RioJsonLDParserFactory();
+      //  factory.createParser().parse(new FileDocumentSource(jsonldFile), ontology, config);
+      //
+      // Unfortunately, RioOWLRDFConsumerAdapter implements org.openrdf.rio.RDFHandler
+      // while the JSON-LD parser expects org.eclipse.rdf4j.rio.RDFHandler. I've tried
+      // adding https://mvnrepository.com/artifact/org.openrdf.sesame/sesame-rio-jsonld,
+      // as version 2.9.0, 4.0.2 and 4.1.2, but neither version registers as a JSON-LD
+      // handler, giving the following error message:
+      //	Caused by: org.openrdf.rio.UnsupportedRDFormatException: Did not recognise RDF
+      //	format object JSON-LD (mimeTypes=application/ld+json; ext=jsonld)
+      // So as to keep moving, I've written a very hacky translator from
+      // an org.openrdf.rio.RDFHandler to an org.eclipse.rdf4j.rio.RDFHandler.
+      // (Tracked at https://github.com/phyloref/jphyloref/issues/11)
+      //
+      parser.setRDFHandler(new org.eclipse.rdf4j.rio.RDFHandler() {
+        // Most of these methods just call the corresponding method on the
+        // other rdfHandler.
+
+        @Override
+        public void startRDF() throws RDFHandlerException {
+          rdfHandler.startRDF();
+        }
+
+        @Override
+        public void endRDF() throws RDFHandlerException {
+          rdfHandler.endRDF();
+        }
+
+        @Override
+        public void handleNamespace(String prefix, String uri) throws RDFHandlerException {
+          rdfHandler.handleNamespace(prefix, uri);
+        }
+
+        @Override
+        public void handleComment(String comment) throws RDFHandlerException {
+          rdfHandler.handleComment(comment);
+        }
+
+        // The only exception to this are handleStatement(Statement), where we
+        // need to translate from one Statement to the other. We do this by
+        // translating subject, object and property using translateResource()
+        // (to translate Resources) and translateValue() (to translate Values).
+
+        @Override
+        public void handleStatement(org.eclipse.rdf4j.model.Statement st) throws RDFHandlerException {
+          SimpleValueFactory svf = SimpleValueFactory.getInstance();
+
+          // System.out.println("Translating statement " + st);
+
+          rdfHandler.handleStatement(svf.createStatement(
+            translateResource(st.getSubject()),
+            svf.createIRI(st.getPredicate().stringValue()),
+            translateValue(st.getObject())
+          ));
+        }
+
+        /**
+         * Translate a Resource from org.eclipse.rdf4j.model.Resource to
+         * org.openrdf.model.Resource. We support two kinds of resources:
+         * blank nodes (BNodes) and IRIs.
+         */
+        private org.openrdf.model.Resource translateResource(org.eclipse.rdf4j.model.Resource res) {
+          SimpleValueFactory svf = SimpleValueFactory.getInstance();
+
+          if(res instanceof org.eclipse.rdf4j.model.BNode) {
+            org.eclipse.rdf4j.model.BNode bnode = (org.eclipse.rdf4j.model.BNode) res;
+
+            return (Resource) svf.createBNode(bnode.getID());
+          }
+
+          if(res instanceof org.eclipse.rdf4j.model.IRI) {
+            org.eclipse.rdf4j.model.IRI iri = (org.eclipse.rdf4j.model.IRI) res;
+
+            return (Resource) svf.createIRI(iri.stringValue());
+          }
+
+          throw new RuntimeException("Unknown resource type: " + res);
+        }
+
+        /**
+         * Translate a Value from org.eclipse.rdf4j.model.Value to org.openrdf.model.Value.
+         * We support three kinds of Values: blank nodes (BNodes), IRIs and
+         * Literals. The first two are handled correctly, but literals are
+         * always converted into strings, regardless of their actual data type.
+         */
+        private org.openrdf.model.Value translateValue(org.eclipse.rdf4j.model.Value value) {
+          SimpleValueFactory svf = SimpleValueFactory.getInstance();
+
+          if(value instanceof org.eclipse.rdf4j.model.BNode) {
+            org.eclipse.rdf4j.model.BNode bnode = (org.eclipse.rdf4j.model.BNode) value;
+
+            return (Value) svf.createBNode(bnode.getID());
+          }
+
+          if(value instanceof org.eclipse.rdf4j.model.IRI) {
+            org.eclipse.rdf4j.model.IRI iri = (org.eclipse.rdf4j.model.IRI) value;
+
+            return (Value) svf.createIRI(iri.stringValue());
+          }
+
+          if(value instanceof org.eclipse.rdf4j.model.Literal) {
+            org.eclipse.rdf4j.model.Literal literal = (org.eclipse.rdf4j.model.Literal) value;
+
+            // Note that this converts literals that should be treated as integers,
+            // doubles and so on will be converted into strings here.
+            return (Value) svf.createLiteral(literal.stringValue(), svf.createIRI(literal.getDatatype().stringValue()));
+          }
+
+          throw new RuntimeException("Unknown value type: " + value);
+        }
+      });
+
+      // Setup ready; parse the file!
+      parser.parse(new FileReader(jsonldFile), "http://example.org/jphyloref#");
+      response.put("ontology", ontology.toString());
+
+      // We have an ontology! Let's reason over it, and store the results as
+      // a map of a list of node IRIs matched by each phyloref IRI.
+      Map<String, Set<String>> nodesPerPhylorefAsString = new HashMap<>();
+
+      // Set up and start the reasoner.
+      JFactReasonerConfiguration jfactConfig = new JFactReasonerConfiguration();
+      JFactReasoner reasoner = new JFactReasoner(ontology, jfactConfig, BufferingMode.BUFFERING);
+
+      // Go through all the phyloreferences, identifying all the nodes that have
+      // matched to that phyloreference.
+      for(OWLNamedIndividual phyloref: PhylorefHelper.getPhyloreferences(ontology, reasoner)) {
+        IRI phylorefIRI = phyloref.getIRI();
+
+        // Pun from the named individual phyloref to the class with the same IRI.
+        OWLClass phylorefAsClass = manager.getOWLDataFactory().getOWLClass(phylorefIRI);
+
+        // Identify all individuals contained in the class, but filter out everything that
+        // is not an IRI_CDAO_NODE.
+        Set<String> nodes = reasoner.getInstances(phylorefAsClass, false).entities()
+          // This includes the phyloreference itself. We only want to
+          // look at phylogeny nodes here. So, let's filter down to named
+          // individuals that are asserted to be cdao:Nodes.
+          .filter(indiv -> EntitySearcher.getTypes(indiv, ontology).anyMatch(
+            type -> (!type.getClassExpressionType().equals(ClassExpressionType.OWL_CLASS)) ||
+              type.asOWLClass().getIRI().equals(PhylorefHelper.IRI_CDAO_NODE)
+          ))
+          .map(indiv -> indiv.getIRI().getIRIString())
+          .collect(Collectors.toSet());
+
+        nodesPerPhylorefAsString.put(phylorefIRI.getIRIString(), nodes);
+      }
+
+      // Record phyloreferences and matching nodes in JSON response.
+      response.put("phylorefs", nodesPerPhylorefAsString);
+      return response;
     }
 
     /**
-     * Add command-line options specific to this command.
-     *
-     * @param opts The command-line options to modify for this command.
+     * Respond to a request for the version (GET /version).
      */
-    @Override
-    public void addCommandLineOptions(Options opts) {
-        opts.addOption(
-            "h", "host", true,
-            "The hostname to listen to HTTP connections on (default: 'localhost')"
-        );
-        opts.addOption(
-            "p", "port", true,
-            "The TCP port to listen to HTTP connections on (default: 8080)"
-        );
+    public JSONObject serveVersion() {
+      JSONObject response = new JSONObject("{'status': 'ok'}");
+
+      // Report OWL API version.
+      String owlapiVersion = VersionInfo.getVersionInfo().getVersion();
+      response.put("owlapiVersion", owlapiVersion);
+
+      // Report reasoner version.
+      JFactReasonerConfiguration jfactConfig = new JFactReasonerConfiguration();
+      JFactReasoner reasoner = new JFactReasoner(null, jfactConfig, BufferingMode.BUFFERING);
+      response.put("reasonerVersion", reasoner.getReasonerName() + "/" + reasoner.getReasonerVersion());
+
+      // Report JPhyloRef version.
+      response.put("name",
+        "JPhyloRef/" + JPhyloRef.VERSION +
+        " OWLAPI/" + owlapiVersion + " " +
+        reasoner.getReasonerName() + "/" + reasoner.getReasonerVersion()
+      );
+      response.put("version", JPhyloRef.VERSION);
+
+      return response;
     }
 
     /**
-     * The webserver we set up.
+     * Respond to a request sent to this webserver.
      */
-    class Webserver extends fi.iki.elonen.NanoHTTPD {
-    	private final WebserverCommand cmd;
+  	@Override
+  	public Response serve(IHTTPSession session) {
+  		// Look for web forms in the body of the HTTP request.
+  		Map<String, String> files = new HashMap<>();
+  		if(session.getMethod().equals(Method.PUT) || session.getMethod().equals(Method.POST)) {
+  			try {
+  				session.parseBody(files);
+  			} catch(IOException ex) {
+  				return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Server threw IOException: " + ex);
+  			} catch(ResponseException re) {
+  				return newFixedLengthResponse(re.getStatus(), MIME_PLAINTEXT, re.getMessage());
+  			}
+  		}
 
-    	public Webserver(WebserverCommand cmd, String hostname, int port) throws IOException {
-      		super(hostname, port);
+      // Errors after this point respond with a JSON object.
+      JSONObject response = new JSONObject("{'status': 'ok'}");
 
-      		this.cmd = cmd;
+  		// Get path and parameters.
+  		String path = session.getUri();
+  		Map<String, List<String>> params = session.getParameters();
 
-      		start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
-      		System.out.println("Webserver started. Try accessing it at http://" + hostname + ":" + port + "/");
-    	}
+  		System.out.println(">> Request received to '" + path + "': " + params);
 
-    	@Override
-    	public Response serve(IHTTPSession session) {
-      		// Is there content in the body?
-    		Map<String, String> files = new HashMap<>();
-    		if(session.getMethod().equals(Method.PUT) || session.getMethod().equals(Method.POST)) {
-    			try {
-    				session.parseBody(files);
-    			} catch(IOException ex) {
-    				return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Server threw IOException: " + ex);
-    			} catch(ResponseException re) {
-    				return newFixedLengthResponse(re.getStatus(), MIME_PLAINTEXT, re.getMessage());
-    			}
-    		}
+			if(path.equals("/reason")) {
+				// If there are multiple 'jsonld' objects, we only read the first one.
+				String filename = String.join("; ", params.get("jsonld"));
+				File jsonldFile = new File(files.get("jsonld"));
 
-      		// Get path and parameters.
-    		String path = session.getUri();
-      		Map<String, List<String>> params = session.getParameters();
+				// Is there is a readable file on the file path?
+				if(jsonldFile == null || !jsonldFile.canRead()) {
+					response.put("status", "error");
+					response.put("error", "Expected a form with a file upload in the 'jsonld' field, but no such field was found");
+				}
 
-      		System.out.println(">> Request received to '" + path + "': " + params);
-
-  			  JSONObject response = new JSONObject("{'status': 'ok'}");
-
-  			if(path.equals("/test")) {
-  				// If there are multiple 'jsonld' objects, we only read the first one.
-  				String filename = String.join("; ", params.get("jsonld"));
-  				File jsonldFile = new File(files.get("jsonld"));
-
-  				// Is there is a readable file on the file path?
-  				if(jsonldFile == null || !jsonldFile.canRead()) {
-  					response.put("status", "error");
-  					response.put("error", "Expected a form with a file upload in the 'jsonld' field, but no such field was found");
-  				}
-
-  				// We have a readable file! But is it JSON-LD?
-  				try {
-  					OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-  					OWLOntology ontology = manager.createOntology();
-  					OWLOntologyLoaderConfiguration config = new OWLOntologyLoaderConfiguration();
-  					AnonymousNodeChecker anonymousNodeChecker = new AnonymousNodeChecker() {
-  						/* Stolen from https://github.com/owlcs/owlapi/blob/master/rio/src/main/java/org/semanticweb/owlapi/rio/RioParserImpl.java */
-
-  						private boolean isAnonymous(String iri) {
-  							return iri.startsWith("_:");
-  						}
-
-						@Override
-						public boolean isAnonymousSharedNode(String iri) {
-							return isAnonymous(iri);
-						}
-
-						@Override
-						public boolean isAnonymousNode(String iri) {
-							return isAnonymous(iri);
-						}
-
-						@Override
-						public boolean isAnonymousNode(IRI iri) {
-							return isAnonymous(iri.toString());
-						}
-					};
-
-					RDFParser parser = Rio.createParser(RDFFormat.JSONLD);
-					RioOWLRDFConsumerAdapter rdfHandler = new RioOWLRDFConsumerAdapter(ontology, anonymousNodeChecker, config);
-					System.err.println("Created adapter of class " + rdfHandler.getClass() + ": " + rdfHandler.toString());
-
-					rdfHandler.setOntologyFormat(new RDFJsonLDDocumentFormat());
-
-          // We would like to use:
-          //  parser.setRDFHandler(adapter);
-          // Or alternatively:
-          //  RioJsonLDParserFactory factory = new RioJsonLDParserFactory();
-          //  factory.createParser().parse(new FileDocumentSource(jsonldFile), ontology, config);
-          //
-          // Unfortunately, RioOWLRDFConsumerAdapter implements org.openrdf.rio.RDFHandler
-          // while the JSON-LD parser expects org.eclipse.rdf4j.rio.RDFHandler. I've tried
-          // adding https://mvnrepository.com/artifact/org.openrdf.sesame/sesame-rio-jsonld,
-          // as version 2.9.0, 4.0.2 and 4.1.2, but neither version registers as a JSON-LD
-          // handler, giving the following error message:
-          //	Caused by: org.openrdf.rio.UnsupportedRDFormatException: Did not recognise RDF
-          //	format object JSON-LD (mimeTypes=application/ld+json; ext=jsonld)
-          // So as to keep moving, I've written a very hacky translator from
-          // an org.openrdf.rio.RDFHandler to an org.eclipse.rdf4j.rio.RDFHandler.
-          //
-					parser.setRDFHandler(new org.eclipse.rdf4j.rio.RDFHandler() {
-						@Override
-						public void startRDF() throws RDFHandlerException {
-							rdfHandler.startRDF();
-						}
-
-						@Override
-						public void endRDF() throws RDFHandlerException {
-							rdfHandler.endRDF();
-						}
-
-						@Override
-						public void handleNamespace(String prefix, String uri) throws RDFHandlerException {
-							rdfHandler.handleNamespace(prefix, uri);
-						}
-
-						@Override
-						public void handleStatement(org.eclipse.rdf4j.model.Statement st) throws RDFHandlerException {
-							SimpleValueFactory svf = SimpleValueFactory.getInstance();
-
-							System.err.println("Translating statement " + st);
-
-							rdfHandler.handleStatement(svf.createStatement(
-								translateResource(st.getSubject()),
-								svf.createIRI(st.getPredicate().stringValue()),
-								translateValue(st.getObject())
-							));
-						}
-
-						private org.openrdf.model.Value translateValue(org.eclipse.rdf4j.model.Value value) {
-							SimpleValueFactory svf = SimpleValueFactory.getInstance();
-
-							if(value instanceof org.eclipse.rdf4j.model.BNode) {
-								org.eclipse.rdf4j.model.BNode bnode = (org.eclipse.rdf4j.model.BNode) value;
-
-								return (Value) svf.createBNode(bnode.getID());
-							}
-
-							if(value instanceof org.eclipse.rdf4j.model.IRI) {
-								org.eclipse.rdf4j.model.IRI iri = (org.eclipse.rdf4j.model.IRI) value;
-
-								return (Value) svf.createIRI(iri.stringValue());
-							}
-
-							if(value instanceof org.eclipse.rdf4j.model.Literal) {
-								org.eclipse.rdf4j.model.Literal literal = (org.eclipse.rdf4j.model.Literal) value;
-
-								return (Value) svf.createLiteral(literal.stringValue(), svf.createIRI(literal.getDatatype().stringValue()));
-							}
-
-							throw new RuntimeException("Unknown value type: " + value);
-						}
-
-						private org.openrdf.model.Resource translateResource(org.eclipse.rdf4j.model.Resource res) {
-							SimpleValueFactory svf = SimpleValueFactory.getInstance();
-
-							if(res instanceof org.eclipse.rdf4j.model.BNode) {
-								org.eclipse.rdf4j.model.BNode bnode = (org.eclipse.rdf4j.model.BNode) res;
-
-								return (Resource) svf.createBNode(bnode.getID());
-							}
-
-							if(res instanceof org.eclipse.rdf4j.model.IRI) {
-								org.eclipse.rdf4j.model.IRI iri = (org.eclipse.rdf4j.model.IRI) res;
-
-								return (Resource) svf.createIRI(iri.stringValue());
-							}
-
-							throw new RuntimeException("Unknown resource type: " + res);
-						}
-
-						@Override
-						public void handleComment(String comment) throws RDFHandlerException {
-							rdfHandler.handleComment(comment);
-						}
-					});
-
-  				parser.parse(new FileReader(jsonldFile), "http://example.org/jphyloref#");
-  				response.put("ontology", ontology.toString());
-  				
-  				// We have an ontology! Let's reason over it.
-  				Map<String, Set<String>> nodesPerPhylorefAsString = new HashMap<>();
-  				
-  				JFactReasonerConfiguration jfactConfig = new JFactReasonerConfiguration();
-  				JFactReasoner reasoner = new JFactReasoner(ontology, jfactConfig, BufferingMode.BUFFERING);
-  				for(OWLNamedIndividual phyloref: PhylorefHelper.getPhyloreferences(ontology, reasoner)) {
-  					IRI phylorefIRI = phyloref.getIRI();
-  					
-  		            OWLClass phylorefAsClass = manager.getOWLDataFactory().getOWLClass(phylorefIRI);
-  					Set<String> nodes = reasoner.getInstances(phylorefAsClass, false).entities()
-		                // This includes the phyloreference itself. We only want to
-		                // look at phylogeny nodes here. So, let's filter down to named
-		                // individuals that are asserted to be cdao:Nodes.
-		                .filter(indiv -> EntitySearcher.getTypes(indiv, ontology).anyMatch(
-		                    type -> (!type.getClassExpressionType().equals(ClassExpressionType.OWL_CLASS)) ||
-		                			type.asOWLClass().getIRI().equals(PhylorefHelper.IRI_CDAO_NODE)
-		                ))
-		                .map(indiv -> indiv.getIRI().getIRIString())
-		                .collect(Collectors.toSet());
-  					
-  					System.err.println("Phyloref '" + phylorefIRI + "' matched nodes: " + nodes.toString());
-  					
-  					nodesPerPhylorefAsString.put(phylorefIRI.getIRIString(), nodes);
-  				}
-  				
-  				// Record phyloreferences and matching nodes in JSON response.
-  				response.put("phylorefs", nodesPerPhylorefAsString);
-
+				// We have a readable file! But is it JSON-LD?
+				try {
+          return newFixedLengthResponse(Status.OK, "application/json", serveReason(jsonldFile).toString());
 				} catch (OWLOntologyCreationException | IOException ex) {
 					response.put("status", "error");
 					response.put("error", "Exception thrown: " + ex.getMessage());
@@ -299,39 +413,13 @@ public class WebserverCommand implements Command {
 					return newFixedLengthResponse(Status.INTERNAL_ERROR, "application/json", response.toString());
 				}
 
-  				return newFixedLengthResponse(Status.OK, "application/json", response.toString());
-
-  			} else if(path.equals("/version")) {
-        			String owlapiVersion = VersionInfo.getVersionInfo().getVersion();
-
-        			response.put("name", "JPhyloRef/" + JPhyloRef.VERSION + " OWLAPI/" + owlapiVersion);
-        			response.put("version", JPhyloRef.VERSION);
-        			response.put("owlapiVersion", owlapiVersion);
-        			return newFixedLengthResponse(Status.OK, "application/json", response.toString());
-      		} else {
-        			response.put("status", "error");
-        			response.put("error", "Path '" + path + "' could not be found.");
-        			return newFixedLengthResponse(Status.NOT_FOUND, "application/json", response.toString());
-      		}
-    	}
-    }
-
-    /**
-     * Set up a webserver to listen on the provided hostname and port (or their defaults).
-     *
-     * @param cmdLine The command line options provided to this command.
-     */
-    @Override
-    public void execute(CommandLine cmdLine) throws RuntimeException {
-        String hostname = cmdLine.getOptionValue("host", "localhost");
-        String portString = cmdLine.getOptionValue("port", "8080");
-        int port = Integer.parseInt(portString);
-
-        try {
-          	Webserver webserver = new Webserver(this, hostname, port);
-          	while(webserver.isAlive()) {}
-        } catch(IOException ex) {
-            System.err.println("An error occurred while running webserver: " + ex);
-        }
-    }
+			} else if(path.equals("/version")) {
+      	return newFixedLengthResponse(Status.OK, "application/json", serveVersion().toString());
+  		} else {
+  			response.put("status", "error");
+  			response.put("error", "Path '" + path + "' could not be found.");
+  			return newFixedLengthResponse(Status.NOT_FOUND, "application/json", response.toString());
+  		}
+  	}
+  }
 }
