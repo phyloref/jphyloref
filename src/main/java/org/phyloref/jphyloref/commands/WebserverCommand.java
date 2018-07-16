@@ -39,6 +39,7 @@ import org.semanticweb.owlapi.util.VersionInfo;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.Response.Status;
+import fi.iki.elonen.NanoHTTPD.Response.IStatus;
 import uk.ac.manchester.cs.jfact.JFactReasoner;
 import uk.ac.manchester.cs.jfact.kernel.options.JFactReasonerConfiguration;
 
@@ -370,6 +371,18 @@ public class WebserverCommand implements Command {
     }
 
     /**
+     * Set up some common items when communicating with a browser.
+     */
+    public Response createResponse(IStatus status, JSONObject result) {
+      Response response = newFixedLengthResponse(status, "application/json", result.toString());
+
+      // Indicate that any resource can access this resource.
+      response.addHeader("Access-Control-Allow-Origin", "*");
+
+      return response;
+    }
+
+    /**
      * Respond to a request sent to this webserver.
      */
   	@Override
@@ -408,20 +421,20 @@ public class WebserverCommand implements Command {
 
 				// We have a readable file! But is it JSON-LD?
 				try {
-          return newFixedLengthResponse(Status.OK, "application/json", serveReason(jsonldFile).toString());
+          return createResponse(Status.OK, serveReason(jsonldFile));
 				} catch (OWLOntologyCreationException | IOException ex) {
 					response.put("status", "error");
 					response.put("error", "Exception thrown: " + ex.getMessage());
 					ex.printStackTrace();
-					return newFixedLengthResponse(Status.INTERNAL_ERROR, "application/json", response.toString());
+					return createResponse(Status.INTERNAL_ERROR, response);
 				}
 
 			} else if(path.equals("/version")) {
-      	return newFixedLengthResponse(Status.OK, "application/json", serveVersion().toString());
+      	return createResponse(Status.OK, serveVersion());
   		} else {
   			response.put("status", "error");
   			response.put("error", "Path '" + path + "' could not be found.");
-  			return newFixedLengthResponse(Status.NOT_FOUND, "application/json", response.toString());
+  			return createResponse(Status.NOT_FOUND, response);
   		}
   	}
   }
