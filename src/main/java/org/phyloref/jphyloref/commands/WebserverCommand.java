@@ -110,8 +110,8 @@ public class WebserverCommand implements Command {
       int port = Integer.parseInt(portString);
 
       try {
-        	Webserver webserver = new Webserver(this, hostname, port);
-        	while(webserver.isAlive()) {}
+          Webserver webserver = new Webserver(this, hostname, port);
+          while(webserver.isAlive()) {}
       } catch(IOException ex) {
           System.err.println("An error occurred while running webserver: " + ex);
       }
@@ -125,7 +125,7 @@ public class WebserverCommand implements Command {
      * We keep a copy of the WebserverCommand that invoked us, although we
      * don't use this for now.
      */
-  	private final WebserverCommand cmd;
+    private final WebserverCommand cmd;
 
     /**
      * Create and start the webserver. It starts in another thread, so
@@ -135,14 +135,14 @@ public class WebserverCommand implements Command {
      * @param hostname The hostname under which this webserver should listen.
      * @param port The port this webserver should listen to.
      */
-  	public Webserver(WebserverCommand cmd, String hostname, int port) throws IOException {
-  		super(hostname, port);
+    public Webserver(WebserverCommand cmd, String hostname, int port) throws IOException {
+      super(hostname, port);
 
-  		this.cmd = cmd;
+      this.cmd = cmd;
 
-  		start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
-  		System.out.println("Webserver started. Try accessing it at http://" + hostname + ":" + port + "/");
-  	}
+      start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
+      System.out.println("Webserver started. Try accessing it at http://" + hostname + ":" + port + "/");
+    }
 
     /**
      * Respond to a request for reasoning over a JSON-LD file (/reason).
@@ -386,35 +386,35 @@ public class WebserverCommand implements Command {
     /**
      * Respond to a request sent to this webserver.
      */
-  	@Override
-  	public Response serve(IHTTPSession session) {
-  		// Look for web forms in the body of the HTTP request.
-  		Map<String, String> files = new HashMap<>();
-  		if(session.getMethod().equals(Method.PUT) || session.getMethod().equals(Method.POST)) {
-  			try {
-  				session.parseBody(files);
-  			} catch(IOException ex) {
-  				return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Server threw IOException: " + ex);
-  			} catch(ResponseException re) {
-  				return newFixedLengthResponse(re.getStatus(), MIME_PLAINTEXT, re.getMessage());
-  			}
-  		}
+    @Override
+    public Response serve(IHTTPSession session) {
+      // Look for web forms in the body of the HTTP request.
+      Map<String, String> files = new HashMap<>();
+      if(session.getMethod().equals(Method.PUT) || session.getMethod().equals(Method.POST)) {
+        try {
+          session.parseBody(files);
+        } catch(IOException ex) {
+          return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Server threw IOException: " + ex);
+        } catch(ResponseException re) {
+          return newFixedLengthResponse(re.getStatus(), MIME_PLAINTEXT, re.getMessage());
+        }
+      }
 
       // Errors after this point respond with a JSON object.
       JSONObject response = new JSONObject("{'status': 'ok'}");
 
-  		// Get path and parameters.
-  		String path = session.getUri();
-  		Map<String, List<String>> params = session.getParameters();
+      // Get path and parameters.
+      String path = session.getUri();
+      Map<String, List<String>> params = session.getParameters();
 
-  		System.out.println(">> Request received to '" + path + "': " + params);
+      System.out.println(">> Request received to '" + path + "': " + params);
 
-			if(path.equals("/reason")) {
+      if(path.equals("/reason")) {
         // We accept two kinds of inputs:
         //  1. A form containing 'jsonld' as a JSON-LD string to process.
         //  2. A form containing 'jsonldFile' as a JSON-LD file to read.
         String filename;
-				File jsonldFile;
+        File jsonldFile;
 
         try {
           if(params.containsKey("jsonldFile")) {
@@ -429,25 +429,25 @@ public class WebserverCommand implements Command {
 
           } else {
             response.put("status", "error");
-  					response.put("error", "Expected a form with a file upload in the 'jsonldFile' field or a JSON-LD string in the 'jsonld' field, but no such field was found");
+            response.put("error", "Expected a form with a file upload in the 'jsonldFile' field or a JSON-LD string in the 'jsonld' field, but no such field was found");
             return createResponse(Status.BAD_REQUEST, response);
           }
 
           return createResponse(Status.OK, serveReason(jsonldFile));
-				} catch (OWLOntologyCreationException | IOException ex) {
-					response.put("status", "error");
-					response.put("error", "Exception thrown: " + ex.getMessage());
-					ex.printStackTrace();
-					return createResponse(Status.INTERNAL_ERROR, response);
-				}
+        } catch (OWLOntologyCreationException | IOException ex) {
+          response.put("status", "error");
+          response.put("error", "Exception thrown: " + ex.getMessage());
+          ex.printStackTrace();
+          return createResponse(Status.INTERNAL_ERROR, response);
+        }
 
-			} else if(path.equals("/version")) {
-      	return createResponse(Status.OK, serveVersion());
-  		} else {
-  			response.put("status", "error");
-  			response.put("error", "Path '" + path + "' could not be found.");
-  			return createResponse(Status.NOT_FOUND, response);
-  		}
-  	}
+      } else if(path.equals("/version")) {
+        return createResponse(Status.OK, serveVersion());
+      } else {
+        response.put("status", "error");
+        response.put("error", "Path '" + path + "' could not be found.");
+        return createResponse(Status.NOT_FOUND, response);
+      }
+    }
   }
 }
