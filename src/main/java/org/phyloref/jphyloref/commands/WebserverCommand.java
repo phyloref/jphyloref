@@ -36,6 +36,7 @@ import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapi.rio.RioOWLRDFConsumerAdapter;
 import org.semanticweb.owlapi.search.EntitySearcher;
 import org.semanticweb.owlapi.util.AnonymousNodeChecker;
+import org.semanticweb.owlapi.util.Version;
 import org.semanticweb.owlapi.util.VersionInfo;
 
 import fi.iki.elonen.NanoHTTPD;
@@ -356,15 +357,25 @@ public class WebserverCommand implements Command {
       response.put("owlapiVersion", owlapiVersion);
 
       // Report reasoner version.
-      JFactReasonerConfiguration jfactConfig = new JFactReasonerConfiguration();
-      JFactReasoner reasoner = new JFactReasoner(null, jfactConfig, BufferingMode.BUFFERING);
-      response.put("reasonerVersion", reasoner.getReasonerName() + "/" + reasoner.getReasonerVersion());
+      String reasonerVersion = "(unknown)";
+      try {
+        OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+        OWLOntology ontology = manager.createOntology();
+        JFactReasonerConfiguration jfactConfig = new JFactReasonerConfiguration();
+        JFactReasoner reasoner = new JFactReasoner(ontology, jfactConfig, BufferingMode.BUFFERING);
+        Version version = reasoner.getReasonerVersion();
+        reasonerVersion = reasoner.getReasonerName() + "/" +
+          version.getMajor() + "." + version.getMinor() + "." + version.getPatch() + "." + version.getBuild();
+      } catch(OWLOntologyCreationException ex) {
+        // This just means we couldn't reason over the ontology; ignore it.
+      }
+      response.put("reasonerVersion", reasonerVersion);
 
       // Report JPhyloRef version.
       response.put("name",
         "JPhyloRef/" + JPhyloRef.VERSION +
         " OWLAPI/" + owlapiVersion + " " +
-        reasoner.getReasonerName() + "/" + reasoner.getReasonerVersion()
+        reasonerVersion
       );
       response.put("version", JPhyloRef.VERSION);
 
