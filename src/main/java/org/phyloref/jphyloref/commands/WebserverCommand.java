@@ -94,7 +94,7 @@ public class WebserverCommand implements Command {
     );
     opts.addOption(
       "p", "port", true,
-      "The TCP port to listen to HTTP connections on (default: 8080)"
+      "The TCP port to listen to HTTP connections on (default: 34214)"
     );
   }
 
@@ -106,7 +106,7 @@ public class WebserverCommand implements Command {
   @Override
   public void execute(CommandLine cmdLine) throws RuntimeException {
       String hostname = cmdLine.getOptionValue("host", "localhost");
-      String portString = cmdLine.getOptionValue("port", "8080");
+      String portString = cmdLine.getOptionValue("port", "34214");
       int port = Integer.parseInt(portString);
 
       try {
