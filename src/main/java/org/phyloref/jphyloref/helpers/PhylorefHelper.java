@@ -28,7 +28,7 @@ public class PhylorefHelper {
     public static final IRI IRI_CDAO_NODE = IRI.create("http://purl.obolibrary.org/obo/CDAO_0000140");
 
     /** IRI for OWL class Phyloreference */
-    public static final IRI IRI_PHYLOREFERENCE = IRI.create("http://phyloinformatics.net/phyloref.owl#Phyloreference");
+    public static final IRI IRI_PHYLOREFERENCE = IRI.create("http://ontology.phyloref.org/phyloref.owl#Phyloreference");
 
     /** IRI for the OWL object property indicating which phylogeny a node belongs to */
     public static final IRI IRI_PHYLOGENY_CONTAINING_NODE = IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#in_phylogeny");
