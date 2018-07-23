@@ -171,8 +171,8 @@ public class TestCommand implements Command {
         OWLAnnotationProperty pso_holdsStatusInTime = dataFactory.getOWLAnnotationProperty(IRI.create("http://purl.org/spar/pso/holdsStatusInTime"));
         OWLAnnotationProperty pso_withStatus = dataFactory.getOWLAnnotationProperty(IRI.create("http://purl.org/spar/pso/withStatus"));
         OWLAnnotationProperty tvc_atTime = dataFactory.getOWLAnnotationProperty(IRI.create("http://www.essepuntato.it/2012/04/tvc/atTime"));
-        OWLDataProperty timeinterval_hasIntervalStartDate = dataFactory.getOWLDataProperty(IRI.create("http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#hasIntervalStartDate"));
-        OWLDataProperty timeinterval_hasIntervalEndDate = dataFactory.getOWLDataProperty(IRI.create("http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#hasIntervalEndDate"));
+        OWLAnnotationProperty timeinterval_hasIntervalStartDate = dataFactory.getOWLAnnotationProperty(IRI.create("http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#hasIntervalStartDate"));
+        OWLAnnotationProperty timeinterval_hasIntervalEndDate = dataFactory.getOWLAnnotationProperty(IRI.create("http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#hasIntervalEndDate"));
 
         // Count the number of test results.
         int testNumber = 0;
@@ -341,7 +341,7 @@ public class TestCommand implements Command {
                     for(OWLAnnotationAssertionAxiom axiom: ontology.getAnnotationAssertionAxioms(indiv_statusInTime)) {
                         if(axiom.getProperty().equals(tvc_atTime)) {
                             for(OWLAnonymousIndividual indiv_atTime: axiom.getValue().getAnonymousIndividuals()) {
-                                for(OWLDataPropertyAssertionAxiom axiom_interval: ontology.getDataPropertyAssertionAxioms(indiv_atTime)) {
+                                for(OWLAnnotationAssertionAxiom axiom_interval: ontology.getAnnotationAssertionAxioms(indiv_atTime)) {
                                     // Look for timeinterval:hasIntervalStartDate and timeinterval:hasIntervalEndDate data properties.
                                     if(axiom_interval.getProperty().equals(timeinterval_hasIntervalStartDate)) {
                                         hasIntervalStartDate = true;
