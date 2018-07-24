@@ -157,7 +157,7 @@ public class TestCommand implements Command {
 
         // Preload some terms we need to use in the following code.
         OWLDataFactory dataFactory = manager.getOWLDataFactory();
-        
+
         // Some classes we will use.
         OWLClass classCDAONode = dataFactory.getOWLClass(PhylorefHelper.IRI_CDAO_NODE);
 
@@ -168,11 +168,11 @@ public class TestCommand implements Command {
         // OWLDataProperty specifierDefinitionProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_CLADE_DEFINITION);
 
         // Terms assocated with publication status
-        OWLAnnotationProperty pso_holdsStatusInTime = dataFactory.getOWLAnnotationProperty(IRI.create("http://purl.org/spar/pso/holdsStatusInTime"));
-        OWLAnnotationProperty pso_withStatus = dataFactory.getOWLAnnotationProperty(IRI.create("http://purl.org/spar/pso/withStatus"));
-        OWLAnnotationProperty tvc_atTime = dataFactory.getOWLAnnotationProperty(IRI.create("http://www.essepuntato.it/2012/04/tvc/atTime"));
-        OWLAnnotationProperty timeinterval_hasIntervalStartDate = dataFactory.getOWLAnnotationProperty(IRI.create("http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#hasIntervalStartDate"));
-        OWLAnnotationProperty timeinterval_hasIntervalEndDate = dataFactory.getOWLAnnotationProperty(IRI.create("http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#hasIntervalEndDate"));
+        OWLAnnotationProperty pso_holdsStatusInTime = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_PSO_HOLDS_STATUS_IN_TIME);
+        OWLAnnotationProperty pso_withStatus = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_PSO_WITH_STATUS);
+        OWLAnnotationProperty tvc_atTime = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_TVC_AT_TIME);
+        OWLAnnotationProperty timeinterval_hasIntervalStartDate = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_TIMEINT_HAS_INTERVAL_START_DATE);
+        OWLAnnotationProperty timeinterval_hasIntervalEndDate = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_TIMEINT_HAS_INTERVAL_END_DATE);
 
         // Count the number of test results.
         int testNumber = 0;

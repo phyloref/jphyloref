@@ -23,7 +23,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
  */
 public class PhylorefHelper {
     // IRIs used in this package.
-    
+
     /** IRI for OWL class Phylogeny */
     public static final IRI IRI_CDAO_NODE = IRI.create("http://purl.obolibrary.org/obo/CDAO_0000140");
 
@@ -41,6 +41,21 @@ public class PhylorefHelper {
 
     /** IRI for the OWL data property with the verbatim clade definition */
     public static final IRI IRI_CLADE_DEFINITION = IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#clade_definition");
+
+    /** IRI for the OWL object property that associates a publication with its publication status at a particular time. */
+    public static final IRI IRI_PSO_HOLDS_STATUS_IN_TIME = IRI.create("http://purl.org/spar/pso/holdsStatusInTime");
+
+    /** IRI for the OWL object property that indicates the publication status of a publication status at a particular time. */
+    public static final IRI IRI_PSO_WITH_STATUS = IRI.create("http://purl.org/spar/pso/withStatus");
+
+    /** IRI for the OWL object property that associates a publication status at a particular time with a particular time. */
+    public static final IRI IRI_TVC_AT_TIME = IRI.create("http://www.essepuntato.it/2012/04/tvc/atTime");
+
+    /** IRI for the OWL data property that indicates when a publication status time begins */
+    public static final IRI IRI_TIMEINT_HAS_INTERVAL_START_DATE = IRI.create("http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#hasIntervalStartDate");
+
+    /** IRI for the OWL data property that indicates when a publication status time ends */
+    public static final IRI IRI_TIMEINT_HAS_INTERVAL_END_DATE = IRI.create("http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#hasIntervalEndDate");
 
     /**
      * Get a list of phyloreferences in this ontology without reasoning. This method does not use
@@ -79,7 +94,7 @@ public class PhylorefHelper {
      * Get a list of phyloreferences in this ontology. This method uses the
      * reasoner, and so will find all individuals determined to be of
      * type phyloref:Phyloreference.
-     * 
+     *
      * @param ontology The OWL Ontology within with we should look for phylorefs
      * @param reasoner The reasoner to use. May be null.
      */
@@ -88,7 +103,7 @@ public class PhylorefHelper {
         // inferred to be phyloref:Phyloreference, but we can still find all
         // individuals that are stated to be phyloref:Phyloreference. So let's do that!
         if(reasoner == null) return PhylorefHelper.getPhyloreferencesWithoutReasoning(ontology);
-        
+
         // Get a list of all phyloreferences. First, we need to know what a Phyloreference is.
         Set<OWLEntity> set_phyloref_Phyloreference = ontology.getEntitiesInSignature(IRI_PHYLOREFERENCE);
         if (set_phyloref_Phyloreference.isEmpty()) {
