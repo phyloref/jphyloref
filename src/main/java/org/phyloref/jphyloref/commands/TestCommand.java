@@ -3,6 +3,7 @@ package org.phyloref.jphyloref.commands;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -117,7 +118,7 @@ public class TestCommand implements Command {
         // Create File object to load
         File inputFile = new File(str_input);
         System.err.println("Input: " + inputFile);
-        
+
         // Set up an OWL Ontology Manager to work with.
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 
@@ -166,13 +167,6 @@ public class TestCommand implements Command {
         OWLDataProperty expectedPhyloreferenceNamedProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_NAME_OF_EXPECTED_PHYLOREF);
         OWLObjectProperty unmatchedSpecifierProperty = dataFactory.getOWLObjectProperty(PhylorefHelper.IRI_PHYLOREF_UNMATCHED_SPECIFIER);
         // OWLDataProperty specifierDefinitionProperty = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_CLADE_DEFINITION);
-
-        // Terms assocated with publication status
-        OWLAnnotationProperty pso_holdsStatusInTime = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_PSO_HOLDS_STATUS_IN_TIME);
-        OWLAnnotationProperty pso_withStatus = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_PSO_WITH_STATUS);
-        OWLAnnotationProperty tvc_atTime = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_TVC_AT_TIME);
-        OWLAnnotationProperty timeinterval_hasIntervalStartDate = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_TIMEINT_HAS_INTERVAL_START_DATE);
-        OWLAnnotationProperty timeinterval_hasIntervalEndDate = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_TIMEINT_HAS_INTERVAL_END_DATE);
 
         // Count the number of test results.
         int testNumber = 0;
@@ -322,63 +316,28 @@ public class TestCommand implements Command {
                 }
             }
 
-            // Retrieve holdsStatusInTime to determine the active status of this phyloreference.
-            Set<OWLAnnotation> holdsStatusInTime = new HashSet<>(EntitySearcher.getAnnotations(phylorefAsClass, ontology, pso_holdsStatusInTime));
+            // Get a list of phyloref statuses for this phyloreference.
+            List<PhylorefHelper.PhylorefStatus> statuses = PhylorefHelper.getCurrentStatusesForPhyloref(phyloref, ontology);
 
-            // Instead of checking which time interval were are in, we take a simpler approach: we look for all
-            // statuses that have a start date but not an end date, i.e. those which have yet to end.
-            Set<IRI> statuses = new HashSet<>();
-            for(OWLAnnotation statusInTime: holdsStatusInTime) {
-                // Each statusInTime entry should have one status (pso:withStatus)
-                // and a number of time intervals (tvc:atTime). We collect all
-                // statusues and test to see if any of those time intervals are
-                // "incomplete", i.e. they have a start date but no end date.
-            	Set<IRI> currentStatuses = new HashSet<>();
-                boolean hasIntervalStartDate = false;
-                boolean hasIntervalEndDate = false;
+            // Instead of checking which time interval we are currently in, we take a simpler approach:
+            // we look for all statuses asserted to be "active", i.e. those with a start time but no end time.
+            boolean flag_expected_to_resolve = false;
 
-            	for(OWLAnonymousIndividual indiv_statusInTime: statusInTime.getAnonymousIndividuals()) {
-                    for(OWLAnnotationAssertionAxiom axiom: ontology.getAnnotationAssertionAxioms(indiv_statusInTime)) {
-                        if(axiom.getProperty().equals(tvc_atTime)) {
-                            for(OWLAnonymousIndividual indiv_atTime: axiom.getValue().getAnonymousIndividuals()) {
-                                for(OWLAnnotationAssertionAxiom axiom_interval: ontology.getAnnotationAssertionAxioms(indiv_atTime)) {
-                                    // Look for timeinterval:hasIntervalStartDate and timeinterval:hasIntervalEndDate data properties.
-                                    if(axiom_interval.getProperty().equals(timeinterval_hasIntervalStartDate)) {
-                                        hasIntervalStartDate = true;
-                                    }
-                                    if(axiom_interval.getProperty().equals(timeinterval_hasIntervalEndDate)) {
-                                        hasIntervalEndDate = true;
-                                    }
-                                }
-                            }
-                        }
+            List<PhylorefHelper.PhylorefStatus> activeStatuses = statuses.stream()
+              .filter(ps -> ps.getIntervalStart() != null && ps.getIntervalEnd() == null)
+              .collect(Collectors.toList());
 
-                        else if(axiom.getProperty().equals(pso_withStatus)) {
-                            currentStatuses.add((IRI)axiom.getValue());
-                        } else {
-                            System.err.println("Unknown axiom: " + axiom);
-                            System.exit(-1);
-                        }
-                    }
-            	}
-
-                // Did the current statuses have a start date but no end date, i.e. are they currently active?
-                if(hasIntervalStartDate && !hasIntervalEndDate) {
-                    statuses.addAll(currentStatuses);
-                }
-            }
-
-            // System.err.println("Active statuses: " + statuses);
-
-            // Based on the phyloreference status, we can determine whether or not
-            // we expect the phyloreference to actually resolve: we do if there
-            // were no statuses, or if the statuses include submitted or published.
-            // In all other cases, we're not expecting the phyloreference to resolve.
-            boolean flag_expected_to_resolve = (
-                statuses.isEmpty() ||
-                statuses.contains(IRI.create("http://purl.org/spar/pso/submitted")) ||
-                statuses.contains(IRI.create("http://purl.org/spar/pso/published"))
-            );
+            // If there are no active statuses, we default to assuming that we expect phyloreferences to resolve.
+            if(activeStatuses.isEmpty())
+              flag_expected_to_resolve = true;
+            else
+              // If there are active statuses, we default to assuming that we expect phyloreferences NOT to resolve,
+              // unless they are actively in the "submitted" or "published" statuses.
+              flag_expected_to_resolve = activeStatuses.stream()
+                .anyMatch(ps ->
+                  ps.getStatus().equals(PhylorefHelper.IRI_PSO_STATUS_SUBMITTED) ||
+                  ps.getStatus().equals(PhylorefHelper.IRI_PSO_PUBLISHED)
+                );
 
             // Determine if this phyloreference has failed or succeeded.
             if(testFailed) {
