@@ -74,9 +74,10 @@ public class PhylorefHelper {
 
     /** IRI for the publication status of "Submitted" */
     public static final IRI IRI_PSO_SUBMITTED = IRI.create("http://purl.org/spar/pso/submitted");
+
     /** IRI for the publication status of "Published" */
     public static final IRI IRI_PSO_PUBLISHED = IRI.create("http://purl.org/spar/pso/published");
-    
+
     /**
      * Get a list of phyloreferences in this ontology without reasoning. This method does not use
      * the reasoner, and so will only find individuals asserted to have a type
@@ -136,154 +137,152 @@ public class PhylorefHelper {
         OWLClass phyloref_Phyloreference = set_phyloref_Phyloreference.iterator().next().asOWLClass();
         return reasoner.getInstances(phyloref_Phyloreference, true).getFlattened();
     }
-    
+
     /**
      * A wrapper for a phyloref status at a particular point in time.
      */
     public static class PhylorefStatus {
-    	private OWLNamedIndividual phyloref;
-    	private IRI statusIRI;
-    	private Instant intervalStart;
-    	private Instant intervalEnd;
-    	
-    	/**
-    	 * Create a PhylorefStatus. All arguments except status are optional, and may be null.
-    	 * 
-    	 * @param phyloref The phyloreference containing this status.
-    	 * @param status The status of this phyloreference, as an individual in the class http://purl.org/spar/pso/PublicationStatus. Required.
-    	 * @param intervalStart The interval at which this status starts.
-    	 * @param intervalEnd The interval at which this status ends. May be null if this status hasn't ended yet.
-    	 */
-    	public PhylorefStatus(OWLNamedIndividual phyloref, IRI status, Instant intervalStart, Instant intervalEnd) {
-    		this.phyloref = phyloref;
-    		this.statusIRI = status;
-    		this.intervalStart = intervalStart;
-    		this.intervalEnd = intervalEnd;
-    		
-    		if(status == null) throw new IllegalArgumentException("No status provided to PhylorefStatus, which is a required argument");
-    	}
-    	
-    	/**
-    	 * @return the phyloreference this status is associated with. May be null.
-    	 */
-    	public OWLNamedIndividual getPhyloref() {
-    		return phyloref;
-    	}
-    	
-    	/**
-    	 * @return the status of this phyloreference, as an individual in the class http://purl.org/spar/pso/PublicationStatus
-    	 */
-    	public IRI getStatus() {
-    		return statusIRI;
-    	}
-    	
-    	/**
-    	 * @return the interval at which this status starts.
-    	 */
-    	public Instant getIntervalStart() {
-    		return intervalStart;
-    	}
-    	
-    	/**
-    	 * @return the interval at which this status ends. May be null if this status hasn't ended yet.
-    	 */
-    	public Instant getIntervalEnd() {
-    		return intervalEnd;
-    	}
-    	
-    	/**
-    	 * @return a String representation of this phyloref status
-    	 */
-    	@Override
-    	public String toString() {
-    		StringBuffer statusString = new StringBuffer("phyloreference status " + statusIRI);
-    		
-    		if(getIntervalStart() != null) statusString.append(" starting at " + getIntervalStart().toString());
-    		if(getIntervalEnd() != null) statusString.append(" ending at " + getIntervalEnd().toString());
-    		
-    		return statusString.toString();
-    	}
+      private OWLNamedIndividual phyloref;
+      private IRI statusIRI;
+      private Instant intervalStart;
+      private Instant intervalEnd;
+
+      /**
+       * Create a PhylorefStatus. All arguments except status are optional, and may be null.
+       *
+       * @param phyloref The phyloreference containing this status.
+       * @param status The status of this phyloreference, as an individual in the class http://purl.org/spar/pso/PublicationStatus. Required.
+       * @param intervalStart The interval at which this status starts.
+       * @param intervalEnd The interval at which this status ends. May be null if this status hasn't ended yet.
+       */
+      public PhylorefStatus(OWLNamedIndividual phyloref, IRI status, Instant intervalStart, Instant intervalEnd) {
+        this.phyloref = phyloref;
+        this.statusIRI = status;
+        this.intervalStart = intervalStart;
+        this.intervalEnd = intervalEnd;
+
+        if(status == null) throw new IllegalArgumentException("No status provided to PhylorefStatus, which is a required argument");
+      }
+
+      /**
+       * @return the phyloreference this status is associated with. May be null.
+       */
+      public OWLNamedIndividual getPhyloref() {
+        return phyloref;
+      }
+
+      /**
+       * @return the status of this phyloreference, as an individual in the class http://purl.org/spar/pso/PublicationStatus
+       */
+      public IRI getStatus() {
+        return statusIRI;
+      }
+
+      /**
+       * @return the interval at which this status starts.
+       */
+      public Instant getIntervalStart() {
+        return intervalStart;
+      }
+
+      /**
+       * @return the interval at which this status ends. May be null if this status hasn't ended yet.
+       */
+      public Instant getIntervalEnd() {
+        return intervalEnd;
+      }
+
+      /**
+       * @return a String representation of this phyloref status
+       */
+      @Override
+      public String toString() {
+        StringBuffer statusString = new StringBuffer("phyloreference status " + statusIRI);
+
+        if(getIntervalStart() != null) statusString.append(" starting at " + getIntervalStart().toString());
+        if(getIntervalEnd() != null) statusString.append(" ending at " + getIntervalEnd().toString());
+
+        return statusString.toString();
+      }
     }
-    
+
     /**
      * Return a list of PhylorefStatuses associated with a particular phyloreference in the provided ontology.
-     * 
+     *
      * @param phyloref The phyloreference whose statuses are being queried.
      * @param ontology The ontology within which this phyloreference is defined.
      * @return A list of phyloref statuses.
      */
-	public static List<PhylorefStatus> getCurrentStatusesForPhyloref(OWLNamedIndividual phyloref, OWLOntology ontology) {
-		List<PhylorefStatus> statuses = new ArrayList<>();
-		
-		// Set up the OWL annotation properties we need to look up the phyloref statuses.
-		OWLDataFactory dataFactory = ontology.getOWLOntologyManager().getOWLDataFactory();
-		OWLClass phylorefAsClass = dataFactory.getOWLClass(phyloref.getIRI());
-		
-        OWLAnnotationProperty pso_holdsStatusInTime = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_PSO_HOLDS_STATUS_IN_TIME);
-        OWLAnnotationProperty pso_withStatus = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_PSO_WITH_STATUS);
-        OWLAnnotationProperty tvc_atTime = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_TVC_AT_TIME);
-        OWLAnnotationProperty timeinterval_hasIntervalStartDate = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_TIMEINT_HAS_INTERVAL_START_DATE);
-        OWLAnnotationProperty timeinterval_hasIntervalEndDate = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_TIMEINT_HAS_INTERVAL_END_DATE);
+    public static List<PhylorefStatus> getCurrentStatusesForPhyloref(OWLNamedIndividual phyloref, OWLOntology ontology) {
+      List<PhylorefStatus> statuses = new ArrayList<>();
 
-		// Retrieve holdsStatusInTime to determine the active status of this phyloreference.
-		List<OWLAnnotation> holdsStatusInTime = EntitySearcher.getAnnotations(phylorefAsClass, ontology, pso_holdsStatusInTime).collect(Collectors.toList());
+      // Set up the OWL annotation properties we need to look up the phyloref statuses.
+      OWLDataFactory dataFactory = ontology.getOWLOntologyManager().getOWLDataFactory();
+      OWLClass phylorefAsClass = dataFactory.getOWLClass(phyloref.getIRI());
 
-		// Read through the list of OWLAnnotations to create corresponding PhylorefStatus objects.
-		for(OWLAnnotation statusInTime: holdsStatusInTime) {
-		    // Each statusInTime entry should have one status (pso:withStatus)
-		    // and a number of time intervals (tvc:atTime). We collect all
-		    // statusues and test to see if any of those time intervals are
-		    // "incomplete", i.e. they have a start date but no end date.
-			IRI phylorefStatusIRI = null;
-			Instant intervalStartDate = null;
-			Instant intervalEndDate = null;
-			
-			for(OWLAnonymousIndividual indiv_statusInTime: statusInTime.getAnonymousIndividuals()) {
-		        for(OWLAnnotationAssertionAxiom axiom: ontology.getAnnotationAssertionAxioms(indiv_statusInTime)) {
-		            if(axiom.getProperty().equals(tvc_atTime)) {
-		                for(OWLAnonymousIndividual indiv_atTime: axiom.getValue().getAnonymousIndividuals()) {
-		                    for(OWLAnnotationAssertionAxiom axiom_interval: ontology.getAnnotationAssertionAxioms(indiv_atTime)) {
-		                        // Look for timeinterval:hasIntervalStartDate and timeinterval:hasIntervalEndDate data properties.
-		                        if(axiom_interval.getProperty().equals(timeinterval_hasIntervalStartDate)) {
-		                        	try {
-			                        	intervalStartDate = ZonedDateTime.parse(
-			                        		axiom_interval.getValue().asLiteral().get().getLiteral()
-			                        	).toInstant();
-		                        	} catch(DateTimeParseException ex) {
-		                        		// If we have a start date but can't parse it, record it as the earliest possible time.
-		                        		intervalStartDate = Instant.MIN;
-		                        	}
-		                        }
-		                        if(axiom_interval.getProperty().equals(timeinterval_hasIntervalEndDate)) {
-		                        	try {
-			                            intervalEndDate = ZonedDateTime.parse(
-		                            		axiom_interval.getValue().asLiteral().get().getLiteral()
-			                        	).toInstant();
-		                        	} catch(DateTimeParseException ex) {
-		                        		// If we have an end date but can't parse it, record it at the latest possible time.
-		                        		intervalEndDate = Instant.MAX;
-		                        	}
-		                        }
-		                    }
-		                }
-		            }
+      OWLAnnotationProperty pso_holdsStatusInTime = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_PSO_HOLDS_STATUS_IN_TIME);
+      OWLAnnotationProperty pso_withStatus = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_PSO_WITH_STATUS);
+      OWLAnnotationProperty tvc_atTime = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_TVC_AT_TIME);
+      OWLAnnotationProperty timeinterval_hasIntervalStartDate = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_TIMEINT_HAS_INTERVAL_START_DATE);
+      OWLAnnotationProperty timeinterval_hasIntervalEndDate = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_TIMEINT_HAS_INTERVAL_END_DATE);
 
-		            else if(axiom.getProperty().equals(pso_withStatus)) {
-		            	phylorefStatusIRI = (IRI) axiom.getValue();
-		            } else {
-		                throw new IllegalArgumentException("Phyloreference " + phyloref + " contains an unknown axiom: " + axiom);
-		            }
-		        }
-			}
-			
-			statuses.add(new PhylorefHelper.PhylorefStatus(
-				phyloref,
-				phylorefStatusIRI,
-				intervalStartDate,
-				intervalEndDate
-			));
-		}
-		
-		return statuses;
-	}
+      // Retrieve holdsStatusInTime to determine the active status of this phyloreference.
+      List<OWLAnnotation> holdsStatusInTime = EntitySearcher.getAnnotations(phylorefAsClass, ontology, pso_holdsStatusInTime).collect(Collectors.toList());
+
+      // Read through the list of OWLAnnotations to create corresponding PhylorefStatus objects.
+      for(OWLAnnotation statusInTime: holdsStatusInTime) {
+        // Each statusInTime entry should have one status (pso:withStatus)
+        // and a number of time intervals (tvc:atTime). We collect all
+        // statusues and test to see if any of those time intervals are
+        // "incomplete", i.e. they have a start date but no end date.
+        IRI phylorefStatusIRI = null;
+        Instant intervalStartDate = null;
+        Instant intervalEndDate = null;
+
+        for(OWLAnonymousIndividual indiv_statusInTime: statusInTime.getAnonymousIndividuals()) {
+          for(OWLAnnotationAssertionAxiom axiom: ontology.getAnnotationAssertionAxioms(indiv_statusInTime)) {
+            if(axiom.getProperty().equals(tvc_atTime)) {
+              for(OWLAnonymousIndividual indiv_atTime: axiom.getValue().getAnonymousIndividuals()) {
+                for(OWLAnnotationAssertionAxiom axiom_interval: ontology.getAnnotationAssertionAxioms(indiv_atTime)) {
+                  // Look for timeinterval:hasIntervalStartDate and timeinterval:hasIntervalEndDate data properties.
+                  if(axiom_interval.getProperty().equals(timeinterval_hasIntervalStartDate)) {
+                    try {
+                      intervalStartDate = ZonedDateTime.parse(
+                        axiom_interval.getValue().asLiteral().get().getLiteral()
+                      ).toInstant();
+                    } catch(DateTimeParseException ex) {
+                      // If we have a start date but can't parse it, record it as the earliest possible time.
+                      intervalStartDate = Instant.MIN;
+                    }
+                  }
+                  if(axiom_interval.getProperty().equals(timeinterval_hasIntervalEndDate)) {
+                    try {
+                      intervalEndDate = ZonedDateTime.parse(
+                        axiom_interval.getValue().asLiteral().get().getLiteral()
+                      ).toInstant();
+                    } catch(DateTimeParseException ex) {
+                      // If we have an end date but can't parse it, record it at the latest possible time.
+                      intervalEndDate = Instant.MAX;
+                    }
+                  }
+                }
+              }
+            } else if(axiom.getProperty().equals(pso_withStatus)) {
+              phylorefStatusIRI = (IRI) axiom.getValue();
+            } else {
+              throw new IllegalArgumentException("Phyloreference " + phyloref + " contains an unknown axiom: " + axiom);
+            }
+          }
+        }
+
+        statuses.add(new PhylorefHelper.PhylorefStatus(
+          phyloref,
+          phylorefStatusIRI,
+          intervalStartDate,
+          intervalEndDate
+        ));
+      }
+
+      return statuses;
+    }
 }
