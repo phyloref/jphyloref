@@ -69,9 +69,11 @@ public class PhylorefHelper {
     /** IRI for the OWL data property that indicates when a publication status time ends */
     public static final IRI IRI_TIMEINT_HAS_INTERVAL_END_DATE = IRI.create("http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#hasIntervalEndDate");
 
+    /** IRI for the publication status of "Draft" */
+    public static final IRI IRI_PSO_DRAFT = IRI.create("http://purl.org/spar/pso/draft");
+
     /** IRI for the publication status of "Submitted" */
-    public static final IRI IRI_PSO_STATUS_SUBMITTED = IRI.create("http://purl.org/spar/pso/submitted");
-    
+    public static final IRI IRI_PSO_SUBMITTED = IRI.create("http://purl.org/spar/pso/submitted");
     /** IRI for the publication status of "Published" */
     public static final IRI IRI_PSO_PUBLISHED = IRI.create("http://purl.org/spar/pso/published");
     

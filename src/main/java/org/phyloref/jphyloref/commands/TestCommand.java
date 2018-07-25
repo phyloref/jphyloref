@@ -331,13 +331,13 @@ public class TestCommand implements Command {
             if(activeStatuses.isEmpty())
               flag_expected_to_resolve = true;
             else
-              // If there are active statuses, we default to assuming that we expect phyloreferences NOT to resolve,
-              // unless they are actively in the "submitted" or "published" statuses.
-              flag_expected_to_resolve = activeStatuses.stream()
-                .anyMatch(ps ->
-                  ps.getStatus().equals(PhylorefHelper.IRI_PSO_STATUS_SUBMITTED) ||
-                  ps.getStatus().equals(PhylorefHelper.IRI_PSO_PUBLISHED)
-                );
+            	// If there are active statuses, we default to assuming that we expect phyloreferences NOT to resolve,
+            	// unless they are actively in the "submitted" or "published" statuses.
+            	flag_expected_to_resolve = activeStatuses.stream()
+            	  .anyMatch(ps ->
+            		  ps.getStatus().equals(PhylorefHelper.IRI_PSO_SUBMITTED) ||
+            		  ps.getStatus().equals(PhylorefHelper.IRI_PSO_PUBLISHED)
+            	  );
 
             // Determine if this phyloreference has failed or succeeded.
             if(testFailed) {
@@ -360,9 +360,9 @@ public class TestCommand implements Command {
                     countTODO++;
                     result.setStatus(StatusValues.NOT_OK);
                     result.setDirective(new Directive(DirectiveValues.TODO, "Phyloreference could not be tested, as one or more specifiers did not match."));
-                    if(!statuses.contains(IRI.create("http://purl.org/spar/pso/draft"))) {
+                    if(!activeStatuses.stream().anyMatch(st -> st.getStatus().equals(PhylorefHelper.IRI_PSO_DRAFT))) {
                         result.addComment(new Comment(
-                            "Since specifiers remain unmatched, this phyloreference should have a status of 'pso:draft' but instead its status is " + statuses
+                            "Since specifiers remain unmatched, this phyloreference should have a status of 'pso:draft' but instead its status is " + activeStatuses
                         ));
                     }
                     testSet.addTapLine(result);
