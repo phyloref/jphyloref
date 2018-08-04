@@ -49,6 +49,11 @@ public class JPhyloRef {
     public void execute(String[] args) {
         // Prepare to parse command line arguments.
         Options opts = new Options();
+        
+        // Add global options.
+        ReasonerHelper.addCommandLineOptions(opts);
+        
+        // Add per-command options.
         for(Command cmd: commands) {
             cmd.addCommandLineOptions(opts);
         }
@@ -153,7 +158,7 @@ public class JPhyloRef {
             Map<String, OWLReasonerFactory> reasonerList = ReasonerHelper.getReasonerFactories();
             for(String name: reasonerList.keySet()) {
             	OWLReasonerFactory factory = reasonerList.get(name);            	
-            	System.out.println("    '" + name + "': " + reasonerList.get(name).getReasonerName() + "/" + ReasonerHelper.getReasonerFactoryVersionString(factory));
+            	System.out.println("    '" + name + "': " + ReasonerHelper.getReasonerNameAndVersion(factory));
             }
 
             // One final blank line, please.

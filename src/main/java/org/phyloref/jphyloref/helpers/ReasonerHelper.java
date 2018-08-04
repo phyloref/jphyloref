@@ -3,6 +3,8 @@ package org.phyloref.jphyloref.helpers;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -26,13 +28,14 @@ public class ReasonerHelper {
 		/*
 		 * Set up a list of reasoner names and their corresponding reasoner factory.
 		 */
+		reasonerFactories.put("null", null);
 		reasonerFactories.put("jfact", new JFactFactory());
 	}
 
 	/**
 	 * Get reasoner factory by name.
 	 */
-	public OWLReasonerFactory getReasonerFactory(String name) {
+	public static OWLReasonerFactory getReasonerFactory(String name) {
 		// Look it up.
 		if(reasonerFactories.containsKey(name)) {
 			return reasonerFactories.get(name);
@@ -49,25 +52,38 @@ public class ReasonerHelper {
 		return reasonerFactories;
 	}
 	
-	/**
-	 * Get the Version of a particular reasoner factory. Unfortunately, the only way to
-	 * determine this is to create an OWLReasoner, but we can cache that. 
-	 */
-	public static Version getReasonerFactoryVersion(OWLReasonerFactory factory) {
+	public static String getReasonerNameAndVersion(OWLReasonerFactory factory) {
+		if(factory == null) return "Deactivate reasoner (all tests will fail!)";
+		
+		String versionString;
 		try {
 			OWLReasoner reasoner = factory.createNonBufferingReasoner(OWLManager.createOWLOntologyManager().createOntology());
-			return reasoner.getReasonerVersion();
+			Version version = reasoner.getReasonerVersion();
+			versionString = version.getMajor() + "." + version.getMinor() + "." + version.getBuild() + "." + version.getPatch();
 		} catch (OWLOntologyCreationException e) {
-			return new Version(0, 0, 0, 0);
+			versionString = "(undefined)"; 
+		}		
+		
+		return factory.getReasonerName() + "/" + versionString; 
+	}
+		
+	/**
+	 * Return an OWLReasoner based on the command-line settings.
+	 * 
+	 * For now, we only look for one setting -- '--reasoner' -- and identify a reasoner based on that,
+	 * but in the future we might support additional options that allow you to configure the reasoner.
+	 */
+	public static OWLReasonerFactory getReasonerFromCmdLine(CommandLine cmdLine) {
+		if(cmdLine.hasOption("reasoner")) {
+			return getReasonerFactory(cmdLine.getOptionValue("reasoner")); 				
+		} else {
+			// No reasoner provided? We use the default.
+			return getReasonerFactory("");
 		}
 	}
 	
-	/**
-	 * Get the version of a particular reasoner factory as a String.
-	 */
-	public static String getReasonerFactoryVersionString(OWLReasonerFactory factory) {
-		Version version = getReasonerFactoryVersion(factory);
-	
-		return version.getMajor() + "." + version.getMinor() + "." + version.getBuild() + "." + version.getPatch();
+	/** Add command line options that can be read by getReasonerFromCmdLine() */
+	public static void addCommandLineOptions(Options opts) {
+		opts.addOption("reasoner", "reasoner", true, "The reasoner to be used (use help to see list of options)");
 	}
 }
