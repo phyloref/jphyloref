@@ -53,7 +53,7 @@ public class ReasonerHelper {
 	}
 	
 	public static String getReasonerNameAndVersion(OWLReasonerFactory factory) {
-		if(factory == null) return "Deactivate reasoner (all tests will fail!)";
+		if(factory == null) return "No reasoner used";
 		
 		String versionString;
 		try {
@@ -73,7 +73,7 @@ public class ReasonerHelper {
 	 * For now, we only look for one setting -- '--reasoner' -- and identify a reasoner based on that,
 	 * but in the future we might support additional options that allow you to configure the reasoner.
 	 */
-	public static OWLReasonerFactory getReasonerFromCmdLine(CommandLine cmdLine) {
+	public static OWLReasonerFactory getReasonerFactoryFromCmdLine(CommandLine cmdLine) {
 		if(cmdLine.hasOption("reasoner")) {
 			return getReasonerFactory(cmdLine.getOptionValue("reasoner")); 				
 		} else {

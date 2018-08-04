@@ -22,6 +22,7 @@ import org.openrdf.model.Value;
 import org.openrdf.model.impl.SimpleValueFactory;
 import org.phyloref.jphyloref.JPhyloRef;
 import org.phyloref.jphyloref.helpers.PhylorefHelper;
+import org.phyloref.jphyloref.helpers.ReasonerHelper;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.formats.RDFJsonLDDocumentFormat;
 import org.semanticweb.owlapi.model.ClassExpressionType;
@@ -33,6 +34,8 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyLoaderConfiguration;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.rio.RioOWLRDFConsumerAdapter;
 import org.semanticweb.owlapi.search.EntitySearcher;
 import org.semanticweb.owlapi.util.AnonymousNodeChecker;
@@ -111,7 +114,7 @@ public class WebserverCommand implements Command {
       int port = Integer.parseInt(portString);
 
       try {
-          Webserver webserver = new Webserver(this, hostname, port);
+          Webserver webserver = new Webserver(this, hostname, port, cmdLine);
           while(webserver.isAlive()) {}
       } catch(IOException ex) {
           System.err.println("An error occurred while running webserver: " + ex);
@@ -127,7 +130,12 @@ public class WebserverCommand implements Command {
      * don't use this for now.
      */
     private final WebserverCommand cmd;
-
+    
+    /**
+     * The CommandLine used to invoke this webserver.
+     */
+    private final CommandLine cmdLine;
+    
     /**
      * Create and start the webserver. It starts in another thread, so
      * execution will not stop.
@@ -136,10 +144,11 @@ public class WebserverCommand implements Command {
      * @param hostname The hostname under which this webserver should listen.
      * @param port The port this webserver should listen to.
      */
-    public Webserver(WebserverCommand cmd, String hostname, int port) throws IOException {
+    public Webserver(WebserverCommand cmd, String hostname, int port, CommandLine cmdLine) throws IOException {
       super(hostname, port);
 
       this.cmd = cmd;
+      this.cmdLine = cmdLine;
 
       start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
       System.out.println("Webserver started. Try accessing it at http://" + hostname + ":" + port + "/");
@@ -314,8 +323,8 @@ public class WebserverCommand implements Command {
       Map<String, Set<String>> nodesPerPhylorefAsString = new HashMap<>();
 
       // Set up and start the reasoner.
-      JFactReasonerConfiguration jfactConfig = new JFactReasonerConfiguration();
-      JFactReasoner reasoner = new JFactReasoner(ontology, jfactConfig, BufferingMode.BUFFERING);
+      OWLReasonerFactory factory = ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine);
+      OWLReasoner reasoner = factory.createReasoner(ontology);
 
       // Go through all the phyloreferences, identifying all the nodes that have
       // matched to that phyloreference.
@@ -357,18 +366,7 @@ public class WebserverCommand implements Command {
       response.put("owlapiVersion", owlapiVersion);
 
       // Report reasoner version.
-      String reasonerVersion = "(unknown)";
-      try {
-        OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-        OWLOntology ontology = manager.createOntology();
-        JFactReasonerConfiguration jfactConfig = new JFactReasonerConfiguration();
-        JFactReasoner reasoner = new JFactReasoner(ontology, jfactConfig, BufferingMode.BUFFERING);
-        Version version = reasoner.getReasonerVersion();
-        reasonerVersion = reasoner.getReasonerName() + "/" +
-          version.getMajor() + "." + version.getMinor() + "." + version.getPatch() + "." + version.getBuild();
-      } catch(OWLOntologyCreationException ex) {
-        // This just means we couldn't reason over the ontology; ignore it.
-      }
+      String reasonerVersion = ReasonerHelper.getReasonerNameAndVersion(ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine));
       response.put("reasonerVersion", reasonerVersion);
 
       // Report JPhyloRef version.

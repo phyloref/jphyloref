@@ -140,7 +140,7 @@ public class TestCommand implements Command {
 
         // Reason over the loaded ontology -- but only if the user wants that!
         // Set up an OWLReasoner to work with.
-        OWLReasonerFactory reasonerFactory = ReasonerHelper.getReasonerFromCmdLine(cmdLine);
+        OWLReasonerFactory reasonerFactory = ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine);
         OWLReasoner reasoner = null;
         if(reasonerFactory != null) reasoner = reasonerFactory.createReasoner(ontology);
         Set<OWLNamedIndividual> phylorefs;
