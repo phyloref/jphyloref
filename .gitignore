@@ -1,3 +1,6 @@
+# JNI libraries
+*.jnilib
+
 # Eclipse files
 .classpath
 .settings/
