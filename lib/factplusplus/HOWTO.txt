@@ -1,6 +1,0 @@
-
-Installing factplusplus:
-    - Download 'uk.ac.manchester.cs.owl.factplusplus-P5.x-v1.6.5.jar' from https://bitbucket.org/dtsarkov/factplusplus/downloads/
-    - Install it locally using:
-        mvn install:install-file -Dfile=/home/vaidyagi/code/phyloref/jphyloref/lib/uk.ac.manchester.cs.owl.factplusplus-P5.x-v1.6.5.jar -DgroupId=uk.ac.manchester.cs -DartifactId=factplusplus -Dversion=1.6.5 -Dpackaging=jar -DgeneratePom=true
-    -
