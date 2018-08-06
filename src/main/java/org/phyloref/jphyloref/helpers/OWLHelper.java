@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLiteral;
@@ -90,7 +89,7 @@ public final class OWLHelper {
         Map<String, Set<String>> valuesByLanguage = new HashMap<>();
 
         // Go through all known annotations, looking for OWLLiterals.
-        EntitySearcher.getAnnotations(entity, ontology, annotationProperty)
+        EntitySearcher.getAnnotations(entity, ontology, annotationProperty).stream()
             .filter(annotation -> annotation.getValue() instanceof OWLLiteral)
             .forEach(annotation -> {
                 OWLLiteral val = (OWLLiteral) annotation.getValue();

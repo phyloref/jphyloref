@@ -11,6 +11,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.util.Version;
 
+import uk.ac.manchester.cs.factplusplus.owlapiv3.FaCTPlusPlusReasonerFactory;
 import uk.ac.manchester.cs.jfact.JFactFactory;
 
 /**
@@ -30,6 +31,7 @@ public class ReasonerHelper {
 		 */
 		reasonerFactories.put("null", null);
 		reasonerFactories.put("jfact", new JFactFactory());
+		reasonerFactories.put("fact++", new FaCTPlusPlusReasonerFactory());
 	}
 
 	/**
@@ -41,8 +43,8 @@ public class ReasonerHelper {
 			return reasonerFactories.get(name);
 		}
 		
-		// If all else fails, we default to JFact.
-		return new JFactFactory();
+		// If all else fails, throw an exception.
+		throw new IllegalArgumentException("No reasoner named '" + name + "'; must be one of: " + reasonerFactories.keySet().toString());
 	}
 	
 	/**
@@ -77,7 +79,7 @@ public class ReasonerHelper {
 		if(cmdLine.hasOption("reasoner")) {
 			return getReasonerFactory(cmdLine.getOptionValue("reasoner")); 				
 		} else {
-			// No reasoner provided? We use the default.
+			// No reasoner provided? Throw an exception!
 			return getReasonerFactory("");
 		}
 	}

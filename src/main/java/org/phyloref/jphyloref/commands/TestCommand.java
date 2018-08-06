@@ -210,11 +210,11 @@ public class TestCommand implements Command {
             Set<OWLNamedIndividual> nodes;
             if(reasoner != null) {
             	// Use the reasoner to determine which nodes are members of this phyloref as a class
-            	nodes = reasoner.getInstances(phylorefAsClass, false).entities()
+            	nodes = reasoner.getInstances(phylorefAsClass, false).getFlattened().stream()
 	                // This includes the phyloreference itself. We only want to
 	                // look at phylogeny nodes here. So, let's filter down to named
 	                // individuals that are asserted to be cdao:Nodes.
-	                .filter(indiv -> EntitySearcher.getTypes(indiv, ontology).anyMatch(
+	                .filter(indiv -> EntitySearcher.getTypes(indiv, ontology).stream().anyMatch(
 	                    type -> (!type.getClassExpressionType().equals(ClassExpressionType.OWL_CLASS)) ||
 	                			type.asOWLClass().getIRI().equals(PhylorefHelper.IRI_CDAO_NODE)
 	                ))
@@ -252,7 +252,7 @@ public class TestCommand implements Command {
 
                 for(OWLNamedIndividual node: nodes) {
                     // Get a list of all expected phyloreference labels from the OWL file.
-                    Set<String> expectedPhylorefsNamed = EntitySearcher.getDataPropertyValues(node, expectedPhyloreferenceNamedProperty, ontology)
+                    Set<String> expectedPhylorefsNamed = EntitySearcher.getDataPropertyValues(node, expectedPhyloreferenceNamedProperty, ontology).stream()
                         .map(literal -> literal.getLiteral()) // We ignore languages for now.
                         .collect(Collectors.toSet());
 
@@ -299,7 +299,7 @@ public class TestCommand implements Command {
             }
 
             // Look for all unmatched specifiers reported for this phyloreference
-            Set<OWLAxiom> axioms = EntitySearcher.getReferencingAxioms(phyloref, ontology).collect(Collectors.toSet());
+            Set<OWLAxiom> axioms = new HashSet<>(EntitySearcher.getReferencingAxioms(phyloref, ontology));
             Set<OWLNamedIndividual> unmatched_specifiers = new HashSet<>();
             for(OWLAxiom axiom: axioms) {
             	if(axiom.containsEntityInSignature(unmatchedSpecifierProperty)) {
@@ -323,7 +323,7 @@ public class TestCommand implements Command {
             }
 
             // Retrieve holdsStatusInTime to determine the active status of this phyloreference.
-            Set<OWLAnnotation> holdsStatusInTime = EntitySearcher.getAnnotations(phylorefAsClass, ontology, pso_holdsStatusInTime).collect(Collectors.toSet());
+            Set<OWLAnnotation> holdsStatusInTime = new HashSet<>(EntitySearcher.getAnnotations(phylorefAsClass, ontology, pso_holdsStatusInTime));
 
             // Instead of checking which time interval were are in, we take a simpler approach: we look for all
             // statuses that have a start date but not an end date, i.e. those which have yet to end.
