@@ -2,6 +2,8 @@ package org.phyloref.jphyloref;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
@@ -11,6 +13,13 @@ import org.phyloref.jphyloref.commands.Command;
 import org.phyloref.jphyloref.commands.ReasonCommand;
 import org.phyloref.jphyloref.commands.TestCommand;
 import org.phyloref.jphyloref.commands.WebserverCommand;
+import org.phyloref.jphyloref.helpers.ReasonerHelper;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+import org.semanticweb.owlapi.util.Version;
 import org.semanticweb.owlapi.util.VersionInfo;
 
 /**
@@ -40,6 +49,11 @@ public class JPhyloRef {
     public void execute(String[] args) {
         // Prepare to parse command line arguments.
         Options opts = new Options();
+        
+        // Add global options.
+        ReasonerHelper.addCommandLineOptions(opts);
+        
+        // Add per-command options.
         for(Command cmd: commands) {
             cmd.addCommandLineOptions(opts);
         }
@@ -60,6 +74,9 @@ public class JPhyloRef {
             HelpCommand help = new HelpCommand();
             help.execute(cmdLine);
         } else {
+        	// Look for global options:
+        	//	--reasoner: Set the reasoner.
+        	
             // The first unprocessed argument should be the command.
             String command = cmdLine.getArgList().get(0);
 
@@ -133,6 +150,15 @@ public class JPhyloRef {
                         + opt.getDescription()
                     );
                 }
+            }
+            
+            // Display global options, including the list of possible reasoners.
+            System.out.println("\nWe also accept some global options, including:");
+            System.out.println(" --reasoner <reasonerName>: sets the reasoner name, which should be one of:");
+            Map<String, OWLReasonerFactory> reasonerList = ReasonerHelper.getReasonerFactories();
+            for(String name: reasonerList.keySet()) {
+            	OWLReasonerFactory factory = reasonerList.get(name);            	
+            	System.out.println("    '" + name + "': " + ReasonerHelper.getReasonerNameAndVersion(factory));
             }
 
             // One final blank line, please.

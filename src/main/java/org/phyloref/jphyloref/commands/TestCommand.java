@@ -10,6 +10,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.phyloref.jphyloref.helpers.OWLHelper;
 import org.phyloref.jphyloref.helpers.PhylorefHelper;
+import org.phyloref.jphyloref.helpers.ReasonerHelper;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.ClassExpressionType;
@@ -30,6 +31,8 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.search.EntitySearcher;
 import org.semanticweb.owlapi.util.AutoIRIMapper;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
@@ -88,10 +91,6 @@ public class TestCommand implements Command {
             "i", "input", true,
             "The input ontology to read in RDF/XML (can also be provided without the '-i')"
         );
-        opts.addOption(
-            "nr", "no-reasoner", false,
-            "Turn off reasoning (all tests will fail!)"
-        );
     }
 
     /**
@@ -105,7 +104,6 @@ public class TestCommand implements Command {
     public void execute(CommandLine cmdLine) throws RuntimeException {
         // Extract command-line options
         String str_input = cmdLine.getOptionValue("input");
-        boolean flag_no_reasoner = cmdLine.hasOption("no-reasoner");
 
         if(str_input == null && cmdLine.getArgList().size() > 1) {
             // No 'input'? Maybe it's just provided as a left-over option?
@@ -119,7 +117,7 @@ public class TestCommand implements Command {
         // Create File object to load
         File inputFile = new File(str_input);
         System.err.println("Input: " + inputFile);
-
+        
         // Set up an OWL Ontology Manager to work with.
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 
@@ -141,12 +139,13 @@ public class TestCommand implements Command {
         System.err.println("Loaded ontology: " + ontology);
 
         // Reason over the loaded ontology -- but only if the user wants that!
-        JFactReasonerConfiguration config = new JFactReasonerConfiguration();
-        JFactReasoner reasoner = null;
+        // Set up an OWLReasoner to work with.
+        OWLReasonerFactory reasonerFactory = ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine);
+        OWLReasoner reasoner = null;
+        if(reasonerFactory != null) reasoner = reasonerFactory.createReasoner(ontology);
         Set<OWLNamedIndividual> phylorefs;
 
         // Get a list of all phyloreferences.
-        if(!flag_no_reasoner) reasoner = new JFactReasoner(ontology, config, BufferingMode.BUFFERING);
         phylorefs = PhylorefHelper.getPhyloreferences(ontology, reasoner);
 
         // Okay, time to start testing! Each phyloreference counts as one test.
@@ -211,11 +210,11 @@ public class TestCommand implements Command {
             Set<OWLNamedIndividual> nodes;
             if(reasoner != null) {
             	// Use the reasoner to determine which nodes are members of this phyloref as a class
-            	nodes = reasoner.getInstances(phylorefAsClass, false).entities()
+            	nodes = reasoner.getInstances(phylorefAsClass, false).getFlattened().stream()
 	                // This includes the phyloreference itself. We only want to
 	                // look at phylogeny nodes here. So, let's filter down to named
 	                // individuals that are asserted to be cdao:Nodes.
-	                .filter(indiv -> EntitySearcher.getTypes(indiv, ontology).anyMatch(
+	                .filter(indiv -> EntitySearcher.getTypes(indiv, ontology).stream().anyMatch(
 	                    type -> (!type.getClassExpressionType().equals(ClassExpressionType.OWL_CLASS)) ||
 	                			type.asOWLClass().getIRI().equals(PhylorefHelper.IRI_CDAO_NODE)
 	                ))
@@ -253,7 +252,7 @@ public class TestCommand implements Command {
 
                 for(OWLNamedIndividual node: nodes) {
                     // Get a list of all expected phyloreference labels from the OWL file.
-                    Set<String> expectedPhylorefsNamed = EntitySearcher.getDataPropertyValues(node, expectedPhyloreferenceNamedProperty, ontology)
+                    Set<String> expectedPhylorefsNamed = EntitySearcher.getDataPropertyValues(node, expectedPhyloreferenceNamedProperty, ontology).stream()
                         .map(literal -> literal.getLiteral()) // We ignore languages for now.
                         .collect(Collectors.toSet());
 
@@ -300,7 +299,7 @@ public class TestCommand implements Command {
             }
 
             // Look for all unmatched specifiers reported for this phyloreference
-            Set<OWLAxiom> axioms = EntitySearcher.getReferencingAxioms(phyloref, ontology).collect(Collectors.toSet());
+            Set<OWLAxiom> axioms = new HashSet<>(EntitySearcher.getReferencingAxioms(phyloref, ontology));
             Set<OWLNamedIndividual> unmatched_specifiers = new HashSet<>();
             for(OWLAxiom axiom: axioms) {
             	if(axiom.containsEntityInSignature(unmatchedSpecifierProperty)) {
@@ -324,7 +323,7 @@ public class TestCommand implements Command {
             }
 
             // Retrieve holdsStatusInTime to determine the active status of this phyloreference.
-            Set<OWLAnnotation> holdsStatusInTime = EntitySearcher.getAnnotations(phylorefAsClass, ontology, pso_holdsStatusInTime).collect(Collectors.toSet());
+            Set<OWLAnnotation> holdsStatusInTime = new HashSet<>(EntitySearcher.getAnnotations(phylorefAsClass, ontology, pso_holdsStatusInTime));
 
             // Instead of checking which time interval were are in, we take a simpler approach: we look for all
             // statuses that have a start date but not an end date, i.e. those which have yet to end.

@@ -19,9 +19,10 @@ import org.eclipse.rdf4j.rio.Rio;
 import org.json.JSONObject;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Value;
-import org.openrdf.model.impl.SimpleValueFactory;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.phyloref.jphyloref.JPhyloRef;
 import org.phyloref.jphyloref.helpers.PhylorefHelper;
+import org.phyloref.jphyloref.helpers.ReasonerHelper;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.formats.RDFJsonLDDocumentFormat;
 import org.semanticweb.owlapi.model.ClassExpressionType;
@@ -32,18 +33,16 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyLoaderConfiguration;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.reasoner.BufferingMode;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.rio.RioOWLRDFConsumerAdapter;
 import org.semanticweb.owlapi.search.EntitySearcher;
 import org.semanticweb.owlapi.util.AnonymousNodeChecker;
-import org.semanticweb.owlapi.util.Version;
 import org.semanticweb.owlapi.util.VersionInfo;
 
 import fi.iki.elonen.NanoHTTPD;
-import fi.iki.elonen.NanoHTTPD.Response.Status;
 import fi.iki.elonen.NanoHTTPD.Response.IStatus;
-import uk.ac.manchester.cs.jfact.JFactReasoner;
-import uk.ac.manchester.cs.jfact.kernel.options.JFactReasonerConfiguration;
+import fi.iki.elonen.NanoHTTPD.Response.Status;
 
 /**
  * Sets up a webserver that allows reasoning over phyloreferences
@@ -111,7 +110,7 @@ public class WebserverCommand implements Command {
       int port = Integer.parseInt(portString);
 
       try {
-          Webserver webserver = new Webserver(this, hostname, port);
+          Webserver webserver = new Webserver(this, hostname, port, cmdLine);
           while(webserver.isAlive()) {}
       } catch(IOException ex) {
           System.err.println("An error occurred while running webserver: " + ex);
@@ -127,7 +126,12 @@ public class WebserverCommand implements Command {
      * don't use this for now.
      */
     private final WebserverCommand cmd;
-
+    
+    /**
+     * The CommandLine used to invoke this webserver.
+     */
+    private final CommandLine cmdLine;
+    
     /**
      * Create and start the webserver. It starts in another thread, so
      * execution will not stop.
@@ -136,10 +140,11 @@ public class WebserverCommand implements Command {
      * @param hostname The hostname under which this webserver should listen.
      * @param port The port this webserver should listen to.
      */
-    public Webserver(WebserverCommand cmd, String hostname, int port) throws IOException {
+    public Webserver(WebserverCommand cmd, String hostname, int port, CommandLine cmdLine) throws IOException {
       super(hostname, port);
 
       this.cmd = cmd;
+      this.cmdLine = cmdLine;
 
       start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
       System.out.println("Webserver started. Try accessing it at http://" + hostname + ":" + port + "/");
@@ -235,13 +240,13 @@ public class WebserverCommand implements Command {
 
         @Override
         public void handleStatement(org.eclipse.rdf4j.model.Statement st) throws RDFHandlerException {
-          SimpleValueFactory svf = SimpleValueFactory.getInstance();
+          ValueFactoryImpl svf = ValueFactoryImpl.getInstance();
 
           // System.out.println("Translating statement " + st);
 
           rdfHandler.handleStatement(svf.createStatement(
             translateResource(st.getSubject()),
-            svf.createIRI(st.getPredicate().stringValue()),
+            svf.createURI(st.getPredicate().stringValue()),
             translateValue(st.getObject())
           ));
         }
@@ -252,7 +257,7 @@ public class WebserverCommand implements Command {
          * blank nodes (BNodes) and IRIs.
          */
         private org.openrdf.model.Resource translateResource(org.eclipse.rdf4j.model.Resource res) {
-          SimpleValueFactory svf = SimpleValueFactory.getInstance();
+          ValueFactoryImpl svf = ValueFactoryImpl.getInstance();
 
           if(res instanceof org.eclipse.rdf4j.model.BNode) {
             org.eclipse.rdf4j.model.BNode bnode = (org.eclipse.rdf4j.model.BNode) res;
@@ -263,7 +268,7 @@ public class WebserverCommand implements Command {
           if(res instanceof org.eclipse.rdf4j.model.IRI) {
             org.eclipse.rdf4j.model.IRI iri = (org.eclipse.rdf4j.model.IRI) res;
 
-            return (Resource) svf.createIRI(iri.stringValue());
+            return (Resource) svf.createURI(iri.stringValue());
           }
 
           throw new RuntimeException("Unknown resource type: " + res);
@@ -276,7 +281,7 @@ public class WebserverCommand implements Command {
          * always converted into strings, regardless of their actual data type.
          */
         private org.openrdf.model.Value translateValue(org.eclipse.rdf4j.model.Value value) {
-          SimpleValueFactory svf = SimpleValueFactory.getInstance();
+          ValueFactoryImpl svf = ValueFactoryImpl.getInstance();
 
           if(value instanceof org.eclipse.rdf4j.model.BNode) {
             org.eclipse.rdf4j.model.BNode bnode = (org.eclipse.rdf4j.model.BNode) value;
@@ -287,7 +292,7 @@ public class WebserverCommand implements Command {
           if(value instanceof org.eclipse.rdf4j.model.IRI) {
             org.eclipse.rdf4j.model.IRI iri = (org.eclipse.rdf4j.model.IRI) value;
 
-            return (Value) svf.createIRI(iri.stringValue());
+            return (Value) svf.createURI(iri.stringValue());
           }
 
           if(value instanceof org.eclipse.rdf4j.model.Literal) {
@@ -295,7 +300,7 @@ public class WebserverCommand implements Command {
 
             // Note that this converts literals that should be treated as integers,
             // doubles and so on will be converted into strings here.
-            return (Value) svf.createLiteral(literal.stringValue(), svf.createIRI(literal.getDatatype().stringValue()));
+            return (Value) svf.createLiteral(literal.stringValue(), svf.createURI(literal.getDatatype().stringValue()));
           }
 
           throw new RuntimeException("Unknown value type: " + value);
@@ -314,8 +319,8 @@ public class WebserverCommand implements Command {
       Map<String, Set<String>> nodesPerPhylorefAsString = new HashMap<>();
 
       // Set up and start the reasoner.
-      JFactReasonerConfiguration jfactConfig = new JFactReasonerConfiguration();
-      JFactReasoner reasoner = new JFactReasoner(ontology, jfactConfig, BufferingMode.BUFFERING);
+      OWLReasonerFactory factory = ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine);
+      OWLReasoner reasoner = factory.createReasoner(ontology);
 
       // Go through all the phyloreferences, identifying all the nodes that have
       // matched to that phyloreference.
@@ -327,18 +332,18 @@ public class WebserverCommand implements Command {
 
         // Identify all individuals contained in the class, but filter out everything that
         // is not an IRI_CDAO_NODE.
-        Set<String> nodes = reasoner.getInstances(phylorefAsClass, false).entities()
+        Set<String> nodes = reasoner.getInstances(phylorefAsClass, false).getFlattened().stream()
           // This includes the phyloreference itself. We only want to
           // look at phylogeny nodes here. So, let's filter down to named
           // individuals that are asserted to be cdao:Nodes.
-          .filter(indiv -> EntitySearcher.getTypes(indiv, ontology).anyMatch(
+          .filter(indiv -> EntitySearcher.getTypes(indiv, ontology).stream().anyMatch(
             type -> (!type.getClassExpressionType().equals(ClassExpressionType.OWL_CLASS)) ||
               type.asOWLClass().getIRI().equals(PhylorefHelper.IRI_CDAO_NODE)
           ))
-          .map(indiv -> indiv.getIRI().getIRIString())
+          .map(indiv -> indiv.getIRI().toString())
           .collect(Collectors.toSet());
 
-        nodesPerPhylorefAsString.put(phylorefIRI.getIRIString(), nodes);
+        nodesPerPhylorefAsString.put(phylorefIRI.toString(), nodes);
       }
 
       // Record phyloreferences and matching nodes in JSON response.
@@ -357,18 +362,7 @@ public class WebserverCommand implements Command {
       response.put("owlapiVersion", owlapiVersion);
 
       // Report reasoner version.
-      String reasonerVersion = "(unknown)";
-      try {
-        OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-        OWLOntology ontology = manager.createOntology();
-        JFactReasonerConfiguration jfactConfig = new JFactReasonerConfiguration();
-        JFactReasoner reasoner = new JFactReasoner(ontology, jfactConfig, BufferingMode.BUFFERING);
-        Version version = reasoner.getReasonerVersion();
-        reasonerVersion = reasoner.getReasonerName() + "/" +
-          version.getMajor() + "." + version.getMinor() + "." + version.getPatch() + "." + version.getBuild();
-      } catch(OWLOntologyCreationException ex) {
-        // This just means we couldn't reason over the ontology; ignore it.
-      }
+      String reasonerVersion = ReasonerHelper.getReasonerNameAndVersion(ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine));
       response.put("reasonerVersion", reasonerVersion);
 
       // Report JPhyloRef version.

@@ -1,6 +1,10 @@
+# JNI libraries
+*.jnilib
+
 # Eclipse files
 .classpath
 .settings/
+bin/
 
 # Compiled class file
 *.class
