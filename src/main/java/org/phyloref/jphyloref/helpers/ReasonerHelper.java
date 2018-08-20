@@ -79,8 +79,8 @@ public class ReasonerHelper {
 		if(cmdLine.hasOption("reasoner")) {
 			return getReasonerFactory(cmdLine.getOptionValue("reasoner")); 				
 		} else {
-			// No reasoner provided? Throw an exception!
-			return getReasonerFactory("");
+			// No reasoner provided? Default to JFact.
+			return new JFactFactory();
 		}
 	}
 	
