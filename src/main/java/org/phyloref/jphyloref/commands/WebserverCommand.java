@@ -38,6 +38,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.rio.RioOWLRDFConsumerAdapter;
 import org.semanticweb.owlapi.search.EntitySearcher;
 import org.semanticweb.owlapi.util.AnonymousNodeChecker;
+import org.semanticweb.owlapi.util.AutoIRIMapper;
 import org.semanticweb.owlapi.util.VersionInfo;
 
 import fi.iki.elonen.NanoHTTPD;
@@ -158,6 +159,13 @@ public class WebserverCommand implements Command {
 
       // Prepare an ontology to fill with the provided JSON-LD file.
       OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+
+      // Is purl.obolibrary.org down? No worries, you can access local copies
+      // of your ontologies in the 'ontologies/' folder.
+      AutoIRIMapper mapper = new AutoIRIMapper(new File("ontologies"), true);
+      System.err.println("Found local ontologies: " + mapper.getOntologyIRIs());
+      manager.addIRIMapper(mapper);
+
       OWLOntology ontology = manager.createOntology();
       OWLOntologyLoaderConfiguration config = new OWLOntologyLoaderConfiguration();
 
