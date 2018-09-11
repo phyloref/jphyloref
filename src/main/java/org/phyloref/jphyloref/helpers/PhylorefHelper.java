@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.model.AxiomType;
@@ -19,6 +20,8 @@ import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -35,6 +38,9 @@ import org.semanticweb.owlapi.search.EntitySearcher;
  * @author Gaurav Vaidya <gaurav@ggvaidya.com>
  */
 public class PhylorefHelper {
+	// Logging
+	public static Logger LOGGER = Logger.getLogger(PhylorefHelper.class.getName());
+	
     // IRIs used in this package.
 
     /** IRI for OWL class Phylogeny */
@@ -220,12 +226,17 @@ public class PhylorefHelper {
       // Set up the OWL annotation properties we need to look up the phyloref statuses.
       OWLDataFactory dataFactory = ontology.getOWLOntologyManager().getOWLDataFactory();
       OWLClass phylorefAsClass = dataFactory.getOWLClass(phyloref.getIRI());
+      
+      LOGGER.info("Phyloreference '" + phyloref.getIRI() + "' corresponds to OWL Class " + phylorefAsClass);
 
       OWLAnnotationProperty pso_holdsStatusInTime = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_PSO_HOLDS_STATUS_IN_TIME);
       OWLAnnotationProperty pso_withStatus = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_PSO_WITH_STATUS);
       OWLAnnotationProperty tvc_atTime = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_TVC_AT_TIME);
-      OWLAnnotationProperty timeinterval_hasIntervalStartDate = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_TIMEINT_HAS_INTERVAL_START_DATE);
-      OWLAnnotationProperty timeinterval_hasIntervalEndDate = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_TIMEINT_HAS_INTERVAL_END_DATE);
+
+      OWLAnnotationProperty timeinterval_hasIntervalStartDate_annot = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_TIMEINT_HAS_INTERVAL_START_DATE);
+      OWLAnnotationProperty timeinterval_hasIntervalEndDate_annot = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_TIMEINT_HAS_INTERVAL_END_DATE);
+      OWLDataProperty timeinterval_hasIntervalStartDate_data = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_TIMEINT_HAS_INTERVAL_START_DATE);
+      OWLDataProperty timeinterval_hasIntervalEndDate_data = dataFactory.getOWLDataProperty(PhylorefHelper.IRI_TIMEINT_HAS_INTERVAL_END_DATE);
 
       // Retrieve holdsStatusInTime to determine the active status of this phyloreference.
       Collection<OWLAnnotation> holdsStatusInTime = EntitySearcher.getAnnotations(phylorefAsClass, ontology, pso_holdsStatusInTime);
@@ -244,9 +255,12 @@ public class PhylorefHelper {
           for(OWLAnnotationAssertionAxiom axiom: ontology.getAnnotationAssertionAxioms(indiv_statusInTime)) {
             if(axiom.getProperty().equals(tvc_atTime)) {
               for(OWLAnonymousIndividual indiv_atTime: axiom.getValue().getAnonymousIndividuals()) {
+                // These assertions sometimes show up as AnnotationAssertionAxioms and sometimes as
+                // DataPropertyAssertionAxioms. So we check for both.
+                // First, we check for OWLAnnotationAssertionAxioms.
                 for(OWLAnnotationAssertionAxiom axiom_interval: ontology.getAnnotationAssertionAxioms(indiv_atTime)) {
                   // Look for timeinterval:hasIntervalStartDate and timeinterval:hasIntervalEndDate data properties.
-                  if(axiom_interval.getProperty().equals(timeinterval_hasIntervalStartDate)) {
+                  if(axiom_interval.getProperty().equals(timeinterval_hasIntervalStartDate_annot)) {
                     try {
                       intervalStartDate = ZonedDateTime.parse(
                         axiom_interval.getValue().asLiteral().get().getLiteral()
@@ -256,10 +270,37 @@ public class PhylorefHelper {
                       intervalStartDate = Instant.MIN;
                     }
                   }
-                  if(axiom_interval.getProperty().equals(timeinterval_hasIntervalEndDate)) {
+
+                  if(axiom_interval.getProperty().equals(timeinterval_hasIntervalEndDate_annot)) {
                     try {
                       intervalEndDate = ZonedDateTime.parse(
                         axiom_interval.getValue().asLiteral().get().getLiteral()
+                      ).toInstant();
+                    } catch(DateTimeParseException ex) {
+                      // If we have an end date but can't parse it, record it at the latest possible time.
+                      intervalEndDate = Instant.MAX;
+                    }
+                  }
+                }
+
+                // And if they show up as DataPropertyAssertions, we process them too.
+                for(OWLDataPropertyAssertionAxiom axiom_interval: ontology.getDataPropertyAssertionAxioms(indiv_atTime)) {
+                  // Look for timeinterval:hasIntervalStartDate and timeinterval:hasIntervalEndDate data properties.
+                  if(axiom_interval.getProperty().equals(timeinterval_hasIntervalStartDate_data)) {
+                    try {
+                      intervalStartDate = ZonedDateTime.parse(
+                        axiom_interval.getObject().getLiteral()
+                      ).toInstant();
+                    } catch(DateTimeParseException ex) {
+                      // If we have a start date but can't parse it, record it as the earliest possible time.
+                      intervalStartDate = Instant.MIN;
+                    }
+                  }
+
+                  if(axiom_interval.getProperty().equals(timeinterval_hasIntervalEndDate_data)) {
+                    try {
+                      intervalEndDate = ZonedDateTime.parse(
+                        axiom_interval.getObject().getLiteral()
                       ).toInstant();
                     } catch(DateTimeParseException ex) {
                       // If we have an end date but can't parse it, record it at the latest possible time.
