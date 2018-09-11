@@ -383,8 +383,8 @@ public class TestCommand implements Command {
         System.out.println(tapProducer.dump(testSet));
         System.err.println("Testing complete:" + countSuccess + " successes, " + countFailure + " failures, " + countTODO + " failures marked TODO, " + countSkipped + " skipped.");
 
-        // Exit with error unless we have zero failures.
-        if(countSuccess == 0) System.exit(-1);
+        // Exit with the number of failures. If there are zero, then command line tools
+        // will treat this test as successful.
         System.exit(countFailure);
     }
 }
