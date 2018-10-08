@@ -14,9 +14,11 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFHandlerException;
+import org.eclipse.rdf4j.rio.RDFParseException;
 import org.eclipse.rdf4j.rio.RDFParser;
 import org.eclipse.rdf4j.rio.Rio;
 import org.json.JSONObject;
+
 import org.openrdf.model.Resource;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -154,7 +156,7 @@ public class WebserverCommand implements Command {
     /**
      * Respond to a request for reasoning over a JSON-LD file (/reason).
      */
-    public JSONObject serveReason(File jsonldFile) throws OWLOntologyCreationException, IOException {
+    public JSONObject serveReason(File jsonldFile) throws OWLOntologyCreationException, RDFParseException, IOException {
       JSONObject response = new JSONObject("{'status': 'ok'}");
 
       // Prepare an ontology to fill with the provided JSON-LD file.
@@ -447,7 +449,7 @@ public class WebserverCommand implements Command {
           }
 
           return createResponse(Status.OK, serveReason(jsonldFile));
-        } catch (OWLOntologyCreationException | IOException ex) {
+        } catch (OWLOntologyCreationException | RDFParseException | IOException ex) {
           response.put("status", "error");
           response.put("error", "Exception thrown: " + ex.getMessage());
           ex.printStackTrace();

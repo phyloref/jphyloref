@@ -7,6 +7,8 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 - Added a "webserver" command that starts a webserver that provides a simple
   HTTP API for reasoning over JSON-LD file in [phyloref/jphyloref#12].
 - Removed Eclipse files that should not have been added in [phyloref/jphyloref#13].
+- Moved code for determining Phyloref statuses to PhylorefHelper. This is part of
+  [phyloref/jphyloref#8].
 - WebserverCommand now looks for ontologies in the local 'ontologies/' directory.
 
 ## 0.2 - 2018-06-20
@@ -24,3 +26,4 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 [phyloref/curation-tool#25]: https://github.com/phyloref/curation-tool/issues/25
 [phyloref/jphyloref#13]: https://github.com/phyloref/jphyloref/pull/13
 [phyloref/jphyloref#12]: https://github.com/phyloref/jphyloref/pull/12
+[phyloref/jphyloref#8]: https://github.com/phyloref/jphyloref/issues/8
