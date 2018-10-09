@@ -313,7 +313,12 @@ public class WebserverCommand implements Command {
       // We could jsonldFile.toURI().toString() as the file IRI, but this points
       // to a temporary file on the server where the JSON-LD file was stored by
       // NanoHTTPD.
-      parser.parse(new FileReader(jsonldFile), "http://example.org/jphyloref#");
+      //
+      // It looks like the library needs a prefix if one is not set in the JSON-LD
+      // file. So we'll use a default prefix here and then remove it in the results
+      // later.
+      String DEFAULT_URI_PREFIX = "http://example.org/jphyloref";
+      parser.parse(new FileReader(jsonldFile), DEFAULT_URI_PREFIX);
       response.put("ontology", ontology.toString());
 
       // We have an ontology! Let's reason over it, and store the results as
@@ -343,10 +348,23 @@ public class WebserverCommand implements Command {
               type.asOWLClass().getIRI().equals(PhylorefHelper.IRI_CDAO_NODE)
           ))
           .map(indiv -> indiv.getIRI().toString())
+          // Strip the default prefix if present. If the JSON-LD file had an '@id',
+          // that should be used instead, and we'll only strip that if it happens
+          // to be identical to ours.
+          .map(iri -> !iri.startsWith(DEFAULT_URI_PREFIX) ? iri : iri.substring(DEFAULT_URI_PREFIX.length()))
           .collect(Collectors.toSet());
 
-        nodesPerPhylorefAsString.put(phylorefIRI.toString(), nodes);
+        // Strip the default prefix if present. If the JSON-LD file had an '@id',
+        // that should be used instead, and we'll only strip that if it happens
+        // to be identical to ours.
+        String nodeURI = phylorefIRI.toString();
+        if(nodeURI.startsWith(DEFAULT_URI_PREFIX)) nodeURI = nodeURI.substring(DEFAULT_URI_PREFIX.length());
+
+        nodesPerPhylorefAsString.put(nodeURI, nodes);
       }
+
+      // Log reasoning results.
+      System.err.println("Phyloreferencing reasoning results: " + nodesPerPhylorefAsString);
 
       // Record phyloreferences and matching nodes in JSON response.
       response.put("phylorefs", nodesPerPhylorefAsString);
