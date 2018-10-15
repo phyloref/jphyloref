@@ -314,9 +314,12 @@ public class WebserverCommand implements Command {
       // to a temporary file on the server where the JSON-LD file was stored by
       // NanoHTTPD.
       //
-      // It looks like the library needs a prefix if one is not set in the JSON-LD
-      // file. So we'll use a default prefix here and then remove it in the results
-      // later.
+      // The JSON-LD loader needs a default URI prefix. The input JSON-LD ontology
+      // will usually provide one in the '@id' field, but if not, we set up a default
+      // URI prefix here. If that prefix appears in either node URIs or phyloref URIs,
+      // we will strip it later -- that way, a JSON-LD ontology without a base URI
+      // (i.e. all of whose URIs are local to the document itself) will produce
+      // results with local URIs as well.
       String DEFAULT_URI_PREFIX = "http://example.org/jphyloref";
       parser.parse(new FileReader(jsonldFile), DEFAULT_URI_PREFIX);
       response.put("ontology", ontology.toString());
@@ -348,15 +351,11 @@ public class WebserverCommand implements Command {
               type.asOWLClass().getIRI().equals(PhylorefHelper.IRI_CDAO_NODE)
           ))
           .map(indiv -> indiv.getIRI().toString())
-          // Strip the default prefix if present. If the JSON-LD file had an '@id',
-          // that should be used instead, and we'll only strip that if it happens
-          // to be identical to ours.
+          // Strip the default prefix on the node URI if present.
           .map(iri -> !iri.startsWith(DEFAULT_URI_PREFIX) ? iri : iri.substring(DEFAULT_URI_PREFIX.length()))
           .collect(Collectors.toSet());
 
-        // Strip the default prefix if present. If the JSON-LD file had an '@id',
-        // that should be used instead, and we'll only strip that if it happens
-        // to be identical to ours.
+        // Strip the default prefix on the phyloref URI if present.
         String nodeURI = phylorefIRI.toString();
         if(nodeURI.startsWith(DEFAULT_URI_PREFIX)) nodeURI = nodeURI.substring(DEFAULT_URI_PREFIX.length());
 
