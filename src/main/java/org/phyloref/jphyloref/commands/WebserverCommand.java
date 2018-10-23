@@ -352,7 +352,7 @@ public class WebserverCommand implements Command {
           ))
           .map(indiv -> indiv.getIRI().toString())
           // Strip the default prefix on the node URI if present.
-          .map(iri -> !iri.startsWith(DEFAULT_URI_PREFIX) ? iri : iri.substring(DEFAULT_URI_PREFIX.length()))
+          .map(iri -> iri.replace(new RegExp("^" + DEFAULT_URI_PREFIX), ''))
           .collect(Collectors.toSet());
 
         // Strip the default prefix on the phyloref URI if present.
