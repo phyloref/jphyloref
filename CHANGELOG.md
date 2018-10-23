@@ -11,6 +11,7 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
   [phyloref/jphyloref#8].
 - Added support for JSON-LD files without a base URI by using a temporary URI
   internally.
+- WebserverCommand now looks for ontologies in the local 'ontologies/' directory.
 
 ## 0.2 - 2018-06-20
 - Added support for phyloreference statuses using the Publication Status Ontology
