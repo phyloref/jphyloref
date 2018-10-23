@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -227,7 +228,7 @@ public class PhylorefHelper {
       OWLAnnotationProperty timeinterval_hasIntervalEndDate = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_TIMEINT_HAS_INTERVAL_END_DATE);
 
       // Retrieve holdsStatusInTime to determine the active status of this phyloreference.
-      List<OWLAnnotation> holdsStatusInTime = EntitySearcher.getAnnotations(phylorefAsClass, ontology, pso_holdsStatusInTime).collect(Collectors.toList());
+      Collection<OWLAnnotation> holdsStatusInTime = EntitySearcher.getAnnotations(phylorefAsClass, ontology, pso_holdsStatusInTime);
 
       // Read through the list of OWLAnnotations to create corresponding PhylorefStatus objects.
       for(OWLAnnotation statusInTime: holdsStatusInTime) {
