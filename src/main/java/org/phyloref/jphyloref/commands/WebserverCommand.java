@@ -357,7 +357,7 @@ public class WebserverCommand implements Command {
 
         // Strip the default prefix on the phyloref URI if present.
         String nodeURI = phylorefIRI.toString();
-        if(nodeURI.startsWith(DEFAULT_URI_PREFIX)) nodeURI = nodeURI.substring(DEFAULT_URI_PREFIX.length());
+        nodeURI = nodeURI.replace(new RegExp("^" + DEFAULT_URI_PREFIX), '');
 
         nodesPerPhylorefAsString.put(nodeURI, nodes);
       }
