@@ -360,12 +360,12 @@ public class WebserverCommand implements Command {
           ))
           .map(indiv -> indiv.getIRI().toString())
           // Strip the default prefix on the node URI if present.
-          .map(iri -> iri.replace(new RegExp("^" + DEFAULT_URI_PREFIX), ''))
+          .map(iri -> iri.replaceFirst("^" + DEFAULT_URI_PREFIX, ""))
           .collect(Collectors.toSet());
 
         // Strip the default prefix on the phyloref URI if present.
         String nodeURI = phylorefIRI.toString();
-        nodeURI = nodeURI.replace(new RegExp("^" + DEFAULT_URI_PREFIX), '');
+        nodeURI = nodeURI.replaceFirst("^" + DEFAULT_URI_PREFIX, "");
 
         nodesPerPhylorefAsString.put(nodeURI, nodes);
       }
