@@ -40,7 +40,7 @@ import org.semanticweb.owlapi.search.EntitySearcher;
 public class PhylorefHelper {
 	// Logging
 	public static Logger LOGGER = Logger.getLogger(PhylorefHelper.class.getName());
-	
+
     // IRIs used in this package.
 
     /** IRI for OWL class Phylogeny */
@@ -220,14 +220,14 @@ public class PhylorefHelper {
      * @param ontology The ontology within which this phyloreference is defined.
      * @return A list of phyloref statuses.
      */
-    public static List<PhylorefStatus> getCurrentStatusesForPhyloref(OWLNamedIndividual phyloref, OWLOntology ontology) {
+    public static List<PhylorefStatus> getPhylorefStatuses(OWLNamedIndividual phyloref, OWLOntology ontology) {
       List<PhylorefStatus> statuses = new ArrayList<>();
 
       // Set up the OWL annotation properties we need to look up the phyloref statuses.
       OWLDataFactory dataFactory = ontology.getOWLOntologyManager().getOWLDataFactory();
       OWLClass phylorefAsClass = dataFactory.getOWLClass(phyloref.getIRI());
-      
-      LOGGER.info("Phyloreference '" + phyloref.getIRI() + "' corresponds to OWL Class " + phylorefAsClass);
+
+      LOGGER.fine("Looking up phyloref statuses for phyloref: " + phyloref.getIRI());
 
       OWLAnnotationProperty pso_holdsStatusInTime = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_PSO_HOLDS_STATUS_IN_TIME);
       OWLAnnotationProperty pso_withStatus = dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_PSO_WITH_STATUS);
@@ -248,8 +248,8 @@ public class PhylorefHelper {
         // statusues and test to see if any of those time intervals are
         // "incomplete", i.e. they have a start date but no end date.
         IRI phylorefStatusIRI = null;
-        Instant intervalStartDate = null;
-        Instant intervalEndDate = null;
+        String intervalStartDate = null;
+        String intervalEndDate = null;
 
         for(OWLAnonymousIndividual indiv_statusInTime: statusInTime.getAnonymousIndividuals()) {
           for(OWLAnnotationAssertionAxiom axiom: ontology.getAnnotationAssertionAxioms(indiv_statusInTime)) {
@@ -257,55 +257,32 @@ public class PhylorefHelper {
               for(OWLAnonymousIndividual indiv_atTime: axiom.getValue().getAnonymousIndividuals()) {
                 // These assertions sometimes show up as AnnotationAssertionAxioms and sometimes as
                 // DataPropertyAssertionAxioms. So we check for both.
+                //
                 // First, we check for OWLAnnotationAssertionAxioms.
                 for(OWLAnnotationAssertionAxiom axiom_interval: ontology.getAnnotationAssertionAxioms(indiv_atTime)) {
-                  // Look for timeinterval:hasIntervalStartDate and timeinterval:hasIntervalEndDate data properties.
+                  LOGGER.fine(" - OWL annotation assertion axiom: " + axiom_interval);
+
+                  // Look for timeinterval:hasIntervalStartDate and timeinterval:hasIntervalEndDate annotation properties.
                   if(axiom_interval.getProperty().equals(timeinterval_hasIntervalStartDate_annot)) {
-                    try {
-                      intervalStartDate = ZonedDateTime.parse(
-                        axiom_interval.getValue().asLiteral().get().getLiteral()
-                      ).toInstant();
-                    } catch(DateTimeParseException ex) {
-                      // If we have a start date but can't parse it, record it as the earliest possible time.
-                      intervalStartDate = Instant.MIN;
-                    }
+                  intervalStartDate = axiom_interval.getValue().asLiteral().get().getLiteral();
                   }
 
                   if(axiom_interval.getProperty().equals(timeinterval_hasIntervalEndDate_annot)) {
-                    try {
-                      intervalEndDate = ZonedDateTime.parse(
-                        axiom_interval.getValue().asLiteral().get().getLiteral()
-                      ).toInstant();
-                    } catch(DateTimeParseException ex) {
-                      // If we have an end date but can't parse it, record it at the latest possible time.
-                      intervalEndDate = Instant.MAX;
-                    }
+                    intervalEndDate = axiom_interval.getValue().asLiteral().get().getLiteral();
                   }
                 }
 
                 // And if they show up as DataPropertyAssertions, we process them too.
                 for(OWLDataPropertyAssertionAxiom axiom_interval: ontology.getDataPropertyAssertionAxioms(indiv_atTime)) {
+                  LOGGER.fine(" - OWL data property assertion axiom: " + axiom_interval);
+
                   // Look for timeinterval:hasIntervalStartDate and timeinterval:hasIntervalEndDate data properties.
                   if(axiom_interval.getProperty().equals(timeinterval_hasIntervalStartDate_data)) {
-                    try {
-                      intervalStartDate = ZonedDateTime.parse(
-                        axiom_interval.getObject().getLiteral()
-                      ).toInstant();
-                    } catch(DateTimeParseException ex) {
-                      // If we have a start date but can't parse it, record it as the earliest possible time.
-                      intervalStartDate = Instant.MIN;
-                    }
+                    intervalStartDate = axiom_interval.getObject().getLiteral();
                   }
 
                   if(axiom_interval.getProperty().equals(timeinterval_hasIntervalEndDate_data)) {
-                    try {
-                      intervalEndDate = ZonedDateTime.parse(
-                        axiom_interval.getObject().getLiteral()
-                      ).toInstant();
-                    } catch(DateTimeParseException ex) {
-                      // If we have an end date but can't parse it, record it at the latest possible time.
-                      intervalEndDate = Instant.MAX;
-                    }
+                    intervalEndDate = axiom_interval.getObject().getLiteral();
                   }
                 }
               }
@@ -317,11 +294,34 @@ public class PhylorefHelper {
           }
         }
 
+        // Default to null.
+        Instant instant_intervalStartDate = null;
+        if(intervalStartDate != null) {
+          try {
+            instant_intervalStartDate = ZonedDateTime.parse(intervalStartDate).toInstant();
+          } catch(DateTimeParseException ex) {
+            // If we have a start date but can't parse it, use the default.
+          }
+        }
+
+        // Default to null.
+        Instant instant_intervalEndDate = null;
+        if(intervalEndDate != null) {
+          try {
+            instant_intervalEndDate = ZonedDateTime.parse(intervalEndDate).toInstant();
+          } catch(DateTimeParseException ex) {
+            // If we have a end date but can't parse it, use the default.
+          }
+        }
+
+        // Status extracted.
+        LOGGER.fine("New phyloref status: " + phyloref + " (" + phylorefStatusIRI + ") from " + instant_intervalStartDate + " to " + instant_intervalEndDate);
+
         statuses.add(new PhylorefHelper.PhylorefStatus(
           phyloref,
           phylorefStatusIRI,
-          intervalStartDate,
-          intervalEndDate
+          instant_intervalStartDate,
+          instant_intervalEndDate
         ));
       }
 
