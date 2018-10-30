@@ -5,30 +5,45 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /** A unit test for running the JPhyloRef application. */
-public class AppTest {
+@DisplayName("The JPhyloRef application")
+class AppTest {
+  static JPhyloRef jphyloref = new JPhyloRef();
+  static ByteArrayOutputStream output = new ByteArrayOutputStream();
+  static ByteArrayOutputStream error = new ByteArrayOutputStream();
+
+  /** Set up input and output streams */
+  @BeforeAll
+  static void setupIO() {
+    System.setOut(new PrintStream(output));
+    System.setErr(new PrintStream(error));
+  }
+
+  /** Reset input and output streams between test runs */
+  @BeforeEach
+  void resetIO() {
+    output.reset();
+    error.reset();
+  }
+
   /** Test whether JPhyloRef has a version number. */
   @Test
-  public void phylorefVersion() {
+  @DisplayName("includes a version number")
+  void phylorefVersion() {
     JPhyloRef jphyloref = new JPhyloRef();
     assertNotEquals(jphyloref.VERSION, "");
   }
 
   /** Test whether we can run the "help" command. */
   @Test
-  @DisplayName("Test 'java -jar jphyloref.jar help'")
-  public void phylorefCommandLineHelp() {
-    final ByteArrayOutputStream output = new ByteArrayOutputStream();
-    System.setOut(new PrintStream(output));
-
-    final ByteArrayOutputStream error = new ByteArrayOutputStream();
-    System.setErr(new PrintStream(error));
-
+  @DisplayName("has a working 'help' command")
+  void phylorefCommandLineHelp() {
     // Run 'help' and see if we get the correct response.
-    JPhyloRef jphyloref = new JPhyloRef();
     jphyloref.execute(new String[] {"help"});
 
     try {
@@ -49,16 +64,9 @@ public class AppTest {
 
   /** Test how JPhyloRef responds to an unknown command. */
   @Test
-  @DisplayName("Test 'java -jar jphyloref.jar unknown', which should fail")
-  public void phylorefCommandLineUnknown() {
-    final ByteArrayOutputStream output = new ByteArrayOutputStream();
-    System.setOut(new PrintStream(output));
-
-    final ByteArrayOutputStream error = new ByteArrayOutputStream();
-    System.setErr(new PrintStream(error));
-
+  @DisplayName("fails correctly for unknown command line commands")
+  void phylorefCommandLineUnknown() {
     // Run 'version' and see if we get the correct response.
-    JPhyloRef jphyloref = new JPhyloRef();
     jphyloref.execute(new String[] {"unknown"});
 
     try {
