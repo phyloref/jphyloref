@@ -1,3 +1,6 @@
+# Ignore .DS_Store files generated on macOS.
+.DS_Store
+
 # JNI libraries
 *.jnilib
 
