@@ -321,7 +321,15 @@ public class WebserverCommand implements Command {
       // We could jsonldFile.toURI().toString() as the file IRI, but this points
       // to a temporary file on the server where the JSON-LD file was stored by
       // NanoHTTPD.
-      parser.parse(new FileReader(jsonldFile), "http://example.org/jphyloref#");
+      //
+      // The JSON-LD loader needs a default URI prefix. The input JSON-LD ontology
+      // will usually provide one in the '@id' field, but if not, we set up a default
+      // URI prefix here. If that prefix appears in either node URIs or phyloref URIs,
+      // we will strip it later -- that way, a JSON-LD ontology without a base URI
+      // (i.e. all of whose URIs are local to the document itself) will produce
+      // results with local URIs as well.
+      String DEFAULT_URI_PREFIX = "http://example.org/jphyloref";
+      parser.parse(new FileReader(jsonldFile), DEFAULT_URI_PREFIX);
       response.put("ontology", ontology.toString());
 
       // We have an ontology! Let's reason over it, and store the results as
@@ -351,10 +359,19 @@ public class WebserverCommand implements Command {
               type.asOWLClass().getIRI().equals(PhylorefHelper.IRI_CDAO_NODE)
           ))
           .map(indiv -> indiv.getIRI().toString())
+          // Strip the default prefix on the node URI if present.
+          .map(iri -> iri.replaceFirst("^" + DEFAULT_URI_PREFIX, ""))
           .collect(Collectors.toSet());
 
-        nodesPerPhylorefAsString.put(phylorefIRI.toString(), nodes);
+        // Strip the default prefix on the phyloref URI if present.
+        String nodeURI = phylorefIRI.toString();
+        nodeURI = nodeURI.replaceFirst("^" + DEFAULT_URI_PREFIX, "");
+
+        nodesPerPhylorefAsString.put(nodeURI, nodes);
       }
+
+      // Log reasoning results.
+      System.err.println("Phyloreferencing reasoning results: " + nodesPerPhylorefAsString);
 
       // Record phyloreferences and matching nodes in JSON response.
       response.put("phylorefs", nodesPerPhylorefAsString);
