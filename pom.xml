@@ -114,6 +114,31 @@
 
     <build>
         <plugins>
+            <!-- Use Spotless to check and fix style: https://github.com/diffplug/spotless/tree/master/plugin-maven -->
+            <plugin>
+              <groupId>com.diffplug.spotless</groupId>
+              <artifactId>spotless-maven-plugin</artifactId>
+              <version>1.15.0</version>
+              <configuration>
+                <java>
+                  <googleJavaFormat>
+                    <version>1.6</version>
+                    <style>GOOGLE</style>
+                  </googleJavaFormat>
+                  <removeUnusedImports/>
+                </java>
+              </configuration>
+              <executions>
+                <execution>
+                  <id>test</id>
+                  <phase>test</phase>
+                  <goals>
+                    <goal>check</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
