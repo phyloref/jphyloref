@@ -89,7 +89,7 @@ public class TestCommand implements Command {
    * @param cmdLine The command line options provided to this command.
    */
   @Override
-  public void execute(CommandLine cmdLine) throws RuntimeException {
+  public int execute(CommandLine cmdLine) throws RuntimeException {
     // Extract command-line options
     String str_input = cmdLine.getOptionValue("input");
 
@@ -433,7 +433,7 @@ public class TestCommand implements Command {
             + " skipped.");
 
     // Exit with error unless we have zero failures.
-    if (countSuccess == 0) System.exit(-1);
-    System.exit(countFailure);
+    if (countSuccess == 0) return -1;
+    return countFailure;
   }
 }

@@ -34,7 +34,7 @@ public class JPhyloRef {
    *
    * @param args Command line arguments
    */
-  public void execute(String[] args) {
+  public int execute(String[] args) {
     // Prepare to parse command line arguments.
     Options opts = new Options();
 
@@ -52,15 +52,14 @@ public class JPhyloRef {
       cmdLine = new DefaultParser().parse(opts, args);
     } catch (ParseException ex) {
       System.err.println("Could not parse command line options: " + ex);
-      System.exit(1);
-      return;
+      return 1;
     }
 
     // Are there any command line arguments?
     if (cmdLine.getArgList().isEmpty()) {
       // No command line arguments -- display help!
       HelpCommand help = new HelpCommand();
-      help.execute(cmdLine);
+      return help.execute(cmdLine);
     } else {
       // Look for global options:
       //	--reasoner: Set the reasoner.
@@ -73,13 +72,13 @@ public class JPhyloRef {
         if (cmd.getName().equalsIgnoreCase(command)) {
           // Found a match!
           cmd.execute(cmdLine);
-          System.exit(0);
+          return 0;
         }
       }
 
       // Could not find any command.
       System.err.println("Error: command '" + command + "' has not been implemented.");
-      System.exit(1);
+      return 1;
     }
   }
 
@@ -91,7 +90,7 @@ public class JPhyloRef {
    */
   public static void main(String[] args) {
     JPhyloRef jphyloref = new JPhyloRef();
-    jphyloref.execute(args);
+    System.exit(jphyloref.execute(args));
   }
 
   /**
@@ -114,7 +113,7 @@ public class JPhyloRef {
     public void addCommandLineOptions(Options opts) {}
 
     /** Display a list of Commands that can be executed on the command line. */
-    public void execute(CommandLine cmdLine) {
+    public int execute(CommandLine cmdLine) {
       // Display version number.
       System.out.println(
           "JPhyloRef/"
@@ -156,6 +155,8 @@ public class JPhyloRef {
 
       // One final blank line, please.
       System.out.println("");
+
+      return 0;
     }
   }
 }
