@@ -64,8 +64,13 @@ public class ReasonerHelper {
 			Version version = reasoner.getReasonerVersion();
 			versionString = version.getMajor() + "." + version.getMinor() + "." + version.getBuild() + "." + version.getPatch();
 		} catch (OWLOntologyCreationException e) {
-			versionString = "(undefined)";
+                        // There was an error creating the OWL Ontology.
+			versionString = "(error: " + e + ")";
 		} catch (UnsatisfiedLinkError err) {
+                        // Reasoners that use Java Native Interface (JNI) libraries
+                        // will throw this exception if a native method could not be
+                        // found. Trapping it here allows us to display the entire
+                        // list of reasoners without disruption.
 			versionString = "(JNI library not linked)";
 		}
 
