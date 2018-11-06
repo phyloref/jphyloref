@@ -27,6 +27,9 @@ public interface Command {
   /** A list of valid command line options. These should be added to the provided Options object. */
   public void addCommandLineOptions(Options opts);
 
-  /** Execute this command with the provided command line options. */
-  public void execute(CommandLine cmdLine);
+  /**
+   * Execute this command with the provided command line options, and provide an exit value to
+   * return to the operating system.
+   */
+  public int execute(CommandLine cmdLine);
 }
