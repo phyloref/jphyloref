@@ -39,27 +39,29 @@ class AppTest {
     assertNotEquals(jphyloref.VERSION, "");
   }
 
-  /** Test whether we can run the "help" command. */
+  /** Test whether we get the "help" output if we run JPhyloRef without any command line. */
   @Test
-  @DisplayName("has a working 'help' command")
-  void phylorefCommandLineHelp() {
+  @DisplayName("provides 'help' output with an empty command line.")
+  void phylorefEmptyCommandLine() {
     // Run 'help' and see if we get the correct response.
-    jphyloref.execute(new String[] {"help"});
-
+    jphyloref.execute(new String[] {});
     try {
-      String outputStr = output.toString("UTF-8");
-      assertTrue(
-          outputStr.matches("(?s)^JPhyloRef/[\\w\\-\\.]+ OWLAPI/[\\d\\.\\-]+.*"),
-          "We get the version information in the first line: " + outputStr);
-      assertTrue(
-          outputStr.contains("Synopsis: jphyloref <command> <options>"),
-          "We see the synopsis in the output: " + outputStr);
-      assertTrue(
-          outputStr.contains("'jfact': JFact/"),
-          "We see JFact reported in the output: " + outputStr);
+      checkHelpOutput(output.toString("UTF-8"));
     } catch (UnsupportedEncodingException ex) {
       throw new RuntimeException("'UTF-8' is not supported as an encoding: " + ex);
     }
+  }
+
+  /** This method checks whether the output of the Help command is sensible */
+  private void checkHelpOutput(String outputStr) {
+    assertTrue(
+        outputStr.matches("(?s)^JPhyloRef/[\\w\\-\\.]+ OWLAPI/[\\d\\.\\-]+.*"),
+        "We get the version information in the first line: " + outputStr);
+    assertTrue(
+        outputStr.contains("Synopsis: jphyloref <command> <options>"),
+        "We see the synopsis in the output: " + outputStr);
+    assertTrue(
+        outputStr.contains("'jfact': JFact/"), "We see JFact reported in the output: " + outputStr);
   }
 
   /** Test how JPhyloRef responds to an unknown command. */
@@ -72,6 +74,23 @@ class AppTest {
     try {
       assertEquals("", output.toString("UTF-8"));
       assertEquals("Error: command 'unknown' has not been implemented.\n", error.toString("UTF-8"));
+    } catch (UnsupportedEncodingException ex) {
+      throw new RuntimeException("'UTF-8' is not supported as an encoding: " + ex);
+    }
+  }
+
+  /** Test whether JPhyloRef works with a malformed command line. */
+  @Test
+  @DisplayName("fails correctly when given a malformed command line")
+  void phylorefCommandLineMalformed() {
+    // Run '----' and see if we get the correct response.
+    jphyloref.execute(new String[] {"----"});
+
+    try {
+      assertEquals("", output.toString("UTF-8"));
+      assertEquals(
+          "Could not parse command line options: org.apache.commons.cli.UnrecognizedOptionException: Unrecognized option: ----\n",
+          error.toString("UTF-8"));
     } catch (UnsupportedEncodingException ex) {
       throw new RuntimeException("'UTF-8' is not supported as an encoding: " + ex);
     }
