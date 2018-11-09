@@ -153,6 +153,28 @@
               <groupId>org.jacoco</groupId>
               <artifactId>jacoco-maven-plugin</artifactId>
               <version>0.8.2</version>
+              <configuration>
+                <!-- These rules are to ensure that CI output records that we still
+                haven't finished testing this code, which is why we don't halt on failure. -->
+                <haltOnFailure>false</haltOnFailure>
+                <rules>
+                  <rule implementation="org.jacoco.maven.RuleConfiguration">
+                    <element>SOURCEFILE</element>
+                    <limits>
+                      <limit implementation="org.jacoco.report.check.Limit">
+                        <counter>INSTRUCTION</counter>
+                        <value>COVEREDRATIO</value>
+                        <minimum>0.80</minimum>
+                      </limit>
+                      <limit implementation="org.jacoco.report.check.Limit">
+                        <counter>CLASS</counter>
+                        <value>MISSEDCOUNT</value>
+                        <maximum>0</maximum>
+                      </limit>
+                    </limits>
+                  </rule>
+                </rules>
+              </configuration>
               <executions>
                 <execution>
                   <id>prepare-agent</id>
@@ -165,6 +187,13 @@
                   <phase>prepare-package</phase>
                   <goals>
                     <goal>report</goal>
+                  </goals>
+                </execution>
+                <execution>
+                  <id>check</id>
+                  <phase>test</phase>
+                  <goals>
+                    <goal>check</goal>
                   </goals>
                 </execution>
               </executions>
