@@ -204,6 +204,17 @@
               </executions>
             </plugin>
 
+            <!-- maven-compiler-plugin allows us to configure compilations errors -->
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <version>3.8.0</version>
+              <configuration>
+                <compilerArgument>-Xlint:unchecked</compilerArgument>
+                <showDeprecation>true</showDeprecation>
+              </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
