@@ -58,12 +58,39 @@ class OWLHelperTest {
       OWLDataFactory df = ontologyManager.getOWLDataFactory();
       OWLNamedIndividual phyloref =
           df.getOWLNamedIndividual(IRI.create("http://example.org/phyloref1"));
-      Set<String> englishLabels = OWLHelper.getLabelsInEnglish(phyloref, testOntology);
 
+      // Look up labels in English.
+      Set<String> englishLabels = OWLHelper.getLabelsInEnglish(phyloref, testOntology);
       assertEquals(1, englishLabels.size());
       assertTrue(
           englishLabels.contains("Label in English"),
           "Label 'Label in English' correctly identified.");
+
+      // Look up Hindi or German names. Since Hindi is listed first, only the
+      // Hindi label is retrieved.
+      Set<String> hindiGermanLabels =
+          OWLHelper.getAnnotationLiteralsForEntity(
+              testOntology,
+              phyloref,
+              df.getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI()),
+              Arrays.asList("hi", "de"));
+      assertEquals(1, hindiGermanLabels.size());
+      assertTrue(
+          hindiGermanLabels.contains("अंग्रेजी में लेबल"),
+          "Label 'अंग्रेजी में लेबल' correctly identified.");
+
+      // Look up Spanish labels. Without a label, we'll default to the name without
+      // a language.
+      Set<String> spanishLabels =
+          OWLHelper.getAnnotationLiteralsForEntity(
+              testOntology,
+              phyloref,
+              df.getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI()),
+              Arrays.asList("es"));
+      assertEquals(1, spanishLabels.size());
+      assertTrue(
+          spanishLabels.contains("Label without a language"),
+          "Label 'Label without a language' correctly identified.");
     }
   }
 }
