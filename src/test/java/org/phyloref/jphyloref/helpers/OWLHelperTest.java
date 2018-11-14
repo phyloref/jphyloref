@@ -102,6 +102,13 @@ class OWLHelperTest {
       assertTrue(
           spanishLabels.contains("Label without a language"),
           "Label 'Label without a language' correctly identified.");
+
+      // Look up an unlabeled entity (e.g. "http://example.org/phyloref2").
+      // This should return an empty set.
+      Set<String> unlabeledLabels =
+          OWLHelper.getLabelsInEnglish(
+              df.getOWLNamedIndividual(IRI.create("http://example.org/phyloref2")), testOntology);
+      assertEquals(0, unlabeledLabels.size());
     }
   }
 }
