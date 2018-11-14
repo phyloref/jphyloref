@@ -45,6 +45,18 @@ class ReasonerHelperTest {
     }
 
     @Test
+    @DisplayName("fails correctly when given an incorrect reasoner name")
+    void failsCorrectly() {
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> {
+            ReasonerHelper.getReasonerFactory("incorrect");
+          },
+          "No reasoner named 'incorrect'; must be one of: "
+              + ReasonerHelper.getReasonerFactories().keySet().toString());
+    }
+
+    @Test
     @DisplayName("can read the reasoner from the command line")
     void canReadFromCmdLine() {
       Options cmdLineOptions = new Options();
