@@ -2,7 +2,7 @@ package org.phyloref.jphyloref.helpers;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.*;
+import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
@@ -10,10 +10,9 @@ import org.apache.commons.cli.ParseException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
-/** A unit test for running the JPhyloRef application. */
+/** A unit test for the ReasonerHelper class */
 @DisplayName("ReasonerHelper")
 class ReasonerHelperTest {
   @Nested
