@@ -34,7 +34,7 @@ class OWLHelperTest {
       // Set up some labels on a named individual.
       List<OWLAxiom> axioms = new ArrayList<>();
       IRI phyloref1IRI = IRI.create("http://example.org/phyloref1");
-      OWLNamedIndividual phyloref = df.getOWLNamedIndividual(phyloref1IRI);
+
       axioms.add(
           df.getOWLAnnotationAssertionAxiom(
               RDFSLabelProperty, phyloref1IRI, df.getOWLLiteral("Label without a language", "")));
@@ -49,7 +49,7 @@ class OWLHelperTest {
               RDFSLabelProperty, phyloref1IRI, df.getOWLLiteral("अंग्रेजी में लेबल", "hi")));
 
       // Set up the test ontology.
-      testOntology = ontologyManager.createOntology(new HashSet(axioms));
+      testOntology = ontologyManager.createOntology(new HashSet<>(axioms));
     }
 
     @Test
