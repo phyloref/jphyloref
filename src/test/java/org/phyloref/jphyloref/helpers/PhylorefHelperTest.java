@@ -216,32 +216,34 @@ class PhylorefHelperTest {
       // we have no guarantee as to which order these statuses will appear in.
 
       // Find the first status somewhere in this list.
-      assertEquals(
-          1,
+      PhylorefStatus first =
           statuses
               .stream()
-              .filter(
-                  st ->
-                      st.getPhyloref().equals(phyloref)
-                          && st.getStatus().equals(IRI.create("http://purl.org/spar/pso/draft"))
-                          && st.getIntervalStart().equals(Instant.parse("2018-11-14T01:00:00.00Z"))
-                          && st.getIntervalEnd().equals(Instant.parse("2018-11-14T02:00:00.00Z")))
-              .count(),
-          "Found the first status: 'pso:draft'");
+              .filter(st -> st.getStatus().equals(IRI.create("http://purl.org/spar/pso/draft")))
+              .findAny()
+              .get();
+
+      assertEquals(phyloref, first.getPhyloref());
+      assertEquals(Instant.parse("2018-11-14T01:00:00.00Z"), first.getIntervalStart());
+      assertEquals(Instant.parse("2018-11-14T02:00:00.00Z"), first.getIntervalEnd());
+      assertEquals(
+          "phyloreference status http://purl.org/spar/pso/draft starting at 2018-11-14T01:00:00Z ending at 2018-11-14T02:00:00Z",
+          first.toString());
 
       // Find the final status somewhere in this list.
-      assertEquals(
-          1,
+      PhylorefStatus last =
           statuses
               .stream()
-              .filter(
-                  st ->
-                      st.getPhyloref().equals(phyloref)
-                          && st.getStatus().equals(IRI.create("http://purl.org/spar/pso/published"))
-                          && st.getIntervalStart().equals(Instant.parse("2018-11-14T04:00:00.00Z"))
-                          && st.getIntervalEnd() == null)
-              .count(),
-          "Found the final status: 'pso:published'");
+              .filter(st -> st.getStatus().equals(IRI.create("http://purl.org/spar/pso/published")))
+              .findAny()
+              .get();
+
+      assertEquals(phyloref, last.getPhyloref());
+      assertEquals(Instant.parse("2018-11-14T04:00:00.00Z"), last.getIntervalStart());
+      assertNull(last.getIntervalEnd());
+      assertEquals(
+          "phyloreference status http://purl.org/spar/pso/published starting at 2018-11-14T04:00:00Z",
+          last.toString());
 
       // How many are "current" (i.e. missing an end time)?
       assertEquals(1, statuses.stream().filter(st -> st.getIntervalEnd() == null).count());
