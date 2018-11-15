@@ -235,7 +235,7 @@ public class PhylorefHelper {
    * @param ontology The ontology within which this phyloreference is defined.
    * @return A list of phyloref statuses.
    */
-  public static List<PhylorefStatus> getCurrentStatusesForPhyloref(
+  public static List<PhylorefStatus> getStatusesForPhyloref(
       OWLNamedIndividual phyloref, OWLOntology ontology) {
     List<PhylorefStatus> statuses = new ArrayList<>();
 

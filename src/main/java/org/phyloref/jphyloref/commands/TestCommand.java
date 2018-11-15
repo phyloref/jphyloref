@@ -341,7 +341,7 @@ public class TestCommand implements Command {
 
       // Get a list of phyloref statuses for this phyloreference.
       List<PhylorefHelper.PhylorefStatus> statuses =
-          PhylorefHelper.getCurrentStatusesForPhyloref(phyloref, ontology);
+          PhylorefHelper.getStatusesForPhyloref(phyloref, ontology);
 
       // Instead of checking which time interval we are currently in, we take a simpler approach:
       // we look for all statuses asserted to be "active", i.e. those with a start time but no end
