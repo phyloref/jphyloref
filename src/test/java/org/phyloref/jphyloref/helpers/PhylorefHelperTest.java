@@ -57,10 +57,96 @@ class PhylorefHelperTest {
                   IRI.create("http://ontology.phyloref.org/phyloref.owl#Phyloreference")),
               phyloref1));
 
+      // Make sure that SpecifiedGroups don't get confused for phylorefs.
+      axioms.add(
+          df.getOWLClassAssertionAxiom(
+              df.getOWLClass(
+                  IRI.create("http://ontology.phyloref.org/phyloref.owl#SpecifiedGroup")),
+              df.getOWLNamedIndividual(IRI.create("http://example.org/#aSpecifiedGroup"))));
+
       // Give the phyloreference a label.
       axioms.add(
           df.getOWLAnnotationAssertionAxiom(
               df.getRDFSLabel(), phyloref1IRI, df.getOWLLiteral("Test phyloreference", "en")));
+
+      // Set up the test ontology.
+      testOntology = ontologyManager.createOntology(new HashSet<>(axioms));
+    }
+
+    @Test
+    @DisplayName("can retrieve lists of phylorefs without reasoning")
+    void canRetrievePhylorefsWithoutReasoning() {
+      OWLDataFactory df = ontologyManager.getOWLDataFactory();
+      OWLNamedIndividual phyloref =
+          df.getOWLNamedIndividual(IRI.create("http://example.org/phyloref1"));
+
+      Set<OWLNamedIndividual> phylorefs =
+          PhylorefHelper.getPhyloreferencesWithoutReasoning(testOntology);
+      assertEquals(1, phylorefs.size());
+      assertTrue(
+          phylorefs.contains(phyloref),
+          "Phyloref 'phyloref1' has been retrieved without reasoning");
+
+      // Calling getPhyloreferences() with a null reasoner should also return
+      // the same results.
+      phylorefs = PhylorefHelper.getPhyloreferences(testOntology, null);
+      assertEquals(1, phylorefs.size());
+      assertTrue(
+          phylorefs.contains(phyloref),
+          "Phyloref 'phyloref1' has been retrieved without reasoning");
+    }
+
+    @Test
+    @DisplayName("can retrieve lists of phylorefs with reasoning")
+    void canRetrievePhylorefsWithReasoning() {
+      OWLDataFactory df = ontologyManager.getOWLDataFactory();
+      OWLReasoner reasoner = new JFactFactory().createNonBufferingReasoner(testOntology);
+      OWLNamedIndividual phyloref =
+          df.getOWLNamedIndividual(IRI.create("http://example.org/phyloref1"));
+
+      // Note that this should be identical to the "without reasoning" code in
+      // the absence of individuals that are implied to be Phyloreferences but
+      // not explicitly stated to be phylorefs. This is not tested yet!
+
+      Set<OWLNamedIndividual> phylorefs = PhylorefHelper.getPhyloreferences(testOntology, reasoner);
+      assertEquals(1, phylorefs.size());
+      assertTrue(
+          phylorefs.contains(phyloref), "Phyloref 'phyloref1' has been retrieved with reasoning");
+    }
+  }
+
+  @Nested
+  @DisplayName("has a class for storing phyloref statuses that")
+  class PhylorefStatusTest {
+    @Test
+    @DisplayName("fails unless a status has been provided")
+    void checkPhylorefStatusConstructor() {
+      PhylorefStatus status1 = new PhylorefStatus(null, IRI.create("http://"), null, null);
+      IllegalArgumentException ex =
+          assertThrows(
+              IllegalArgumentException.class, () -> new PhylorefStatus(null, null, null, null));
+      assertEquals(
+          "No status provided to PhylorefStatus, which is a required argument", ex.getMessage());
+    }
+  }
+
+  @Nested
+  @DisplayName("has methods for retrieving phyloref statuses that")
+  class PhylorefStatusRetrievalTest {
+    OWLOntologyManager ontologyManager;
+    OWLOntology testOntology;
+
+    /** Set up the test ontology with annotations involving labels */
+    @BeforeEach
+    void setupOntology() throws OWLOntologyCreationException {
+      // Set up a set of axioms we will use to run these tests.
+      ontologyManager = OWLManager.createOWLOntologyManager();
+      OWLDataFactory df = ontologyManager.getOWLDataFactory();
+
+      // Set up a phyloreference we can use for testing.
+      List<OWLAxiom> axioms = new ArrayList<>();
+      IRI phyloref1IRI = IRI.create("http://example.org/phyloref1");
+      OWLNamedIndividual phyloref1 = df.getOWLNamedIndividual(phyloref1IRI);
 
       // Set up annotation properties for setting statuses.
       axioms.addAll(
@@ -156,47 +242,6 @@ class PhylorefHelperTest {
 
       // Return the axioms that need to be added.
       return axioms;
-    }
-
-    @Test
-    @DisplayName("can retrieve lists of phylorefs without reasoning")
-    void canRetrievePhylorefsWithoutReasoning() {
-      OWLDataFactory df = ontologyManager.getOWLDataFactory();
-      OWLNamedIndividual phyloref =
-          df.getOWLNamedIndividual(IRI.create("http://example.org/phyloref1"));
-
-      Set<OWLNamedIndividual> phylorefs =
-          PhylorefHelper.getPhyloreferencesWithoutReasoning(testOntology);
-      assertEquals(1, phylorefs.size());
-      assertTrue(
-          phylorefs.contains(phyloref),
-          "Phyloref 'phyloref1' has been retrieved without reasoning");
-
-      // Calling getPhyloreferences() with a null reasoner should also return
-      // the same results.
-      phylorefs = PhylorefHelper.getPhyloreferences(testOntology, null);
-      assertEquals(1, phylorefs.size());
-      assertTrue(
-          phylorefs.contains(phyloref),
-          "Phyloref 'phyloref1' has been retrieved without reasoning");
-    }
-
-    @Test
-    @DisplayName("can retrieve lists of phylorefs with reasoning")
-    void canRetrievePhylorefsWithReasoning() {
-      OWLDataFactory df = ontologyManager.getOWLDataFactory();
-      OWLReasoner reasoner = new JFactFactory().createNonBufferingReasoner(testOntology);
-      OWLNamedIndividual phyloref =
-          df.getOWLNamedIndividual(IRI.create("http://example.org/phyloref1"));
-
-      // Note that this should be identical to the "without reasoning" code in
-      // the absence of individuals that are implied to be Phyloreferences but
-      // not explicitly stated to be phylorefs. This is not tested yet!
-
-      Set<OWLNamedIndividual> phylorefs = PhylorefHelper.getPhyloreferences(testOntology, reasoner);
-      assertEquals(1, phylorefs.size());
-      assertTrue(
-          phylorefs.contains(phyloref), "Phyloref 'phyloref1' has been retrieved with reasoning");
     }
 
     @Test
