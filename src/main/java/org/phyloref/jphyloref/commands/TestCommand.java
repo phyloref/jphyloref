@@ -3,6 +3,7 @@ package org.phyloref.jphyloref.commands;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -112,6 +113,12 @@ public class TestCommand implements Command {
       throw new IllegalArgumentException("Error: no input ontology specified (use '-i input.owl')");
     }
 
+    // If the input filename is '-', we should read the ontology from STDIN instead.
+    InputStream inputStreamToReadFrom = null;
+    if (str_input.equals("-")) {
+      inputStreamToReadFrom = System.in;
+    }
+
     // Create File object to load
     File inputFile = new File(str_input);
     System.err.println("Input: " + inputFile);
@@ -136,10 +143,22 @@ public class TestCommand implements Command {
         String DEFAULT_URI_PREFIX = "http://example.org/jphyloref";
         ontology = manager.createOntology();
         RDFParser parser = JSONLDHelper.createRDFParserForOntology(ontology);
-        parser.parse(new FileReader(inputFile), DEFAULT_URI_PREFIX);
+        if (inputStreamToReadFrom != null) {
+          // Read from the provided input stream (probably STDIN).
+          parser.parse(inputStreamToReadFrom, DEFAULT_URI_PREFIX);
+        } else {
+          // Read from the provided input file.
+          parser.parse(new FileReader(inputFile), DEFAULT_URI_PREFIX);
+        }
       } else {
         // Load the ontology using OWLManager.
-        ontology = manager.loadOntologyFromOntologyDocument(inputFile);
+        if (inputStreamToReadFrom != null) {
+          // Read from the provided input stream (probably STDIN).
+          ontology = manager.loadOntologyFromOntologyDocument(inputStreamToReadFrom);
+        } else {
+          // Read from the provided input file.
+          ontology = manager.loadOntologyFromOntologyDocument(inputFile);
+        }
       }
     } catch (OWLOntologyCreationException ex) {
       System.err.println("Could not create ontology '" + inputFile + "': " + ex);
