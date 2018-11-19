@@ -39,7 +39,8 @@ class TestCommandTest {
     @DisplayName("successfully tests simple OWL files")
     void testSimpleOWLFiles() {
       // Run 'test dummy1.owl' and see if we get the correct response.
-      jphyloref.execute(new String[] {"test", "src/test/resources/phylorefs/dummy1.owl"});
+      int exitCode =
+          jphyloref.execute(new String[] {"test", "src/test/resources/phylorefs/dummy1.owl"});
 
       String outputStr, errorStr;
       try {
@@ -49,6 +50,7 @@ class TestCommandTest {
         throw new RuntimeException("'UTF-8' is not supported as an encoding: " + ex);
       }
 
+      assertEquals(0, exitCode);
       assertTrue(
           errorStr.contains("Input: src/test/resources/phylorefs/dummy1.owl"),
           "Make sure JPhyloRef reports the name of the file being processed");
@@ -67,9 +69,10 @@ class TestCommandTest {
   class TestingJSONLDFile {
     @Test
     @DisplayName("successfully tests simple JSON-LD files")
-    void testSimpleOWLFiles() {
-      // Run 'test dummy1.owl' and see if we get the correct response.
-      jphyloref.execute(new String[] {"test", "src/test/resources/phylorefs/dummy1.jsonld"});
+    void testSimpleJSONLDFiles() {
+      // Run 'test dummy1.jsonld' and see if we get the correct response.
+      int exitCode =
+          jphyloref.execute(new String[] {"test", "src/test/resources/phylorefs/dummy1.jsonld"});
 
       String outputStr, errorStr;
       try {
@@ -79,6 +82,7 @@ class TestCommandTest {
         throw new RuntimeException("'UTF-8' is not supported as an encoding: " + ex);
       }
 
+      assertEquals(0, exitCode);
       assertTrue(
           errorStr.contains("Input: src/test/resources/phylorefs/dummy1.jsonld"),
           "Make sure JPhyloRef reports the name of the file being processed");
@@ -89,6 +93,32 @@ class TestCommandTest {
       assertEquals(
           "1..1\nok 1 Phyloreference '1'\n# The following nodes were matched and expected this phyloreference: [1]\n\n",
           outputStr);
+      resetIO();
+
+      // Run 'test dummy1.txt' with the '--jsonld' option and see if we get the correct response.
+      exitCode =
+          jphyloref.execute(
+              new String[] {"test", "src/test/resources/phylorefs/dummy1.txt", "--jsonld"});
+
+      try {
+        outputStr = output.toString("UTF-8");
+        errorStr = error.toString("UTF-8");
+      } catch (UnsupportedEncodingException ex) {
+        throw new RuntimeException("'UTF-8' is not supported as an encoding: " + ex);
+      }
+
+      assertEquals(0, exitCode);
+      assertTrue(
+          errorStr.contains("Input: src/test/resources/phylorefs/dummy1.txt"),
+          "Make sure JPhyloRef reports the name of the file being processed");
+      assertTrue(
+          errorStr.endsWith(
+              "Testing complete:1 successes, 0 failures, 0 failures marked TODO, 0 skipped.\n"),
+          "Make sure the testing was successful.");
+      assertEquals(
+          "1..1\nok 1 Phyloreference '1'\n# The following nodes were matched and expected this phyloreference: [1]\n\n",
+          outputStr);
+      resetIO();
     }
   }
 }

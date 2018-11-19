@@ -82,7 +82,13 @@ public class TestCommand implements Command {
         "i",
         "input",
         true,
-        "The input ontology to read in RDF/XML (can also be provided without the '-i')");
+        "The input ontology to read in RDF/XML or JSON-LD (can also be provided without the '-i').");
+
+    opts.addOption(
+        "j",
+        "jsonld",
+        false,
+        "Treat the input file as a JSON-LD file. Files with a '.json' or '.jsonld' extension will automatically be treated as a JSON-LD file.");
   }
 
   /**
@@ -123,7 +129,9 @@ public class TestCommand implements Command {
     OWLOntology ontology;
     String inputFileLowercase = str_input.toLowerCase();
     try {
-      if (inputFileLowercase.endsWith(".json") || inputFileLowercase.endsWith(".jsonld")) {
+      if (cmdLine.hasOption("jsonld")
+          || inputFileLowercase.endsWith(".json")
+          || inputFileLowercase.endsWith(".jsonld")) {
         // Use the JSONLD Helper to load the ontology.
         String DEFAULT_URI_PREFIX = "http://example.org/jphyloref";
         ontology = manager.createOntology();
