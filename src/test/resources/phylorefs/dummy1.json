@@ -1,0 +1,41 @@
+{
+    "@context": "http://phyloref.org/curation-tool/json/phyx.json",
+    "citation": "Dummy phyloreference for testing",
+    "phylogenies": [
+        {
+            "description": "Dummy phylogeny for testing",
+            "newick": "(Aa_a, (Bb_b, (Cc_c, Dd_d, Ee_e)1)2)3"
+        }
+    ],
+    "phylorefs": [
+        {
+            "label": "1",
+            "cladeDefinition": "Node-based, includes C and E, should resolve to (C, D, E) clade.",
+            "internalSpecifiers": [
+                {
+                    "referencesTaxonomicUnits": [
+                        {
+                            "scientificNames": [
+                                {
+                                    "scientificName": "Cc c"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "referencesTaxonomicUnits": [
+                        {
+                            "scientificNames": [
+                                {
+                                    "scientificName": "Ee e"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "externalSpecifiers": []
+        }
+    ]
+}
