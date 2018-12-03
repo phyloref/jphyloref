@@ -46,9 +46,11 @@ class OWLHelperTest {
       List<OWLAxiom> axioms = new ArrayList<>();
       IRI phyloref1IRI = IRI.create("http://example.org/phyloref1");
 
+      // We set a label without a language tag (i.e. an xsd:string) as well as
+      // several language-tagged labels (i.e. rdfs:langString).
       axioms.add(
           df.getOWLAnnotationAssertionAxiom(
-              RDFSLabelProperty, phyloref1IRI, df.getOWLLiteral("Label without a language", "")));
+              RDFSLabelProperty, phyloref1IRI, df.getOWLLiteral("Label without a language tag")));
       axioms.add(
           df.getOWLAnnotationAssertionAxiom(
               RDFSLabelProperty, phyloref1IRI, df.getOWLLiteral("Label in English", "en")));
@@ -64,13 +66,32 @@ class OWLHelperTest {
     }
 
     @Test
-    @DisplayName("read labels in English")
-    void canReadLabelInEnglish() {
+    @DisplayName("choose the right label by language")
+    void canChooseLabelsByLanguage() {
+      /*
+       * One challenge with working with rdfs:labels is that they may be
+       * language-tagged strings (i.e. rdfs:langString) or plain strings
+       * (i.e. xsd:string).
+       *
+       * OWLHelper tries to help with this by using a simple algorithm:
+       *  - A set of expected languages can be specified in order of priority.
+       *    OWLHelper will return the labels in the first language that contains
+       *    any labels at all.
+       *  - If no language match or if the special language tag "" is used,
+       *    labels specified as untagged language strings will be returned.
+       *  - If no labels in the provided language and no untagged language
+       *    strings are available, OWLHelper will return an empty list.
+       *    It will never return a label in a language not explicitly requested.
+       *
+       * This method tests these possibilities.
+       *
+       */
       OWLDataFactory df = ontologyManager.getOWLDataFactory();
       OWLNamedIndividual phyloref =
           df.getOWLNamedIndividual(IRI.create("http://example.org/phyloref1"));
 
-      // Look up labels in English.
+      // We have a helper method to retrieve English labels, as this is the most
+      // common case.
       Set<String> englishLabels = OWLHelper.getLabelsInEnglish(phyloref, testOntology);
       assertEquals(1, englishLabels.size());
       assertTrue(
@@ -78,7 +99,7 @@ class OWLHelperTest {
           "Label 'Label in English' correctly identified.");
 
       // Look up Hindi or German names. Since Hindi is listed first, only the
-      // Hindi label is retrieved.
+      // Hindi label should be retrieved.
       Set<String> hindiGermanLabels =
           OWLHelper.getAnnotationLiteralsForEntity(
               testOntology,
@@ -90,8 +111,9 @@ class OWLHelperTest {
           hindiGermanLabels.contains("अंग्रेजी में लेबल"),
           "Label 'अंग्रेजी में लेबल' correctly identified.");
 
-      // Look up Spanish labels. Without a label, we'll default to the name without
-      // a language.
+      // Attempt to look up labels in Spanish. Since no such label exist, the
+      // program will look for labels without an explicit language tag, and will
+      // return that instead.
       Set<String> spanishLabels =
           OWLHelper.getAnnotationLiteralsForEntity(
               testOntology,
@@ -100,8 +122,8 @@ class OWLHelperTest {
               Arrays.asList("es"));
       assertEquals(1, spanishLabels.size());
       assertTrue(
-          spanishLabels.contains("Label without a language"),
-          "Label 'Label without a language' correctly identified.");
+          spanishLabels.contains("Label without a language tag"),
+          "Label 'Label without a language tag' correctly identified.");
 
       // Look up an unlabeled entity (e.g. "http://example.org/phyloref2").
       // This should return an empty set.
