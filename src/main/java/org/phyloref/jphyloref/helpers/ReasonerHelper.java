@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
+import org.geneontology.whelk.owlapi.WhelkOWLReasonerFactory;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -31,6 +32,7 @@ public class ReasonerHelper {
     reasonerFactories.put("jfact", new JFactFactory());
     reasonerFactories.put("fact++", new FaCTPlusPlusReasonerFactory());
     reasonerFactories.put("elk", new ElkReasonerFactory());
+    reasonerFactories.put("whelk", new WhelkOWLReasonerFactory());
   }
 
   /** Get reasoner factory by name. */

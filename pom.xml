@@ -95,6 +95,14 @@
       	    <version>4.0.4</version>
       	</dependency>
 
+        <!-- Whelk is the future -->
+        <!-- https://mvnrepository.com/artifact/org.geneontology/whelk -->
+        <dependency>
+          <groupId>org.geneontology</groupId>
+          <artifactId>whelk_2.12</artifactId>
+          <version>0.1.3</version>
+        </dependency>
+
         <!-- Fact++ is a very fast JNI-based reasoner -->
         <dependency>
             <groupId>uk.ac.manchester.cs</groupId>
