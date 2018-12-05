@@ -111,18 +111,18 @@ class OWLHelperTest {
           hindiGermanLabels.contains("अंग्रेजी में लेबल"),
           "Label 'अंग्रेजी में लेबल' correctly identified.");
 
-      // Attempt to look up labels in Spanish. Since no such label exist, the
-      // program will look for labels without an explicit language tag, and will
-      // return that instead.
-      Set<String> spanishLabels =
+      // Look up labels without an explicit language. We can do this by asking for
+      // the language "". Note that OWLHelper will also fall back to this if asked
+      // for a language in which it doesn't have a label, such as Spanish ("es").
+      Set<String> labelsWithoutALanguageTag =
           OWLHelper.getAnnotationLiteralsForEntity(
               testOntology,
               phyloref,
               df.getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI()),
-              Arrays.asList("es"));
-      assertEquals(1, spanishLabels.size());
+              Arrays.asList(""));
+      assertEquals(1, labelsWithoutALanguageTag.size());
       assertTrue(
-          spanishLabels.contains("Label without a language tag"),
+          labelsWithoutALanguageTag.contains("Label without a language tag"),
           "Label 'Label without a language tag' correctly identified.");
 
       // Look up an unlabeled entity (e.g. "http://example.org/phyloref2").
