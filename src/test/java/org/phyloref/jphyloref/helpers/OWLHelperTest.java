@@ -125,6 +125,19 @@ class OWLHelperTest {
           labelsWithoutALanguageTag.contains("Label without a language tag"),
           "Label 'Label without a language tag' correctly identified.");
 
+      // Does OWLHelper.getAnnotationLiteralsForEntity() fall back to returning the same
+      // list if asked for a language for which we don't have any labels, e.g. Spanish ("es")?
+      Set<String> labelsForUnknownLanguage =
+          OWLHelper.getAnnotationLiteralsForEntity(
+              testOntology,
+              phyloref,
+              df.getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI()),
+              Arrays.asList("es"));
+      assertEquals(1, labelsForUnknownLanguage.size());
+      assertTrue(
+          labelsForUnknownLanguage.contains("Label without a language tag"),
+          "Querying for a language tag for which we don't have a label should return labels without a language tag");
+
       // Look up an unlabeled entity (e.g. "http://example.org/phyloref2").
       // This should return an empty set.
       Set<String> unlabeledLabels =
