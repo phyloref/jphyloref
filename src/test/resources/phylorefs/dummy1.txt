@@ -1,0 +1,505 @@
+{
+    "@context": "http://phyloref.org/curation-tool/json/phyx.json",
+    "citation": "Dummy phyloreference for testing",
+    "phylogenies": [
+        {
+            "description": "Dummy phylogeny for testing",
+            "newick": "(Aa_a, (Bb_b, (Cc_c, Dd_d, Ee_e)1)2)3",
+            "@id": "#phylogeny0",
+            "@type": "testcase:PhyloreferenceTestPhylogeny",
+            "nodes": [
+                {
+                    "@id": "#phylogeny1_node0",
+                    "@type": "http://purl.obolibrary.org/obo/CDAO_0000140",
+                    "labels": [
+                        "3"
+                    ],
+                    "representsTaxonomicUnits": [],
+                    "children": [
+                        "#phylogeny1_node1",
+                        "#phylogeny1_node2"
+                    ]
+                },
+                {
+                    "@id": "#phylogeny1_node1",
+                    "@type": "http://purl.obolibrary.org/obo/CDAO_0000140",
+                    "labels": [
+                        "Aa_a"
+                    ],
+                    "representsTaxonomicUnits": [
+                        {
+                            "scientificNames": [
+                                {
+                                    "scientificName": "Aa a",
+                                    "binomialName": "Aa a",
+                                    "genus": "Aa",
+                                    "specificEpithet": "a"
+                                }
+                            ],
+                            "@id": "#phylogeny1_node1_taxonomicunit0",
+                            "@type": "http://purl.obolibrary.org/obo/CDAO_0000138"
+                        }
+                    ],
+                    "parent": "#phylogeny1_node0",
+                    "siblings": [
+                        "#phylogeny1_node2"
+                    ]
+                },
+                {
+                    "@id": "#phylogeny1_node2",
+                    "@type": "http://purl.obolibrary.org/obo/CDAO_0000140",
+                    "labels": [
+                        "2"
+                    ],
+                    "representsTaxonomicUnits": [],
+                    "parent": "#phylogeny1_node0",
+                    "siblings": [
+                        "#phylogeny1_node1"
+                    ],
+                    "children": [
+                        "#phylogeny1_node3",
+                        "#phylogeny1_node4"
+                    ]
+                },
+                {
+                    "@id": "#phylogeny1_node3",
+                    "@type": "http://purl.obolibrary.org/obo/CDAO_0000140",
+                    "labels": [
+                        "Bb_b"
+                    ],
+                    "representsTaxonomicUnits": [
+                        {
+                            "scientificNames": [
+                                {
+                                    "scientificName": "Bb b",
+                                    "binomialName": "Bb b",
+                                    "genus": "Bb",
+                                    "specificEpithet": "b"
+                                }
+                            ],
+                            "@id": "#phylogeny1_node3_taxonomicunit0",
+                            "@type": "http://purl.obolibrary.org/obo/CDAO_0000138"
+                        }
+                    ],
+                    "parent": "#phylogeny1_node2",
+                    "siblings": [
+                        "#phylogeny1_node4"
+                    ]
+                },
+                {
+                    "@id": "#phylogeny1_node4",
+                    "@type": "http://purl.obolibrary.org/obo/CDAO_0000140",
+                    "labels": [
+                        "1"
+                    ],
+                    "representsTaxonomicUnits": [],
+                    "parent": "#phylogeny1_node2",
+                    "siblings": [
+                        "#phylogeny1_node3"
+                    ],
+                    "children": [
+                        "#phylogeny1_node5",
+                        "#phylogeny1_node6",
+                        "#phylogeny1_node7"
+                    ]
+                },
+                {
+                    "@id": "#phylogeny1_node5",
+                    "@type": "http://purl.obolibrary.org/obo/CDAO_0000140",
+                    "labels": [
+                        "Cc_c"
+                    ],
+                    "representsTaxonomicUnits": [
+                        {
+                            "scientificNames": [
+                                {
+                                    "scientificName": "Cc c",
+                                    "binomialName": "Cc c",
+                                    "genus": "Cc",
+                                    "specificEpithet": "c"
+                                }
+                            ],
+                            "@id": "#phylogeny1_node5_taxonomicunit0",
+                            "@type": "http://purl.obolibrary.org/obo/CDAO_0000138"
+                        }
+                    ],
+                    "parent": "#phylogeny1_node4",
+                    "siblings": [
+                        "#phylogeny1_node6",
+                        "#phylogeny1_node7"
+                    ]
+                },
+                {
+                    "@id": "#phylogeny1_node6",
+                    "@type": "http://purl.obolibrary.org/obo/CDAO_0000140",
+                    "labels": [
+                        "Dd_d"
+                    ],
+                    "representsTaxonomicUnits": [
+                        {
+                            "scientificNames": [
+                                {
+                                    "scientificName": "Dd d",
+                                    "binomialName": "Dd d",
+                                    "genus": "Dd",
+                                    "specificEpithet": "d"
+                                }
+                            ],
+                            "@id": "#phylogeny1_node6_taxonomicunit0",
+                            "@type": "http://purl.obolibrary.org/obo/CDAO_0000138"
+                        }
+                    ],
+                    "parent": "#phylogeny1_node4",
+                    "siblings": [
+                        "#phylogeny1_node5",
+                        "#phylogeny1_node7"
+                    ]
+                },
+                {
+                    "@id": "#phylogeny1_node7",
+                    "@type": "http://purl.obolibrary.org/obo/CDAO_0000140",
+                    "labels": [
+                        "Ee_e"
+                    ],
+                    "representsTaxonomicUnits": [
+                        {
+                            "scientificNames": [
+                                {
+                                    "scientificName": "Ee e",
+                                    "binomialName": "Ee e",
+                                    "genus": "Ee",
+                                    "specificEpithet": "e"
+                                }
+                            ],
+                            "@id": "#phylogeny1_node7_taxonomicunit0",
+                            "@type": "http://purl.obolibrary.org/obo/CDAO_0000138"
+                        }
+                    ],
+                    "parent": "#phylogeny1_node4",
+                    "siblings": [
+                        "#phylogeny1_node5",
+                        "#phylogeny1_node6"
+                    ]
+                }
+            ],
+            "hasRootNode": {
+                "@id": "#phylogeny1_node0",
+                "@type": "http://purl.obolibrary.org/obo/CDAO_0000140",
+                "labels": [
+                    "3"
+                ],
+                "representsTaxonomicUnits": [],
+                "children": [
+                    "#phylogeny1_node1",
+                    "#phylogeny1_node2"
+                ]
+            }
+        }
+    ],
+    "phylorefs": [
+        {
+            "label": "1",
+            "cladeDefinition": "Node-based, includes C and E, should resolve to (C, D, E) clade.",
+            "internalSpecifiers": [
+                {
+                    "referencesTaxonomicUnits": [
+                        {
+                            "scientificNames": [
+                                {
+                                    "scientificName": "Cc c"
+                                }
+                            ],
+                            "@id": "#phyloref1_specifier_internal1_tunit0",
+                            "@type": "http://purl.obolibrary.org/obo/CDAO_0000138"
+                        }
+                    ],
+                    "@id": "#phyloref1_specifier_internal1",
+                    "@type": [
+                        "testcase:Specifier"
+                    ]
+                },
+                {
+                    "referencesTaxonomicUnits": [
+                        {
+                            "scientificNames": [
+                                {
+                                    "scientificName": "Ee e"
+                                }
+                            ],
+                            "@id": "#phyloref1_specifier_internal2_tunit0",
+                            "@type": "http://purl.obolibrary.org/obo/CDAO_0000138"
+                        }
+                    ],
+                    "@id": "#phyloref1_specifier_internal2",
+                    "@type": [
+                        "testcase:Specifier"
+                    ]
+                }
+            ],
+            "externalSpecifiers": [],
+            "@id": "#phyloref1",
+            "@type": [
+                "phyloref:Phyloreference",
+                "owl:Class"
+            ],
+            "hasInternalSpecifier": [
+                {
+                    "referencesTaxonomicUnits": [
+                        {
+                            "scientificNames": [
+                                {
+                                    "scientificName": "Cc c"
+                                }
+                            ],
+                            "@id": "#phyloref1_specifier_internal1_tunit0",
+                            "@type": "http://purl.obolibrary.org/obo/CDAO_0000138"
+                        }
+                    ],
+                    "@id": "#phyloref1_specifier_internal1",
+                    "@type": [
+                        "testcase:Specifier"
+                    ]
+                },
+                {
+                    "referencesTaxonomicUnits": [
+                        {
+                            "scientificNames": [
+                                {
+                                    "scientificName": "Ee e"
+                                }
+                            ],
+                            "@id": "#phyloref1_specifier_internal2_tunit0",
+                            "@type": "http://purl.obolibrary.org/obo/CDAO_0000138"
+                        }
+                    ],
+                    "@id": "#phyloref1_specifier_internal2",
+                    "@type": [
+                        "testcase:Specifier"
+                    ]
+                }
+            ],
+            "hasExternalSpecifier": [],
+            "hasAdditionalClass": [
+                {
+                    "@id": "#phyloref1_additional0",
+                    "@type": "owl:Class",
+                    "equivalentClass": {
+                        "@type": "owl:Class",
+                        "unionOf": [
+                            {
+                                "@type": "owl:Class",
+                                "intersectionOf": [
+                                    {
+                                        "@type": "owl:Restriction",
+                                        "onProperty": "testcase:matches_specifier",
+                                        "hasValue": {
+                                            "@id": "#phyloref1_specifier_internal1"
+                                        }
+                                    },
+                                    {
+                                        "@type": "owl:Restriction",
+                                        "onProperty": "obo:CDAO_0000174",
+                                        "someValuesFrom": {
+                                            "@type": "owl:Restriction",
+                                            "onProperty": "testcase:matches_specifier",
+                                            "hasValue": {
+                                                "@id": "#phyloref1_specifier_internal2"
+                                            }
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "@type": "owl:Class",
+                                "intersectionOf": [
+                                    {
+                                        "@type": "owl:Restriction",
+                                        "onProperty": "testcase:matches_specifier",
+                                        "hasValue": {
+                                            "@id": "#phyloref1_specifier_internal2"
+                                        }
+                                    },
+                                    {
+                                        "@type": "owl:Restriction",
+                                        "onProperty": "obo:CDAO_0000174",
+                                        "someValuesFrom": {
+                                            "@type": "owl:Restriction",
+                                            "onProperty": "testcase:matches_specifier",
+                                            "hasValue": {
+                                                "@id": "#phyloref1_specifier_internal1"
+                                            }
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "@type": "owl:Class",
+                                "intersectionOf": [
+                                    {
+                                        "@type": "owl:Restriction",
+                                        "onProperty": "obo:CDAO_0000149",
+                                        "someValuesFrom": {
+                                            "@type": "owl:Class",
+                                            "intersectionOf": [
+                                                {
+                                                    "@type": "owl:Restriction",
+                                                    "unionOf": [
+                                                        {
+                                                            "@type": "owl:Restriction",
+                                                            "onProperty": "testcase:matches_specifier",
+                                                            "hasValue": {
+                                                                "@id": "#phyloref1_specifier_internal1"
+                                                            }
+                                                        },
+                                                        {
+                                                            "@type": "owl:Restriction",
+                                                            "onProperty": "obo:CDAO_0000174",
+                                                            "someValuesFrom": {
+                                                                "@type": "owl:Restriction",
+                                                                "onProperty": "testcase:matches_specifier",
+                                                                "hasValue": {
+                                                                    "@id": "#phyloref1_specifier_internal1"
+                                                                }
+                                                            }
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "@type": "owl:Restriction",
+                                                    "onProperty": "phyloref:has_Sibling",
+                                                    "someValuesFrom": {
+                                                        "@type": "owl:Restriction",
+                                                        "unionOf": [
+                                                            {
+                                                                "@type": "owl:Restriction",
+                                                                "onProperty": "testcase:matches_specifier",
+                                                                "hasValue": {
+                                                                    "@id": "#phyloref1_specifier_internal2"
+                                                                }
+                                                            },
+                                                            {
+                                                                "@type": "owl:Restriction",
+                                                                "onProperty": "obo:CDAO_0000174",
+                                                                "someValuesFrom": {
+                                                                    "@type": "owl:Restriction",
+                                                                    "onProperty": "testcase:matches_specifier",
+                                                                    "hasValue": {
+                                                                        "@id": "#phyloref1_specifier_internal2"
+                                                                    }
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "@type": "owl:Restriction",
+                                        "onProperty": "obo:CDAO_0000149",
+                                        "someValuesFrom": {
+                                            "@type": "owl:Class",
+                                            "intersectionOf": [
+                                                {
+                                                    "@type": "owl:Restriction",
+                                                    "unionOf": [
+                                                        {
+                                                            "@type": "owl:Restriction",
+                                                            "onProperty": "testcase:matches_specifier",
+                                                            "hasValue": {
+                                                                "@id": "#phyloref1_specifier_internal2"
+                                                            }
+                                                        },
+                                                        {
+                                                            "@type": "owl:Restriction",
+                                                            "onProperty": "obo:CDAO_0000174",
+                                                            "someValuesFrom": {
+                                                                "@type": "owl:Restriction",
+                                                                "onProperty": "testcase:matches_specifier",
+                                                                "hasValue": {
+                                                                    "@id": "#phyloref1_specifier_internal2"
+                                                                }
+                                                            }
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "@type": "owl:Restriction",
+                                                    "onProperty": "phyloref:has_Sibling",
+                                                    "someValuesFrom": {
+                                                        "@type": "owl:Restriction",
+                                                        "unionOf": [
+                                                            {
+                                                                "@type": "owl:Restriction",
+                                                                "onProperty": "testcase:matches_specifier",
+                                                                "hasValue": {
+                                                                    "@id": "#phyloref1_specifier_internal1"
+                                                                }
+                                                            },
+                                                            {
+                                                                "@type": "owl:Restriction",
+                                                                "onProperty": "obo:CDAO_0000174",
+                                                                "someValuesFrom": {
+                                                                    "@type": "owl:Restriction",
+                                                                    "onProperty": "testcase:matches_specifier",
+                                                                    "hasValue": {
+                                                                        "@id": "#phyloref1_specifier_internal1"
+                                                                    }
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "equivalentClass": {
+                "@id": "#phyloref1_additional0"
+            }
+        }
+    ],
+    "hasTaxonomicUnitMatches": [
+        {
+            "@id": "#taxonomic_unit_match0",
+            "@type": "testcase:TUMatch",
+            "reason": "Scientific name 'Cc c' and scientific name 'Cc c' share the same binomial name",
+            "matchesTaxonomicUnits": [
+                {
+                    "@id": "#phyloref1_specifier_internal1_tunit0"
+                },
+                {
+                    "@id": "#phylogeny1_node5_taxonomicunit0"
+                }
+            ]
+        },
+        {
+            "@id": "#taxonomic_unit_match1",
+            "@type": "testcase:TUMatch",
+            "reason": "Scientific name 'Ee e' and scientific name 'Ee e' share the same binomial name",
+            "matchesTaxonomicUnits": [
+                {
+                    "@id": "#phyloref1_specifier_internal2_tunit0"
+                },
+                {
+                    "@id": "#phylogeny1_node7_taxonomicunit0"
+                }
+            ]
+        }
+    ],
+    "@id": "",
+    "@type": [
+        "testcase:PhyloreferenceTestCase",
+        "owl:Ontology"
+    ],
+    "owl:imports": [
+        "https://raw.githubusercontent.com/phyloref/curation-workflow/develop/ontologies/phyloref_testcase.owl",
+        "https://ontology.phyloref.org/phyloref.owl",
+        "http://purl.obolibrary.org/obo/bco.owl"
+    ]
+}

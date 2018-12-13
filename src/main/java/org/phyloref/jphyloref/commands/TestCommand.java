@@ -1,6 +1,8 @@
 package org.phyloref.jphyloref.commands;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -9,6 +11,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
+import org.eclipse.rdf4j.rio.RDFParser;
+import org.phyloref.jphyloref.helpers.JSONLDHelper;
 import org.phyloref.jphyloref.helpers.OWLHelper;
 import org.phyloref.jphyloref.helpers.PhylorefHelper;
 import org.phyloref.jphyloref.helpers.ReasonerHelper;
@@ -78,7 +82,13 @@ public class TestCommand implements Command {
         "i",
         "input",
         true,
-        "The input ontology to read in RDF/XML (can also be provided without the '-i')");
+        "The input ontology to read in RDF/XML or JSON-LD (can also be provided without the '-i').");
+
+    opts.addOption(
+        "j",
+        "jsonld",
+        false,
+        "Treat the input file as a JSON-LD file. Files with a '.json' or '.jsonld' extension will automatically be treated as a JSON-LD file.");
   }
 
   /**
@@ -115,12 +125,28 @@ public class TestCommand implements Command {
     System.err.println("Found local ontologies: " + mapper.getOntologyIRIs());
     manager.addIRIMapper(mapper);
 
-    // Load the ontology using OWLManager.
+    // Is this a JSON or JSON-LD file?
     OWLOntology ontology;
+    String inputFileLowercase = str_input.toLowerCase();
     try {
-      ontology = manager.loadOntologyFromOntologyDocument(inputFile);
+      if (cmdLine.hasOption("jsonld")
+          || inputFileLowercase.endsWith(".json")
+          || inputFileLowercase.endsWith(".jsonld")) {
+        // Use the JSONLD Helper to load the ontology.
+        String DEFAULT_URI_PREFIX = "http://example.org/jphyloref";
+        ontology = manager.createOntology();
+        RDFParser parser = JSONLDHelper.createRDFParserForOntology(ontology);
+        parser.parse(new FileReader(inputFile), DEFAULT_URI_PREFIX);
+      } else {
+        // Load the ontology using OWLManager.
+        ontology = manager.loadOntologyFromOntologyDocument(inputFile);
+      }
     } catch (OWLOntologyCreationException ex) {
-      throw new RuntimeException("Could not load ontology '" + inputFile + "': " + ex);
+      System.err.println("Could not create ontology '" + inputFile + "': " + ex);
+      return 1;
+    } catch (IOException ex) {
+      System.err.println("Could not read and load ontology '" + inputFile + "': " + ex);
+      return 1;
     }
 
     // Ontology loaded.
