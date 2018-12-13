@@ -41,19 +41,19 @@ public class ReasonCommand implements Command {
   }
 
   /** Execute this command with the provided command line options. */
-  public void execute(CommandLine cmdLine) {
+  public int execute(CommandLine cmdLine) {
     String str_input = cmdLine.getOptionValue("input");
     String str_output = cmdLine.getOptionValue("output");
 
     if (str_input == null) {
       System.err.println("Error: no input ontology specified (use '-i input.owl')");
-      return;
+      return 1;
     }
 
     File inputFile = new File(str_input);
     if (!inputFile.exists() || !inputFile.canRead()) {
       System.err.println("Error: cannot read from input ontology '" + str_input + "'");
-      return;
+      return 1;
     }
 
     System.err.println("Input: " + str_input);
@@ -66,7 +66,7 @@ public class ReasonCommand implements Command {
       ontology = manager.loadOntologyFromOntologyDocument(inputFile);
     } catch (OWLOntologyCreationException ex) {
       System.err.println("Could not load ontology '" + inputFile + "': " + ex);
-      return;
+      return 1;
     }
 
     // Ontology loaded.
@@ -100,5 +100,7 @@ public class ReasonCommand implements Command {
       }
       System.out.println("");
     }
+
+    return 0;
   }
 }

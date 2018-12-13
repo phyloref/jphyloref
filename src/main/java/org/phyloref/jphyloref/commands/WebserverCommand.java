@@ -95,7 +95,7 @@ public class WebserverCommand implements Command {
    * @param cmdLine The command line options provided to this command.
    */
   @Override
-  public void execute(CommandLine cmdLine) throws RuntimeException {
+  public int execute(CommandLine cmdLine) throws RuntimeException {
     String hostname = cmdLine.getOptionValue("host", "localhost");
     String portString = cmdLine.getOptionValue("port", "34214");
     int port = Integer.parseInt(portString);
@@ -106,6 +106,8 @@ public class WebserverCommand implements Command {
     } catch (IOException ex) {
       System.err.println("An error occurred while running webserver: " + ex);
     }
+
+    return 0;
   }
 
   /** The webserver we set up. */

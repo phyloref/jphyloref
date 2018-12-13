@@ -38,8 +38,8 @@ public final class OWLHelper {
   }
 
   /**
-   * Return a list of labels for an OWLNamedIndividual with either no language provided or in
-   * English.
+   * Return a list of labels for an OWLNamedIndividual in English or (if no such label is known)
+   * with no language provided.
    *
    * @param individual The OWLNamedIndividual whose labels need to be retrieved.
    * @param ontology The ontology within which this individual is defined.
@@ -53,8 +53,10 @@ public final class OWLHelper {
   }
 
   /**
-   * Extract values for an annotation property applied to an OWL entity in an ontology for a
-   * particular set of languages.
+   * Extract literal values for an annotation property applied to an OWL entity in an ontology for a
+   * particular set of languages. If no literals are found for any of the specified languages, we
+   * will return literals that don't have an explicit language tag (i.e. an xsd:string instead of an
+   * rdfs:langString). If no such literals are known, we return an empty set.
    *
    * @param ontology The ontology containing the entity and the annotation property to extract
    * @param entity The entity to extract annotations for
@@ -91,7 +93,8 @@ public final class OWLHelper {
 
   /**
    * Return a Map that contains all known values for a given annotation property for a given OWL
-   * entity, organized by language.
+   * entity, grouped by language tags. The special language tag "" is used as the key for literals
+   * without an explicit language tag.
    *
    * @param ontology The ontology containing the OWL entity and the annotation property to query
    * @param entity The OWL entity to query

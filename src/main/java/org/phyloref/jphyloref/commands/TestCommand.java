@@ -89,7 +89,7 @@ public class TestCommand implements Command {
    * @param cmdLine The command line options provided to this command.
    */
   @Override
-  public void execute(CommandLine cmdLine) throws RuntimeException {
+  public int execute(CommandLine cmdLine) throws RuntimeException {
     // Extract command-line options
     String str_input = cmdLine.getOptionValue("input");
 
@@ -341,7 +341,7 @@ public class TestCommand implements Command {
 
       // Get a list of phyloref statuses for this phyloreference.
       List<PhylorefHelper.PhylorefStatus> statuses =
-          PhylorefHelper.getCurrentStatusesForPhyloref(phyloref, ontology);
+          PhylorefHelper.getStatusesForPhyloref(phyloref, ontology);
 
       // Instead of checking which time interval we are currently in, we take a simpler approach:
       // we look for all statuses asserted to be "active", i.e. those with a start time but no end
@@ -433,7 +433,7 @@ public class TestCommand implements Command {
             + " skipped.");
 
     // Exit with error unless we have zero failures.
-    if (countSuccess == 0) System.exit(-1);
-    System.exit(countFailure);
+    if (countSuccess == 0) return -1;
+    return countFailure;
   }
 }

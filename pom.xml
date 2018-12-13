@@ -102,11 +102,11 @@
             <version>1.7.25</version>
         </dependency>
 
-        <!-- We use JUnit for testing -->
+        <!-- We use JUnit Jupiter Engine for testing -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.3.1</version>
             <scope>test</scope>
         </dependency>
 
@@ -114,6 +114,15 @@
 
     <build>
         <plugins>
+            <!-- We use Surefire to run testing using JUnit Jupiter Engine -->
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <version>2.22.1</version>
+              <configuration>
+              </configuration>
+            </plugin>
+
             <!-- Use Spotless to check and fix style: https://github.com/diffplug/spotless/tree/master/plugin-maven -->
             <plugin>
               <groupId>com.diffplug.spotless</groupId>
@@ -137,6 +146,70 @@
                   </goals>
                 </execution>
               </executions>
+            </plugin>
+
+      <!--
+        The jacoco-maven-plugin uses Jacoco to measure test coverage
+        https://www.eclemma.org/jacoco/trunk/doc/maven.html
+      -->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.2</version>
+        <configuration>
+          <!-- These rules are to ensure that CI output records that we still
+          haven't finished testing this code, which is why we don't halt on failure. -->
+          <haltOnFailure>false</haltOnFailure>
+          <rules>
+            <rule implementation="org.jacoco.maven.RuleConfiguration">
+              <element>SOURCEFILE</element>
+              <limits>
+                <limit implementation="org.jacoco.report.check.Limit">
+                  <counter>INSTRUCTION</counter>
+                  <value>COVEREDRATIO</value>
+                  <minimum>0.80</minimum>
+                </limit>
+                <limit implementation="org.jacoco.report.check.Limit">
+                  <counter>BRANCH</counter>
+                  <value>COVEREDRATIO</value>
+                  <minimum>0.80</minimum>
+                </limit>
+                <limit implementation="org.jacoco.report.check.Limit">
+                  <counter>CLASS</counter>
+                  <value>MISSEDCOUNT</value>
+                  <maximum>0</maximum>
+                </limit>
+              </limits>
+            </rule>
+          </rules>
+        </configuration>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>check</id>
+            <phase>test</phase>
+            <goals>
+              <goal>check</goal>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+            <!-- maven-compiler-plugin allows us to configure compilations errors -->
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <version>3.8.0</version>
+              <configuration>
+                <compilerArgument>-Xlint:unchecked</compilerArgument>
+                <showDeprecation>true</showDeprecation>
+              </configuration>
             </plugin>
 
             <plugin>
