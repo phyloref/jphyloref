@@ -1,8 +1,10 @@
 package org.phyloref.jphyloref.commands;
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -101,20 +103,32 @@ public class TestCommand implements Command {
   @Override
   public int execute(CommandLine cmdLine) throws RuntimeException {
     // Extract command-line options
-    String str_input = cmdLine.getOptionValue("input");
+    String inputFilename = cmdLine.getOptionValue("input");
 
-    if (str_input == null && cmdLine.getArgList().size() > 1) {
+    if (inputFilename == null && cmdLine.getArgList().size() > 1) {
       // No 'input'? Maybe it's just provided as a left-over option?
-      str_input = cmdLine.getArgList().get(1);
+      inputFilename = cmdLine.getArgList().get(1);
     }
 
-    if (str_input == null) {
+    if (inputFilename == null) {
       throw new IllegalArgumentException("Error: no input ontology specified (use '-i input.owl')");
     }
 
-    // Create File object to load
-    File inputFile = new File(str_input);
-    System.err.println("Input: " + inputFile);
+    // If the input filename is '-', we should read the ontology from STDIN instead.
+    InputStream inputStreamToReadFrom = null;
+    if (inputFilename.equals("-")) {
+      inputStreamToReadFrom = System.in;
+    } else {
+      try {
+        inputStreamToReadFrom = new FileInputStream(inputFilename);
+      } catch (FileNotFoundException ex) {
+        System.err.println("Could not open input file '" + inputFilename + "': " + ex);
+        return 1;
+      }
+    }
+
+    // Report the name of the file being tested.
+    System.err.println("Input: " + inputFilename);
 
     // Set up an OWL Ontology Manager to work with.
     OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -127,7 +141,7 @@ public class TestCommand implements Command {
 
     // Is this a JSON or JSON-LD file?
     OWLOntology ontology;
-    String inputFileLowercase = str_input.toLowerCase();
+    String inputFileLowercase = inputFilename.toLowerCase();
     try {
       if (cmdLine.hasOption("jsonld")
           || inputFileLowercase.endsWith(".json")
@@ -136,16 +150,20 @@ public class TestCommand implements Command {
         String DEFAULT_URI_PREFIX = "http://example.org/jphyloref";
         ontology = manager.createOntology();
         RDFParser parser = JSONLDHelper.createRDFParserForOntology(ontology);
-        parser.parse(new FileReader(inputFile), DEFAULT_URI_PREFIX);
+
+        // Read from the provided input stream (either STDIN or a file).
+        parser.parse(inputStreamToReadFrom, DEFAULT_URI_PREFIX);
+
       } else {
-        // Load the ontology using OWLManager.
-        ontology = manager.loadOntologyFromOntologyDocument(inputFile);
+        // Load the ontology using OWLManager, by reading from the provided
+        // input stream (either STDIN or a file).
+        ontology = manager.loadOntologyFromOntologyDocument(inputStreamToReadFrom);
       }
     } catch (OWLOntologyCreationException ex) {
-      System.err.println("Could not create ontology '" + inputFile + "': " + ex);
+      System.err.println("Could not create ontology '" + inputFilename + "': " + ex);
       return 1;
     } catch (IOException ex) {
-      System.err.println("Could not read and load ontology '" + inputFile + "': " + ex);
+      System.err.println("Could not read and load ontology '" + inputFilename + "': " + ex);
       return 1;
     }
 
