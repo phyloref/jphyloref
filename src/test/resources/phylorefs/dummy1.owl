@@ -15,7 +15,7 @@
   </rdf:Description>
   <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld">
     <rdf:type rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#PhyloreferenceTestCase"/>
-    <owl:imports rdf:resource="https://ontology.phyloref.org/phyloref.owl"/>
+    <owl:imports rdf:resource="https://ontology.phyloref.org/2018-12-04/phyloref.owl"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
     <owl:imports rdf:resource="https://raw.githubusercontent.com/phyloref/curation-workflow/develop/ontologies/phyloref_testcase.owl"/>
     <owl:imports rdf:resource="http://purl.obolibrary.org/obo/bco.owl"/>
