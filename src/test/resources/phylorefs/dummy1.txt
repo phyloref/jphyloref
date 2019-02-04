@@ -499,7 +499,7 @@
     ],
     "owl:imports": [
         "https://raw.githubusercontent.com/phyloref/curation-workflow/develop/ontologies/phyloref_testcase.owl",
-        "https://ontology.phyloref.org/phyloref.owl",
+        "https://ontology.phyloref.org/2018-12-04/phyloref.owl",
         "http://purl.obolibrary.org/obo/bco.owl"
     ]
 }
