@@ -175,10 +175,10 @@ public class TestCommand implements Command {
     OWLReasonerFactory reasonerFactory = ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine);
     OWLReasoner reasoner = null;
     if (reasonerFactory != null) reasoner = reasonerFactory.createReasoner(ontology);
-    Set<OWLNamedIndividual> phylorefs;
 
     // Get a list of all phyloreferences.
-    phylorefs = PhylorefHelper.getPhyloreferences(ontology, reasoner);
+    Set<OWLClass> phylorefs = PhylorefHelper.getPhyloreferences(ontology, reasoner);
+    System.err.println("Phyloreferences identified: " + phylorefs);
 
     // Okay, time to start testing! Each phyloreference counts as one test.
     // TAP (https://testanything.org/) can be read by downstream software
@@ -216,7 +216,7 @@ public class TestCommand implements Command {
     int countSkipped = 0;
 
     // Test each phyloreference individually.
-    for (OWLNamedIndividual phyloref : phylorefs) {
+    for (OWLClass phyloref : phylorefs) {
       // Prepare a TestResult object in which we can store the results of
       // testing this particular phyloreference.
       testNumber++;
@@ -237,6 +237,7 @@ public class TestCommand implements Command {
       result.setDescription("Phyloreference '" + phylorefLabel + "'");
 
       // Which nodes did this phyloreference resolved to?
+      // TODO no longer necessary!
       OWLClass phylorefAsClass = manager.getOWLDataFactory().getOWLClass(phyloref.getIRI());
       Set<OWLNamedIndividual> nodes;
       if (reasoner != null) {

@@ -1,423 +1,405 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rdf:RDF
-   xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
-   xmlns:obo="http://purl.obolibrary.org/obo/"
-   xmlns:ot="http://purl.org/opentree/nexson#"
-   xmlns:owl="http://www.w3.org/2002/07/owl#"
-   xmlns:phyloref="http://ontology.phyloref.org/phyloref.owl#"
+   xmlns:ns1="http://purl.obolibrary.org/obo/"
+   xmlns:ns2="http://www.w3.org/2002/07/owl#"
+   xmlns:ns3="http://vocab.phyloref.org/phyloref/testcase.owl#"
+   xmlns:ns4="http://ontology.phyloref.org/phyloref.owl#"
+   xmlns:ns5="http://rs.tdwg.org/dwc/terms/"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:testcase="http://vocab.phyloref.org/phyloref/testcase.owl#"
 >
-  <rdf:Description rdf:nodeID="Nff44733d5cf64cf99b455453eaf618b5">
-    <rdf:rest rdf:nodeID="Na21dafe0d1e74925b3b0ea7c21a216ca"/>
-    <rdf:first rdf:nodeID="Nb18fca210c184efaac91d6b6f98d6a36"/>
+  <rdf:Description rdf:nodeID="Ncf6f46f5de5342d8b30da3a00c355245">
+    <ns2:onProperty rdf:resource="http://ontology.phyloref.org/phyloref.owl#includes_TU"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <ns2:someValuesFrom rdf:nodeID="Nb72df789288e4ee0835e0d04c523db3d"/>
   </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld">
-    <rdf:type rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#PhyloreferenceTestCase"/>
-    <owl:imports rdf:resource="https://ontology.phyloref.org/2018-12-04/phyloref.owl"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
-    <owl:imports rdf:resource="https://raw.githubusercontent.com/phyloref/curation-workflow/develop/ontologies/phyloref_testcase.owl"/>
-    <owl:imports rdf:resource="http://purl.obolibrary.org/obo/bco.owl"/>
-    <testcase:has_phylogeny rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0"/>
-    <testcase:has_taxonomic_unit_match rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#taxonomic_unit_match0"/>
-    <testcase:has_phyloreference rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1"/>
-    <testcase:has_taxonomic_unit_match rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#taxonomic_unit_match1"/>
-    <ot:studyPublicationReference>Dummy phyloreference for testing</ot:studyPublicationReference>
+  <rdf:Description rdf:nodeID="Ncd94fb264ee5463795c0d87808077e83">
+    <ns5:scientificName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Bb b</ns5:scientificName>
+    <ns5:specificEpithet rdf:datatype="http://www.w3.org/2001/XMLSchema#string">b</ns5:specificEpithet>
+    <ns5:genus rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Bb</ns5:genus>
+    <ns3:has_binomial_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Bb b</ns3:has_binomial_name>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="Nd510e03ada224d7ab7fb22293073efd4">
-    <dwc:genus rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Dd</dwc:genus>
-    <dwc:scientificName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Dd d</dwc:scientificName>
-    <testcase:has_binomial_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Dd d</testcase:has_binomial_name>
-    <dwc:specificEpithet rdf:datatype="http://www.w3.org/2001/XMLSchema#string">d</dwc:specificEpithet>
+  <rdf:Description rdf:nodeID="N259f0746e6ff40a28bd8e8aa72aa3f7b">
+    <ns5:specificEpithet rdf:datatype="http://www.w3.org/2001/XMLSchema#string">a</ns5:specificEpithet>
+    <ns3:has_binomial_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Aa a</ns3:has_binomial_name>
+    <ns5:genus rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Aa</ns5:genus>
+    <ns5:scientificName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Aa a</ns5:scientificName>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="N3b9c1f826045465e9387b36bf141e57a">
-    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-    <rdf:first rdf:nodeID="Na7159940e0a14b71be1f747f2d95ce68"/>
+  <rdf:Description rdf:nodeID="N5ba12ce90d5a468fbbe7450d0e2747e6">
+    <ns2:someValuesFrom rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000001"/>
+    <ns2:onProperty rdf:resource="http://purl.obolibrary.org/obo/OBI_0000293"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
   </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node4">
-    <phyloref:has_Sibling rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node3"/>
-    <obo:CDAO_0000149 rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node6"/>
-    <obo:CDAO_0000149 rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node5"/>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node7">
+    <ns1:CDAO_0000187 rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node7_taxonomicunit0"/>
+    <rdf:type rdf:nodeID="Nf8782f0b61a241bbaf1921c710dcbd3a"/>
     <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
-    <obo:CDAO_0000149 rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node7"/>
-    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1</rdfs:label>
-  </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1">
-    <testcase:clade_definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Node-based, includes C and E, should resolve to (C, D, E) clade.</testcase:clade_definition>
-    <testcase:has_additional_class rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_additional0"/>
-    <testcase:has_internal_specifier rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal1"/>
-    <testcase:has_internal_specifier rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal2"/>
-    <rdf:type rdf:resource="http://ontology.phyloref.org/phyloref.owl#Phyloreference"/>
-    <owl:equivalentClass rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_additional0"/>
-    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1</rdfs:label>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node1_taxonomicunit0">
-    <testcase:has_scientific_name rdf:nodeID="N8d09b7f68fbc4e4181235ac5ee33c697"/>
-    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000138"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Nb18fca210c184efaac91d6b6f98d6a36">
-    <owl:hasValue rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal2"/>
-    <owl:onProperty rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#matches_specifier"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N642e35d6c18e4ab1aacd14e647d5870d">
-    <owl:someValuesFrom rdf:nodeID="N17b943cf0dcc4bda9a549d4cbb27800e"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000174"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N7df3877fc1164d50bcfa54adfe8fb659">
-    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-    <rdf:first rdf:nodeID="N5f1f97d51e9e4cb483d196bcdd5a29e1"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Nb2631a4f87914d59a2bb17ec82c909de">
-    <owl:hasValue rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal2"/>
-    <owl:onProperty rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#matches_specifier"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Na7159940e0a14b71be1f747f2d95ce68">
-    <owl:someValuesFrom rdf:nodeID="Ndf311e16c4f94c2daca6814ea1bcbc79"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000174"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node5">
-    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cc_c</rdfs:label>
-    <obo:CDAO_0000187 rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node5_taxonomicunit0"/>
-    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
-    <phyloref:has_Sibling rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node7"/>
-    <phyloref:has_Sibling rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node6"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Nba43ce3ecd1e4d80946032424a8548cc">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <owl:intersectionOf rdf:nodeID="Nf358e2a4894e43c58bd041fe7141acdc"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Naa9b5de6581e44b9be5fe13c405a7171">
-    <rdf:rest rdf:nodeID="Na3d2d606f20f4f53b00510377ce6253f"/>
-    <rdf:first rdf:nodeID="N896bd23533e64469b35a6d2fdc4bbea4"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N0f38a4cd27dd4eddbf79eb5d3fbec038">
-    <rdf:rest rdf:nodeID="N34b20487e3da4c5e9ec7c9941b6fe117"/>
-    <rdf:first rdf:nodeID="N4328ab4246e54d41aea11e7b0b1370c1"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N99ba34150b9a48f981c4ecf262f96b1c">
-    <owl:intersectionOf rdf:nodeID="Ncd9db3d135f1471d9a95a769ec60fe81"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N321adaf55f5345bcb5b16bf0669cf4aa">
-    <rdf:rest rdf:nodeID="N24153587c7e84801b3ab871b5406897b"/>
-    <rdf:first rdf:nodeID="N99ba34150b9a48f981c4ecf262f96b1c"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N8d09b7f68fbc4e4181235ac5ee33c697">
-    <dwc:specificEpithet rdf:datatype="http://www.w3.org/2001/XMLSchema#string">a</dwc:specificEpithet>
-    <dwc:scientificName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Aa a</dwc:scientificName>
-    <dwc:genus rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Aa</dwc:genus>
-    <testcase:has_binomial_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Aa a</testcase:has_binomial_name>
-  </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node5_taxonomicunit0">
-    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000138"/>
-    <testcase:has_scientific_name rdf:nodeID="N5bc27150f784435db4ddb7a054612ff8"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N1e71691f817a40eeb07463d2975ce401">
-    <rdf:first rdf:nodeID="Nf910c45a82fe4c59a3893b9cca1d0187"/>
-    <rdf:rest rdf:nodeID="Ne4f4df2c66f24b63b134d3644e415a3b"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N497741a2072b465dbd15dece47736fd3">
-    <dwc:scientificName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cc c</dwc:scientificName>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N106eb20976844743b7a81f3477f8754b">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <owl:intersectionOf rdf:nodeID="N1e71691f817a40eeb07463d2975ce401"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0">
-    <testcase:has_root_node rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node0"/>
-    <testcase:has_node rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node4"/>
-    <testcase:as_newick_string rdf:datatype="http://www.w3.org/2001/XMLSchema#string">(Aa_a, (Bb_b, (Cc_c, Dd_d, Ee_e)1)2)3</testcase:as_newick_string>
-    <testcase:has_node rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node6"/>
-    <testcase:has_node rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node3"/>
-    <testcase:has_node rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node1"/>
-    <rdf:type rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#PhyloreferenceTestPhylogeny"/>
-    <testcase:has_node rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node2"/>
-    <testcase:has_node rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node0"/>
-    <testcase:has_node rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node7"/>
-    <testcase:has_node rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node5"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal2_tunit0">
-    <testcase:has_scientific_name rdf:nodeID="Nd89eeffffd2046f6acd17bf20f7ec7d5"/>
-    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000138"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N78b663b3fb5041b1921b4fb545204792">
-    <owl:hasValue rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal2"/>
-    <owl:onProperty rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#matches_specifier"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N121d3f504a2c4e14911703dd67c808f5">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <owl:intersectionOf rdf:nodeID="N9193c983e07a498aa0d08b833056c77e"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Nb3715e8e05de441ba3c1ef77a2503cfa">
-    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-    <rdf:first rdf:nodeID="N642e35d6c18e4ab1aacd14e647d5870d"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Nafaf4391a37d418baea404e91040858e">
-    <owl:unionOf rdf:nodeID="N4f19d49f623a4ee7a416f2b080f1eddf"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Nf47ae7bc01154b2fae111c281a816fbd">
-    <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000149"/>
-    <owl:someValuesFrom rdf:nodeID="Nb2291f57f580403f925742080ed63c51"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Ne9f905e0d96f4c5a8138a1f9f14ad75d">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:hasValue rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal1"/>
-    <owl:onProperty rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#matches_specifier"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Na130c6a3dfcb4a9a8c47b939791de7b6">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000174"/>
-    <owl:someValuesFrom rdf:nodeID="Nb2631a4f87914d59a2bb17ec82c909de"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Nd89eeffffd2046f6acd17bf20f7ec7d5">
-    <dwc:scientificName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ee e</dwc:scientificName>
-  </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#taxonomic_unit_match1">
-    <testcase:matches_taxonomic_unit rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node7_taxonomicunit0"/>
-    <testcase:reason_for_match rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Scientific name 'Ee e' and scientific name 'Ee e' share the same binomial name</testcase:reason_for_match>
-    <testcase:matches_taxonomic_unit rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal2_tunit0"/>
-    <rdf:type rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#TUMatch"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Nd0ca847eff334a6ca97e0cd709d77c34">
-    <rdf:first rdf:nodeID="N2554d6cabbb349ff92614cae884f05cc"/>
-    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Nb344a18bd9274e139bd793b614eb713f">
-    <owl:onProperty rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#matches_specifier"/>
-    <owl:hasValue rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal1"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Ndf311e16c4f94c2daca6814ea1bcbc79">
-    <owl:hasValue rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal1"/>
-    <owl:onProperty rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#matches_specifier"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N92228e1a9df34ed7906a4555459b245e">
-    <owl:someValuesFrom rdf:nodeID="Ne9f905e0d96f4c5a8138a1f9f14ad75d"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000174"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N5bc27150f784435db4ddb7a054612ff8">
-    <dwc:scientificName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cc c</dwc:scientificName>
-    <dwc:genus rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cc</dwc:genus>
-    <testcase:has_binomial_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cc c</testcase:has_binomial_name>
-    <dwc:specificEpithet rdf:datatype="http://www.w3.org/2001/XMLSchema#string">c</dwc:specificEpithet>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N24153587c7e84801b3ab871b5406897b">
-    <rdf:first rdf:nodeID="N106eb20976844743b7a81f3477f8754b"/>
-    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N34b20487e3da4c5e9ec7c9941b6fe117">
-    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-    <rdf:first rdf:nodeID="N9496275fedc942b6aee06789d4a780fc"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#taxonomic_unit_match0">
-    <testcase:matches_taxonomic_unit rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal1_tunit0"/>
-    <testcase:matches_taxonomic_unit rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node5_taxonomicunit0"/>
-    <testcase:reason_for_match rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Scientific name 'Cc c' and scientific name 'Cc c' share the same binomial name</testcase:reason_for_match>
-    <rdf:type rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#TUMatch"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node0">
-    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">3</rdfs:label>
-    <obo:CDAO_0000149 rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node1"/>
-    <obo:CDAO_0000149 rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node2"/>
-    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Nc0b67b64ec764dbb9a28aafa7ffa9771">
-    <dwc:specificEpithet rdf:datatype="http://www.w3.org/2001/XMLSchema#string">b</dwc:specificEpithet>
-    <dwc:genus rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Bb</dwc:genus>
-    <testcase:has_binomial_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Bb b</testcase:has_binomial_name>
-    <dwc:scientificName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Bb b</dwc:scientificName>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Ndafd076cb42e45e0912aeb371d0db35f">
-    <rdf:first rdf:nodeID="Nfe8ef43303f147f487b5769798aba9aa"/>
-    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Ne699f871f4354be9b2df88662f0deb2e">
-    <rdf:first rdf:nodeID="N121d3f504a2c4e14911703dd67c808f5"/>
-    <rdf:rest rdf:nodeID="N321adaf55f5345bcb5b16bf0669cf4aa"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Ne4f4df2c66f24b63b134d3644e415a3b">
-    <rdf:first rdf:nodeID="Nf47ae7bc01154b2fae111c281a816fbd"/>
-    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Na18609394f294cfe881e07e273285a63">
-    <owl:onProperty rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#matches_specifier"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:hasValue rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal1"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Nf358e2a4894e43c58bd041fe7141acdc">
-    <rdf:rest rdf:nodeID="Nd0ca847eff334a6ca97e0cd709d77c34"/>
-    <rdf:first rdf:nodeID="Nafaf4391a37d418baea404e91040858e"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N2554d6cabbb349ff92614cae884f05cc">
-    <owl:onProperty rdf:resource="http://ontology.phyloref.org/phyloref.owl#has_Sibling"/>
-    <owl:someValuesFrom rdf:nodeID="N8b594a4c208f402383e5d204a3874164"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal1">
-    <rdf:type rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#Specifier"/>
-    <testcase:references_taxonomic_unit rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal1_tunit0"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N896bd23533e64469b35a6d2fdc4bbea4">
-    <owl:onProperty rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#matches_specifier"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:hasValue rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal1"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node2">
-    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
-    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2</rdfs:label>
-    <obo:CDAO_0000149 rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node4"/>
-    <obo:CDAO_0000149 rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node3"/>
-    <phyloref:has_Sibling rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node1"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node3">
-    <obo:CDAO_0000187 rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node3_taxonomicunit0"/>
-    <phyloref:has_Sibling rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node4"/>
-    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Bb_b</rdfs:label>
-    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node7">
-    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ee_e</rdfs:label>
-    <phyloref:has_Sibling rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node6"/>
-    <obo:CDAO_0000187 rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node7_taxonomicunit0"/>
-    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
-    <phyloref:has_Sibling rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node5"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node6">
-    <phyloref:has_Sibling rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node7"/>
-    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
-    <obo:CDAO_0000187 rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node6_taxonomicunit0"/>
-    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Dd_d</rdfs:label>
-    <phyloref:has_Sibling rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node5"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N9193c983e07a498aa0d08b833056c77e">
-    <rdf:first rdf:nodeID="Na18609394f294cfe881e07e273285a63"/>
-    <rdf:rest rdf:nodeID="N7df3877fc1164d50bcfa54adfe8fb659"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node7_taxonomicunit0">
-    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000138"/>
-    <testcase:has_scientific_name rdf:nodeID="N385f45dfbfef4467bf1cfe7b9b62fa17"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_additional0">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <owl:equivalentClass rdf:nodeID="Nb4d0bc5c432144e6a14abfc891b781dc"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N17b943cf0dcc4bda9a549d4cbb27800e">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:hasValue rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal1"/>
-    <owl:onProperty rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#matches_specifier"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Na3d2d606f20f4f53b00510377ce6253f">
-    <rdf:first rdf:nodeID="N92228e1a9df34ed7906a4555459b245e"/>
-    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N8b594a4c208f402383e5d204a3874164">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:unionOf rdf:nodeID="Nff44733d5cf64cf99b455453eaf618b5"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N62e8bdd53dcc4727bd31ccee7fe88bbe">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:hasValue rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal2"/>
-    <owl:onProperty rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#matches_specifier"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N4328ab4246e54d41aea11e7b0b1370c1">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:unionOf rdf:nodeID="Nf7b239abe8c1415d865420a0fb555a2d"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Na21dafe0d1e74925b3b0ea7c21a216ca">
-    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-    <rdf:first rdf:nodeID="Na130c6a3dfcb4a9a8c47b939791de7b6"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node3_taxonomicunit0">
-    <testcase:has_scientific_name rdf:nodeID="Nc0b67b64ec764dbb9a28aafa7ffa9771"/>
-    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000138"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N771caad8388f4b1fbe9393ebe96ad818">
-    <owl:unionOf rdf:nodeID="Naa9b5de6581e44b9be5fe13c405a7171"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Ne0936191703946978b8007aceac7211f">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:hasValue rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal2"/>
-    <owl:onProperty rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#matches_specifier"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Nfe8ef43303f147f487b5769798aba9aa">
-    <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000174"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:someValuesFrom rdf:nodeID="Ne0936191703946978b8007aceac7211f"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="N385f45dfbfef4467bf1cfe7b9b62fa17">
-    <dwc:specificEpithet rdf:datatype="http://www.w3.org/2001/XMLSchema#string">e</dwc:specificEpithet>
-    <dwc:genus rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ee</dwc:genus>
-    <dwc:scientificName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ee e</dwc:scientificName>
-    <testcase:has_binomial_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ee e</testcase:has_binomial_name>
-  </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node1">
-    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
-    <phyloref:has_Sibling rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node2"/>
     <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Aa_a</rdfs:label>
-    <obo:CDAO_0000187 rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node1_taxonomicunit0"/>
+    <ns1:CDAO_0000179 rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node0"/>
+    <ns4:has_Sibling rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node1"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="Nb4d0bc5c432144e6a14abfc891b781dc">
-    <owl:unionOf rdf:nodeID="Ne699f871f4354be9b2df88662f0deb2e"/>
+  <rdf:Description rdf:nodeID="N7f7f06a4c00d48e6802ffea71e670c26">
+    <ns2:intersectionOf rdf:nodeID="N037ccc44a4d34a51a1b4c8f05c149a49"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="N9496275fedc942b6aee06789d4a780fc">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:someValuesFrom rdf:nodeID="N771caad8388f4b1fbe9393ebe96ad818"/>
-    <owl:onProperty rdf:resource="http://ontology.phyloref.org/phyloref.owl#has_Sibling"/>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node3_taxonomicunit0">
+    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000138"/>
+    <ns3:has_scientific_name rdf:nodeID="Ne8f8adb25d2845b8aac092a39555f00a"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="N5f1f97d51e9e4cb483d196bcdd5a29e1">
-    <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000174"/>
-    <owl:someValuesFrom rdf:nodeID="N62e8bdd53dcc4727bd31ccee7fe88bbe"/>
+  <rdf:Description rdf:nodeID="Nce75b1fa90be418bb167c8af38b794a8">
+    <rdf:rest rdf:nodeID="Nebb1eba1f2af4884abc5c5c8ced5290f"/>
+    <rdf:first rdf:resource="http://purl.obolibrary.org/obo/NOMEN_0000107"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nde74f40c31384723a3f0f004abebe86c">
+    <ns2:someValuesFrom rdf:nodeID="Nd5fd5b24d59c43e7a96567f05505a995"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <ns2:onProperty rdf:resource="http://purl.obolibrary.org/obo/OBI_0000312"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000001">
+    <ns3:has_internal_specifier rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000001_specifier_internal1"/>
+    <ns3:has_internal_specifier rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000001_specifier_internal2"/>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1</rdfs:label>
+    <ns1:IAO_0000115>Node-based, includes C and E, should resolve to (C, D, E) clade.</ns1:IAO_0000115>
+    <ns2:equivalentClass rdf:nodeID="N526e2d46810d4184b6bf07d1abdc22e4"/>
+    <rdfs:subClassOf rdf:resource="http://ontology.phyloref.org/phyloref.owl#Phyloreference"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002">
+    <ns3:has_node rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node1"/>
+    <ns3:has_root_node rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node0"/>
+    <ns3:has_node rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node3"/>
+    <ns3:has_node rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node4"/>
+    <ns3:has_node rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node7"/>
+    <ns3:has_node rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node6"/>
+    <rdf:type rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#PhyloreferenceTestPhylogeny"/>
+    <ns3:has_node rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node5"/>
+    <ns3:has_node rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node0"/>
+    <ns4:newick_expression>(Aa_a, (Bb_b, (Cc_c, Dd_d, Ee_e)1)2)3</ns4:newick_expression>
+    <ns3:has_node rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node2"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N037ccc44a4d34a51a1b4c8f05c149a49">
+    <rdf:first rdf:resource="http://purl.obolibrary.org/obo/NOMEN_0000107"/>
+    <rdf:rest rdf:nodeID="Nfcc3c3452e22485c98b1706773a8607d"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nf705fa0f1dab4e0c8f0252b363994441">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <ns2:hasValue rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cc c</ns2:hasValue>
+    <ns2:onProperty rdf:resource="http://rs.tdwg.org/dwc/terms/scientificName"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N526e2d46810d4184b6bf07d1abdc22e4">
+    <ns2:onProperty rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000149"/>
+    <ns2:someValuesFrom rdf:nodeID="N63baac2b126442f6af2eed4267a2f809"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
   </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal1_tunit0">
-    <testcase:has_scientific_name rdf:nodeID="N497741a2072b465dbd15dece47736fd3"/>
+  <rdf:Description rdf:nodeID="N8313ca8e878547cc8ebca665d2895bfa">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <ns2:onProperty rdf:resource="http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName"/>
+    <ns2:someValuesFrom rdf:nodeID="Na136dc4692494d66b13ad5891417e70c"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node5">
+    <ns4:has_Sibling rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node4"/>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cc_c</rdfs:label>
+    <rdf:type rdf:nodeID="Nc892bdcc67c64a1f8c217e9fe4f92900"/>
+    <ns1:CDAO_0000179 rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node2"/>
+    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
+    <ns4:has_Sibling rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node3"/>
+    <ns1:CDAO_0000187 rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node5_taxonomicunit0"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node2">
+    <ns4:has_Sibling rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node6"/>
+    <ns1:CDAO_0000149 rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node5"/>
+    <ns1:CDAO_0000179 rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node1"/>
+    <rdf:type rdf:nodeID="Nde74f40c31384723a3f0f004abebe86c"/>
+    <ns1:CDAO_0000149 rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node3"/>
+    <ns1:CDAO_0000149 rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node4"/>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1</rdfs:label>
+    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node4_taxonomicunit0">
+    <ns3:has_scientific_name rdf:nodeID="Na1cb5da2f1b84cda92a3ea2a78d5dd08"/>
     <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000138"/>
   </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal2">
-    <testcase:references_taxonomic_unit rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal2_tunit0"/>
+  <rdf:Description rdf:nodeID="N112f4d4c21dc4df38152d4b493372123">
+    <ns2:someValuesFrom rdf:nodeID="N11d09f9096fd414298ec4d29fb471e1e"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <ns2:onProperty rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000187"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N85e8996c2ed142b7938acd66554b65cb">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <ns2:onProperty rdf:resource="http://ontology.phyloref.org/phyloref.owl#excludes_TU"/>
+    <ns2:someValuesFrom rdf:nodeID="Nd9c51972e411499f9c99e47e5cae9d9b"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N655635437520433999a830d88cb04968">
+    <rdf:first rdf:resource="http://purl.obolibrary.org/obo/NOMEN_0000107"/>
+    <rdf:rest rdf:nodeID="N672d86bab01d4e1392ead995d722cec6"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N8e4903ba01214bdf9a3b0113f992d583">
+    <ns2:intersectionOf rdf:nodeID="N655635437520433999a830d88cb04968"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node4">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Dd_d</rdfs:label>
+    <rdf:type rdf:nodeID="Ne1754ff9d1394eb2b83c44f60833aa40"/>
+    <ns1:CDAO_0000187 rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node4_taxonomicunit0"/>
+    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
+    <ns4:has_Sibling rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node5"/>
+    <ns4:has_Sibling rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node3"/>
+    <ns1:CDAO_0000179 rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node2"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nfcc3c3452e22485c98b1706773a8607d">
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    <rdf:first rdf:nodeID="Nf705fa0f1dab4e0c8f0252b363994441"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nd9c51972e411499f9c99e47e5cae9d9b">
+    <ns2:someValuesFrom rdf:nodeID="Nec8d384bd94a45e1a1be29617a7fdd57"/>
+    <ns2:onProperty rdf:resource="http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nc892bdcc67c64a1f8c217e9fe4f92900">
+    <ns2:onProperty rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000187"/>
+    <ns2:someValuesFrom rdf:nodeID="Ncc95385b220e477187e18c08a48f1515"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nf5adbcd749e64f84b3314d557e8ab34f">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <ns2:intersectionOf rdf:nodeID="N9b1fbf5071ec480b8b7b56a19fd332c6"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Naa75160a4df241b0ab2d7c757ab1e6a7">
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    <rdf:first rdf:nodeID="Ne5a5db2a894349d5bb92ef59c99eb29d"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nf8782f0b61a241bbaf1921c710dcbd3a">
+    <ns2:someValuesFrom rdf:nodeID="N8313ca8e878547cc8ebca665d2895bfa"/>
+    <ns2:onProperty rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000187"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nd4e14212d5a044e4b52ab2eb5c05bc33">
+    <rdf:first rdf:nodeID="N5ba12ce90d5a468fbbe7450d0e2747e6"/>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N6ff38edd60914c33841d0f3e40980716">
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    <rdf:first rdf:nodeID="N63b25432fe824cab98aff0e23ded4e18"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node5_taxonomicunit0">
+    <ns3:has_scientific_name rdf:nodeID="N19f2f4599b0a495492acee6162b8dc48"/>
+    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000138"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Ne5a5db2a894349d5bb92ef59c99eb29d">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <ns2:hasValue rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cc c</ns2:hasValue>
+    <ns2:onProperty rdf:resource="http://rs.tdwg.org/dwc/terms/scientificName"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N88c6194479b946d198d9832c1e6ffe2d">
+    <ns2:someValuesFrom rdf:nodeID="Nbec04c0080ce4ec7ae1216c35aaeb88b"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <ns2:onProperty rdf:resource="http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Ne1754ff9d1394eb2b83c44f60833aa40">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <ns2:onProperty rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000187"/>
+    <ns2:someValuesFrom rdf:nodeID="N88c6194479b946d198d9832c1e6ffe2d"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N48521fb93d7a437fb74687ab571f4d21">
+    <rdf:rest rdf:nodeID="Naa75160a4df241b0ab2d7c757ab1e6a7"/>
+    <rdf:first rdf:resource="http://purl.obolibrary.org/obo/NOMEN_0000107"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N655c300e430e4f558177e36049cff479">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <ns2:hasValue rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Aa a</ns2:hasValue>
+    <ns2:onProperty rdf:resource="http://rs.tdwg.org/dwc/terms/scientificName"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nfbde52ede42d42758a9ff128d35d69a8">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <ns2:hasValue rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Bb b</ns2:hasValue>
+    <ns2:onProperty rdf:resource="http://rs.tdwg.org/dwc/terms/scientificName"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N19f2f4599b0a495492acee6162b8dc48">
+    <ns5:scientificName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cc c</ns5:scientificName>
+    <ns3:has_binomial_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cc c</ns3:has_binomial_name>
+    <ns5:genus rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cc</ns5:genus>
+    <ns5:specificEpithet rdf:datatype="http://www.w3.org/2001/XMLSchema#string">c</ns5:specificEpithet>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nbec04c0080ce4ec7ae1216c35aaeb88b">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <ns2:intersectionOf rdf:nodeID="Nd863b9a86f9f479e81ea354f6a02d65d"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000001_specifier_internal2">
+    <ns3:references_taxonomic_unit rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000001_specifier_internal2_tunit0"/>
     <rdf:type rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#Specifier"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="N503c959b6c1a4087a63e7ada1f0d6a7b">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-    <owl:hasValue rdf:resource="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref1_specifier_internal2"/>
-    <owl:onProperty rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#matches_specifier"/>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node0">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">3</rdfs:label>
+    <ns1:CDAO_0000149 rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node1"/>
+    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
+    <ns1:CDAO_0000149 rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node7"/>
   </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/ggvaidya/Development/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny1_node6_taxonomicunit0">
+  <rdf:Description rdf:nodeID="Neaedf3a72ddf4f3bbf79f0c936dfbb4e">
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    <rdf:first rdf:nodeID="N97b7ef5f353e4173a389ca1050a5f872"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node6">
+    <ns1:CDAO_0000187 rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node6_taxonomicunit0"/>
+    <rdf:type rdf:nodeID="N371c0422bb3e459d8c4856b75caab1d8"/>
+    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
+    <ns4:has_Sibling rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node2"/>
+    <ns1:CDAO_0000179 rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node1"/>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Bb_b</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node6_taxonomicunit0">
+    <ns3:has_scientific_name rdf:nodeID="Ncd94fb264ee5463795c0d87808077e83"/>
     <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000138"/>
-    <testcase:has_scientific_name rdf:nodeID="Nd510e03ada224d7ab7fb22293073efd4"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="Nb2291f57f580403f925742080ed63c51">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <owl:intersectionOf rdf:nodeID="N0f38a4cd27dd4eddbf79eb5d3fbec038"/>
+  <rdf:Description rdf:nodeID="Nebb1eba1f2af4884abc5c5c8ced5290f">
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    <rdf:first rdf:nodeID="Nfbde52ede42d42758a9ff128d35d69a8"/>
   </rdf:Description>
-  <rdf:Description rdf:nodeID="N4f19d49f623a4ee7a416f2b080f1eddf">
-    <rdf:first rdf:nodeID="Nb344a18bd9274e139bd793b614eb713f"/>
-    <rdf:rest rdf:nodeID="Nb3715e8e05de441ba3c1ef77a2503cfa"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Ncd9db3d135f1471d9a95a769ec60fe81">
-    <rdf:rest rdf:nodeID="N3b9c1f826045465e9387b36bf141e57a"/>
-    <rdf:first rdf:nodeID="N503c959b6c1a4087a63e7ada1f0d6a7b"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Nf7b239abe8c1415d865420a0fb555a2d">
-    <rdf:rest rdf:nodeID="Ndafd076cb42e45e0912aeb371d0db35f"/>
-    <rdf:first rdf:nodeID="N78b663b3fb5041b1921b4fb545204792"/>
-  </rdf:Description>
-  <rdf:Description rdf:nodeID="Nf910c45a82fe4c59a3893b9cca1d0187">
-    <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000149"/>
-    <owl:someValuesFrom rdf:nodeID="Nba43ce3ecd1e4d80946032424a8548cc"/>
+  <rdf:Description rdf:nodeID="N97b7ef5f353e4173a389ca1050a5f872">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <ns2:onProperty rdf:resource="http://rs.tdwg.org/dwc/terms/scientificName"/>
+    <ns2:hasValue rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ee e</ns2:hasValue>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Ne33ef0e2bc8b4c3d906b5f88e2021d2e">
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    <rdf:first rdf:nodeID="N655c300e430e4f558177e36049cff479"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N0d09f6e904794fd79a3c8d60f6d66637">
+    <ns2:intersectionOf rdf:nodeID="Nce75b1fa90be418bb167c8af38b794a8"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node1">
+    <ns1:CDAO_0000149 rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node2"/>
+    <ns1:CDAO_0000179 rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node0"/>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2</rdfs:label>
+    <ns4:has_Sibling rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node7"/>
+    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
+    <ns1:CDAO_0000149 rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node6"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N63b25432fe824cab98aff0e23ded4e18">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <ns2:onProperty rdf:resource="http://rs.tdwg.org/dwc/terms/scientificName"/>
+    <ns2:hasValue rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Dd d</ns2:hasValue>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl">
+    <ns2:imports rdf:resource="http://ontology.phyloref.org/2018-12-14/tcan.owl"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+    <ns2:imports rdf:resource="http://raw.githubusercontent.com/phyloref/curation-workflow/develop/ontologies/phyloref_testcase.owl"/>
+    <ns2:imports rdf:resource="http://ontology.phyloref.org/2018-12-14/phyloref.owl"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N821df74e0bea4f1c948d1b41cf7f85d4">
+    <rdf:rest rdf:nodeID="Nfa8e973acfce4b4f83128e3a46ff5f1b"/>
+    <rdf:first rdf:nodeID="N85e8996c2ed142b7938acd66554b65cb"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node3">
+    <ns1:CDAO_0000187 rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node3_taxonomicunit0"/>
+    <ns4:has_Sibling rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node4"/>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ee_e</rdfs:label>
+    <rdf:type rdf:nodeID="N112f4d4c21dc4df38152d4b493372123"/>
+    <ns1:CDAO_0000179 rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node2"/>
+    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
+    <ns4:has_Sibling rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node5"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Na1cb5da2f1b84cda92a3ea2a78d5dd08">
+    <ns5:genus rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Dd</ns5:genus>
+    <ns5:specificEpithet rdf:datatype="http://www.w3.org/2001/XMLSchema#string">d</ns5:specificEpithet>
+    <ns5:scientificName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Dd d</ns5:scientificName>
+    <ns3:has_binomial_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Dd d</ns3:has_binomial_name>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nad5556f7fc97448099df1137be54d27f">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <ns2:hasValue rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ee e</ns2:hasValue>
+    <ns2:onProperty rdf:resource="http://rs.tdwg.org/dwc/terms/scientificName"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nd863b9a86f9f479e81ea354f6a02d65d">
+    <rdf:rest rdf:nodeID="N6ff38edd60914c33841d0f3e40980716"/>
+    <rdf:first rdf:resource="http://purl.obolibrary.org/obo/NOMEN_0000107"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Ncc95385b220e477187e18c08a48f1515">
+    <ns2:onProperty rdf:resource="http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName"/>
+    <ns2:someValuesFrom rdf:nodeID="N7f7f06a4c00d48e6802ffea71e670c26"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N2a893a2d0d4f4dd5b6bee5cd142388a1">
+    <ns2:onProperty rdf:resource="http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName"/>
+    <ns2:someValuesFrom rdf:nodeID="N0d09f6e904794fd79a3c8d60f6d66637"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N371c0422bb3e459d8c4856b75caab1d8">
+    <ns2:someValuesFrom rdf:nodeID="N2a893a2d0d4f4dd5b6bee5cd142388a1"/>
+    <ns2:onProperty rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000187"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N672d86bab01d4e1392ead995d722cec6">
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    <rdf:first rdf:nodeID="Nad5556f7fc97448099df1137be54d27f"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N62b70f3dfad54cd88f61bc05b4471d77">
+    <ns5:scientificName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cc c</ns5:scientificName>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nd5fd5b24d59c43e7a96567f05505a995">
+    <ns2:intersectionOf rdf:nodeID="Naf6331727f7248aea6df78172d6f3327"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N9b1fbf5071ec480b8b7b56a19fd332c6">
+    <rdf:first rdf:resource="http://purl.obolibrary.org/obo/NOMEN_0000107"/>
+    <rdf:rest rdf:nodeID="Neaedf3a72ddf4f3bbf79f0c936dfbb4e"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Naf6331727f7248aea6df78172d6f3327">
+    <rdf:rest rdf:nodeID="Nd4e14212d5a044e4b52ab2eb5c05bc33"/>
+    <rdf:first rdf:resource="http://purl.obolibrary.org/obo/OBI_0302910"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000001_specifier_internal2_tunit0">
+    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000138"/>
+    <ns3:has_scientific_name rdf:nodeID="N77a283e5b22f4c7aa76f347be64f9183"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Na136dc4692494d66b13ad5891417e70c">
+    <ns2:intersectionOf rdf:nodeID="N61f94942ef004dc8b0b46b3556f15f30"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Ne8f8adb25d2845b8aac092a39555f00a">
+    <ns5:scientificName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ee e</ns5:scientificName>
+    <ns5:specificEpithet rdf:datatype="http://www.w3.org/2001/XMLSchema#string">e</ns5:specificEpithet>
+    <ns3:has_binomial_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ee e</ns3:has_binomial_name>
+    <ns5:genus rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ee</ns5:genus>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000001_specifier_internal1_tunit0">
+    <ns3:has_scientific_name rdf:nodeID="N62b70f3dfad54cd88f61bc05b4471d77"/>
+    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000138"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nb72df789288e4ee0835e0d04c523db3d">
+    <ns2:someValuesFrom rdf:nodeID="N8e4903ba01214bdf9a3b0113f992d583"/>
+    <ns2:onProperty rdf:resource="http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node7_taxonomicunit0">
+    <ns3:has_scientific_name rdf:nodeID="N259f0746e6ff40a28bd8e8aa72aa3f7b"/>
+    <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000138"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N61f94942ef004dc8b0b46b3556f15f30">
+    <rdf:rest rdf:nodeID="Ne33ef0e2bc8b4c3d906b5f88e2021d2e"/>
+    <rdf:first rdf:resource="http://purl.obolibrary.org/obo/NOMEN_0000107"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nfa8e973acfce4b4f83128e3a46ff5f1b">
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    <rdf:first rdf:nodeID="Ncf6f46f5de5342d8b30da3a00c355245"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N11d09f9096fd414298ec4d29fb471e1e">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <ns2:onProperty rdf:resource="http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName"/>
+    <ns2:someValuesFrom rdf:nodeID="Nf5adbcd749e64f84b3314d557e8ab34f"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nec8d384bd94a45e1a1be29617a7fdd57">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <ns2:intersectionOf rdf:nodeID="N48521fb93d7a437fb74687ab571f4d21"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000001_specifier_internal1">
+    <ns3:references_taxonomic_unit rdf:resource="http://phyloref.org/clade-ontology/clado.owl#CLADO_00000001_specifier_internal1_tunit0"/>
+    <rdf:type rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#Specifier"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N63baac2b126442f6af2eed4267a2f809">
+    <ns2:intersectionOf rdf:nodeID="N821df74e0bea4f1c948d1b41cf7f85d4"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N77a283e5b22f4c7aa76f347be64f9183">
+    <ns5:scientificName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ee e</ns5:scientificName>
   </rdf:Description>
 </rdf:RDF>
