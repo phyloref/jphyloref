@@ -49,7 +49,7 @@ class TestCommandTest {
     assertTrue(
         stderrStr.endsWith(
             "Testing complete:1 successes, 0 failures, 0 failures marked TODO, 0 skipped.\n"),
-        "Make sure the testing was successful.");
+        "Stderr should end with single success but returned: " + stderrStr);
     assertEquals(
         "1..1\nok 1 "
             + phylorefName
