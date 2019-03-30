@@ -3,6 +3,7 @@
 Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
 ## [Unreleased]
+- Added support for the Elk reasoner (as "elk").
 - Updated dependency to JFact 5.0.1, which necessitated some code changes.
 - Added a "webserver" command that starts a webserver that provides a simple
   HTTP API for reasoning over JSON-LD file in [phyloref/jphyloref#12].
