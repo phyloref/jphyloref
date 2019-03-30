@@ -460,6 +460,9 @@ public class TestCommand implements Command {
             + countSkipped
             + " skipped.");
 
+    // Dispose of the reasoner.
+    reasoner.dispose();
+
     // Exit with error unless we have zero failures.
     if (countSuccess == 0) return -1;
     return countFailure;
