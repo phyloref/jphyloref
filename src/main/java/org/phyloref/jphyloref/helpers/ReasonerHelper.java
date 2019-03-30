@@ -99,8 +99,8 @@ public class ReasonerHelper {
     if (cmdLine.hasOption("reasoner")) {
       return getReasonerFactory(cmdLine.getOptionValue("reasoner"));
     } else {
-      // No reasoner provided? Default to JFact.
-      return new JFactFactory();
+      // No reasoner provided? Default to Elk.
+      return new ElkReasonerFactory();
     }
   }
 
