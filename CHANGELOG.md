@@ -3,6 +3,7 @@
 Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
 ## [Unreleased]
+- Added support for the Elk reasoner (as "elk").
 - Removed ReasonCommand, which is no longer useful.
 - Updated dependency to JFact 5.0.1, which necessitated some code changes.
 - Added a "webserver" command that starts a webserver that provides a simple
