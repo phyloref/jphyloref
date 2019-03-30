@@ -209,6 +209,9 @@ public class WebserverCommand implements Command {
         nodesPerPhylorefAsString.put(nodeURI, nodes);
       }
 
+      // Dispose the reasoner.
+      reasoner.dispose();
+
       // Log reasoning results.
       System.err.println("Phyloreferencing reasoning results: " + nodesPerPhylorefAsString);
 
