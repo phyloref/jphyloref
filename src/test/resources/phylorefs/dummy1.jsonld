@@ -1,5 +1,5 @@
 {
-    "@context": "http://phyloref.org/curation-tool/json/phyx.json",
+    "@context": "http://www.phyloref.org/phyx.js/context/v0.1.0/phyx.json",
     "citation": "Dummy phyloreference for testing",
     "phylogenies": [
         {
