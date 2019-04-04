@@ -186,6 +186,8 @@ public class TestCommand implements Command {
     TapProducer tapProducer = TapProducerFactory.makeTap13Producer();
     TestSet testSet = new TestSet();
     testSet.setPlan(new Plan(phylorefs.size()));
+    testSet.addComment(new Comment("Using reasoner: " +
+      ReasonerHelper.getReasonerNameAndVersion(ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine))));
 
     // Preload some terms we need to use in the following code.
     OWLDataFactory dataFactory = manager.getOWLDataFactory();
