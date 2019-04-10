@@ -72,8 +72,15 @@ public class ReasonerHelper {
               + version.getPatch();
     } catch (NumberFormatException e) {
       // Strangely, ELK appears to throw one of these when trying to figure out
-      // its own version string.
-      versionString = "(error: " + e + ")";
+      // its own version string. If so, let's try to extract the version from
+      // the error string.
+      String errorMessage = e.getMessage();
+      if (errorMessage.startsWith("For input string: \"") && errorMessage.endsWith("\"")) {
+        versionString = errorMessage.substring(19, errorMessage.length() - 1);
+      } else {
+        // Report the error as the version string.
+        versionString = "(error: " + errorMessage + ")";
+      }
     } catch (OWLOntologyCreationException e) {
       // There was an error creating the OWL Ontology.
       versionString = "(error: " + e + ")";
