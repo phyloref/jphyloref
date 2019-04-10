@@ -51,7 +51,7 @@ class TestCommandTest {
             "Testing complete:1 successes, 0 failures, 0 failures marked TODO, 0 skipped.\n"),
         "Make sure the testing was successful.");
     assertEquals(
-        "1..1\nok 1 "
+        "1..1\n# Using reasoner: JFact/1.2.0.1\nok 1 "
             + phylorefName
             + "\n# The following nodes were matched and expected this phyloreference: [1]\n\n",
         stdoutStr);
