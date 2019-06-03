@@ -256,7 +256,7 @@ public class TestCommand implements Command {
           }
         }
       }
-      System.err.println("Phyloreference <" + phyloref + "> has nodes: " + nodes);
+      // System.err.println("Phyloreference <" + phyloref + "> has nodes: " + nodes);
 
       if (nodes.isEmpty()) {
         // Phyloref resolved to no nodes at all.
