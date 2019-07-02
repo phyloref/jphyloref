@@ -155,7 +155,14 @@ public class PhylorefHelper {
 
     OWLClass phyloref_Phyloreference = set_phyloref_Phyloreference.iterator().next().asOWLClass();
 
-    // Note that we don't look for indirect subclasses, only the direct ones.
+    // In Model 2.0, we need to look for both direct subclasses of 
+    // phyloref:Phyloreference as well as indirect subclasses, since a
+    // particular phyloreference might be reasoned to be a subclass of another
+    // phyloreference.
+    //
+    // The downside to this approach is that we will test or report on
+    // *every* phyloreference in this ontology, including all the phylorefs
+    // that are only there to build up other phyloreferences.
     Set<OWLClass> classes = reasoner.getSubClasses(phyloref_Phyloreference, false).getFlattened();
 
     // This currently includes classes that are classes of phyloreferences. We
