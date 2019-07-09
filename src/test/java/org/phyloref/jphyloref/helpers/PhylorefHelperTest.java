@@ -47,7 +47,7 @@ class PhylorefHelperTest {
       IRI phyloref1IRI = IRI.create("http://example.org/phyloref1");
       OWLClass phyloref1 = df.getOWLClass(phyloref1IRI);
 
-      // Mark it as a phyloreference.
+      // Set it as a subclass of phyloref:Phyloreference.
       axioms.add(
           df.getOWLSubClassOfAxiom(
               phyloref1,
