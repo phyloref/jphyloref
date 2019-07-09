@@ -99,7 +99,7 @@ public class PhylorefHelper {
 
   /**
    * Get a list of phyloreferences in this ontology without reasoning. This method does not use the
-   * reasoner, and so will only find individuals asserted to have a type of phyloref:Phyloreference.
+   * reasoner, and so will only find classes asserted to be subclasses of phyloref:Phyloreference.
    */
   public static Set<OWLClass> getPhyloreferencesWithoutReasoning(OWLOntology ontology) {
     // Get a list of all phyloreferences. First, we need to know what a Phyloreference is.
@@ -118,9 +118,9 @@ public class PhylorefHelper {
     Set<OWLSubClassOfAxiom> subClassOfAxioms = ontology.getAxioms(AxiomType.SUBCLASS_OF);
 
     for (OWLSubClassOfAxiom subClassOfAxiom : subClassOfAxioms) {
-      // Does this assertion involve class:Phyloreference and a named individual?
+      // Is the superclass phyloref:Phyloreference?
       if (subClassOfAxiom.getSuperClass().equals(phyloref_Phyloreference.asOWLClass())) {
-        // If so, then the individual is a phyloreferences!
+        // If so, then the subclass is a phyloreference!
         phylorefs.add(subClassOfAxiom.getSubClass().asOWLClass());
       }
     }
@@ -130,15 +130,13 @@ public class PhylorefHelper {
 
   /**
    * Get a list of phyloreferences in this ontology. This method uses the reasoner, and so will find
-   * all individuals determined to be of type phyloref:Phyloreference.
+   * all classes reasoned to be subclasses of class phyloref:Phyloreference.
    *
    * @param ontology The OWL Ontology within with we should look for phylorefs
    * @param reasoner The reasoner to use. May be null.
    */
   public static Set<OWLClass> getPhyloreferences(OWLOntology ontology, OWLReasoner reasoner) {
-    // If no reasoner is provided, we can't find all individuals that are
-    // inferred to be phyloref:Phyloreference, but we can still find all
-    // individuals that are stated to be phyloref:Phyloreference. So let's do that!
+    // If no reasoner is provided, fall back to stated subclasses.
     if (reasoner == null) return PhylorefHelper.getPhyloreferencesWithoutReasoning(ontology);
 
     // Get a list of all phyloreferences. First, we need to know what a Phyloreference is.

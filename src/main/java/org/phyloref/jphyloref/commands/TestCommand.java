@@ -251,7 +251,7 @@ public class TestCommand implements Command {
           // Does this assertion involve this phyloreference as a class and a named individual?
           if (classAssertion.getIndividual().isNamed()
               && classAssertion.getClassesInSignature().contains(phyloref)) {
-            // If so, then the individual is a phyloreferences!
+            // If so, then the individual is a node that is included in this phyloreference.
             nodes.add(classAssertion.getIndividual().asOWLNamedIndividual());
           }
         }

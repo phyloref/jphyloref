@@ -180,14 +180,11 @@ public class WebserverCommand implements Command {
       for (OWLClass phyloref : PhylorefHelper.getPhyloreferences(ontology, reasoner)) {
         IRI phylorefIRI = phyloref.getIRI();
 
-        // Pun from the named individual phyloref to the class with the same IRI.
-        OWLClass phylorefAsClass = manager.getOWLDataFactory().getOWLClass(phylorefIRI);
-
-        // Identify all individuals contained in the class, but filter out everything that
-        // is not an IRI_CDAO_NODE.
+        // Identify all individuals contained in this phyloref class, but filter out
+        // everything that is not an IRI_CDAO_NODE.
         Set<String> nodes =
             reasoner
-                .getInstances(phylorefAsClass, false)
+                .getInstances(phyloref, false)
                 .getFlattened()
                 .stream()
                 // This includes the phyloreference itself. We only want to

@@ -48,9 +48,6 @@ class PhylorefHelperTest {
       OWLClass phyloref1 = df.getOWLClass(phyloref1IRI);
 
       // Mark it as a phyloreference.
-      // (Eventually we would like to test whether we can infer that an
-      // individual belongs to class phyloref:Phyloreference based on its
-      // properties alone, but so far no property does this.)
       axioms.add(
           df.getOWLSubClassOfAxiom(
               phyloref1,
