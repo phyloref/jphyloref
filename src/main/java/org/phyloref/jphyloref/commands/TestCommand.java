@@ -20,7 +20,6 @@ import org.phyloref.jphyloref.helpers.PhylorefHelper;
 import org.phyloref.jphyloref.helpers.ReasonerHelper;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.ClassExpressionType;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -175,10 +174,10 @@ public class TestCommand implements Command {
     OWLReasonerFactory reasonerFactory = ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine);
     OWLReasoner reasoner = null;
     if (reasonerFactory != null) reasoner = reasonerFactory.createReasoner(ontology);
-    Set<OWLNamedIndividual> phylorefs;
 
     // Get a list of all phyloreferences.
-    phylorefs = PhylorefHelper.getPhyloreferences(ontology, reasoner);
+    Set<OWLClass> phylorefs = PhylorefHelper.getPhyloreferences(ontology, reasoner);
+    System.err.println("Phyloreferences identified: " + phylorefs);
 
     // Okay, time to start testing! Each phyloreference counts as one test.
     // TAP (https://testanything.org/) can be read by downstream software
@@ -216,7 +215,7 @@ public class TestCommand implements Command {
     int countSkipped = 0;
 
     // Test each phyloreference individually.
-    for (OWLNamedIndividual phyloref : phylorefs) {
+    for (OWLClass phyloref : phylorefs) {
       // Prepare a TestResult object in which we can store the results of
       // testing this particular phyloreference.
       testNumber++;
@@ -237,31 +236,10 @@ public class TestCommand implements Command {
       result.setDescription("Phyloreference '" + phylorefLabel + "'");
 
       // Which nodes did this phyloreference resolved to?
-      OWLClass phylorefAsClass = manager.getOWLDataFactory().getOWLClass(phyloref.getIRI());
       Set<OWLNamedIndividual> nodes;
       if (reasoner != null) {
         // Use the reasoner to determine which nodes are members of this phyloref as a class
-        nodes =
-            reasoner
-                .getInstances(phylorefAsClass, false)
-                .getFlattened()
-                .stream()
-                // This includes the phyloreference itself. We only want to
-                // look at phylogeny nodes here. So, let's filter down to named
-                // individuals that are asserted to be cdao:Nodes.
-                .filter(
-                    indiv ->
-                        EntitySearcher.getTypes(indiv, ontology)
-                            .stream()
-                            .anyMatch(
-                                type ->
-                                    (!type.getClassExpressionType()
-                                            .equals(ClassExpressionType.OWL_CLASS))
-                                        || type.asOWLClass()
-                                            .getIRI()
-                                            .equals(PhylorefHelper.IRI_CDAO_NODE)))
-                .collect(Collectors.toSet());
-        ;
+        nodes = reasoner.getInstances(phyloref, false).getFlattened();
       } else {
         // No reasoner? We can also determine which nodes have been directly stated to
         // be members of this phyloref as a class. This allows us to read a pre-reasoned
@@ -272,12 +250,13 @@ public class TestCommand implements Command {
         for (OWLClassAssertionAxiom classAssertion : classAssertions) {
           // Does this assertion involve this phyloreference as a class and a named individual?
           if (classAssertion.getIndividual().isNamed()
-              && classAssertion.getClassesInSignature().contains(phylorefAsClass)) {
-            // If so, then the individual is a phyloreferences!
+              && classAssertion.getClassesInSignature().contains(phyloref)) {
+            // If so, then the individual is a node that is included in this phyloreference.
             nodes.add(classAssertion.getIndividual().asOWLNamedIndividual());
           }
         }
       }
+      // System.err.println("Phyloreference <" + phyloref + "> has nodes: " + nodes);
 
       if (nodes.isEmpty()) {
         // Phyloref resolved to no nodes at all.
@@ -480,6 +459,9 @@ public class TestCommand implements Command {
             + " failures marked TODO, "
             + countSkipped
             + " skipped.");
+
+    // Dispose of the reasoner.
+    reasoner.dispose();
 
     // Exit with error unless we have zero failures.
     if (countSuccess == 0) return -1;

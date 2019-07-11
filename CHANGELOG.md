@@ -3,6 +3,12 @@
 Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
 ## [Unreleased]
+- Added support for the Elk reasoner (as "elk") and made it the default reasoner.
+- Phyloreferences were previously identified in input ontologies by looking for
+  individuals defined as instances of the class phyloref:Phyloreference. They
+  are now identified as subclasses of phyloref:Phyloreference. This is in line 
+  with the changes introduced by moving from the 2018-12-04 release of the
+  Phyloref Ontology to the 2018-12-14 release.
 - Removed ReasonCommand, which is no longer useful.
 - Updated dependency to JFact 5.0.1, which necessitated some code changes.
 - Added a "webserver" command that starts a webserver that provides a simple

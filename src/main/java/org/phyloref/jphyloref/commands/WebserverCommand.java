@@ -25,7 +25,6 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.ClassExpressionType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -178,17 +177,14 @@ public class WebserverCommand implements Command {
 
       // Go through all the phyloreferences, identifying all the nodes that have
       // matched to that phyloreference.
-      for (OWLNamedIndividual phyloref : PhylorefHelper.getPhyloreferences(ontology, reasoner)) {
+      for (OWLClass phyloref : PhylorefHelper.getPhyloreferences(ontology, reasoner)) {
         IRI phylorefIRI = phyloref.getIRI();
 
-        // Pun from the named individual phyloref to the class with the same IRI.
-        OWLClass phylorefAsClass = manager.getOWLDataFactory().getOWLClass(phylorefIRI);
-
-        // Identify all individuals contained in the class, but filter out everything that
-        // is not an IRI_CDAO_NODE.
+        // Identify all individuals contained in this phyloref class, but filter out
+        // everything that is not an IRI_CDAO_NODE.
         Set<String> nodes =
             reasoner
-                .getInstances(phylorefAsClass, false)
+                .getInstances(phyloref, false)
                 .getFlattened()
                 .stream()
                 // This includes the phyloreference itself. We only want to
@@ -216,6 +212,9 @@ public class WebserverCommand implements Command {
 
         nodesPerPhylorefAsString.put(nodeURI, nodes);
       }
+
+      // Dispose the reasoner.
+      reasoner.dispose();
 
       // Log reasoning results.
       System.err.println("Phyloreferencing reasoning results: " + nodesPerPhylorefAsString);

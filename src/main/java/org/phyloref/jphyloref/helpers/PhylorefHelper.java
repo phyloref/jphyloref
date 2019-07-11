@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
@@ -15,11 +16,10 @@ import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.search.EntitySearcher;
 
@@ -99,9 +99,9 @@ public class PhylorefHelper {
 
   /**
    * Get a list of phyloreferences in this ontology without reasoning. This method does not use the
-   * reasoner, and so will only find individuals asserted to have a type of phyloref:Phyloreference.
+   * reasoner, and so will only find classes asserted to be subclasses of phyloref:Phyloreference.
    */
-  public static Set<OWLNamedIndividual> getPhyloreferencesWithoutReasoning(OWLOntology ontology) {
+  public static Set<OWLClass> getPhyloreferencesWithoutReasoning(OWLOntology ontology) {
     // Get a list of all phyloreferences. First, we need to know what a Phyloreference is.
     Set<OWLEntity> set_phyloref_Phyloreference =
         ontology.getEntitiesInSignature(IRI_PHYLOREFERENCE);
@@ -114,15 +114,14 @@ public class PhylorefHelper {
     }
 
     OWLClass phyloref_Phyloreference = set_phyloref_Phyloreference.iterator().next().asOWLClass();
-    Set<OWLNamedIndividual> phylorefs = new HashSet<>();
-    Set<OWLClassAssertionAxiom> classAssertions = ontology.getAxioms(AxiomType.CLASS_ASSERTION);
+    Set<OWLClass> phylorefs = new HashSet<>();
+    Set<OWLSubClassOfAxiom> subClassOfAxioms = ontology.getAxioms(AxiomType.SUBCLASS_OF);
 
-    for (OWLClassAssertionAxiom classAssertion : classAssertions) {
-      // Does this assertion involve class:Phyloreference and a named individual?
-      if (classAssertion.getIndividual().isNamed()
-          && classAssertion.getClassesInSignature().contains(phyloref_Phyloreference)) {
-        // If so, then the individual is a phyloreferences!
-        phylorefs.add(classAssertion.getIndividual().asOWLNamedIndividual());
+    for (OWLSubClassOfAxiom subClassOfAxiom : subClassOfAxioms) {
+      // Is the superclass phyloref:Phyloreference?
+      if (subClassOfAxiom.getSuperClass().equals(phyloref_Phyloreference.asOWLClass())) {
+        // If so, then the subclass is a phyloreference!
+        phylorefs.add(subClassOfAxiom.getSubClass().asOWLClass());
       }
     }
 
@@ -131,16 +130,13 @@ public class PhylorefHelper {
 
   /**
    * Get a list of phyloreferences in this ontology. This method uses the reasoner, and so will find
-   * all individuals determined to be of type phyloref:Phyloreference.
+   * all classes reasoned to be subclasses of class phyloref:Phyloreference.
    *
    * @param ontology The OWL Ontology within with we should look for phylorefs
    * @param reasoner The reasoner to use. May be null.
    */
-  public static Set<OWLNamedIndividual> getPhyloreferences(
-      OWLOntology ontology, OWLReasoner reasoner) {
-    // If no reasoner is provided, we can't find all individuals that are
-    // inferred to be phyloref:Phyloreference, but we can still find all
-    // individuals that are stated to be phyloref:Phyloreference. So let's do that!
+  public static Set<OWLClass> getPhyloreferences(OWLOntology ontology, OWLReasoner reasoner) {
+    // If no reasoner is provided, fall back to stated subclasses.
     if (reasoner == null) return PhylorefHelper.getPhyloreferencesWithoutReasoning(ontology);
 
     // Get a list of all phyloreferences. First, we need to know what a Phyloreference is.
@@ -156,12 +152,40 @@ public class PhylorefHelper {
     }
 
     OWLClass phyloref_Phyloreference = set_phyloref_Phyloreference.iterator().next().asOWLClass();
-    return reasoner.getInstances(phyloref_Phyloreference, true).getFlattened();
+
+    // In Model 2.0, we need to look for both direct subclasses of
+    // phyloref:Phyloreference as well as indirect subclasses, since a
+    // particular phyloreference might be reasoned to be a subclass of another
+    // phyloreference.
+    //
+    // The downside to this approach is that we will test or report on
+    // *every* phyloreference in this ontology, including all the phylorefs
+    // that are only there to build up other phyloreferences.
+    Set<OWLClass> classes = reasoner.getSubClasses(phyloref_Phyloreference, false).getFlattened();
+
+    // For convenience, we filter out two kinds of classes:
+    //  1. OWL's unsatisfiable classes, such as owl:Nothing.
+    //  2. The Phyloref ontology's classes-of-Phyloreferences, such as
+    //     phyloref:PhyloreferenceUsingMaximumClade, phyloref:PhyloreferenceWithReferenceTree,
+    //     and so on.
+    Set<OWLClass> bottomNodes = reasoner.getUnsatisfiableClasses().getEntities();
+    classes =
+        classes
+            .stream()
+            .filter(c -> !bottomNodes.contains(c)) // remove owl:Nothing
+            .filter(
+                c ->
+                    !c.getIRI()
+                        .toString()
+                        .startsWith("http://ontology.phyloref.org/phyloref.owl#Phyloreference"))
+            .collect(Collectors.toSet());
+
+    return classes;
   }
 
   /** A wrapper for a phyloref status at a particular point in time. */
   public static class PhylorefStatus {
-    private OWLNamedIndividual phyloref;
+    private OWLClass phyloref;
     private IRI statusIRI;
     private Instant intervalStart;
     private Instant intervalEnd;
@@ -177,7 +201,7 @@ public class PhylorefHelper {
      *     ended yet.
      */
     public PhylorefStatus(
-        OWLNamedIndividual phyloref, IRI status, Instant intervalStart, Instant intervalEnd) {
+        OWLClass phyloref, IRI status, Instant intervalStart, Instant intervalEnd) {
       this.phyloref = phyloref;
       this.statusIRI = status;
       this.intervalStart = intervalStart;
@@ -189,7 +213,7 @@ public class PhylorefHelper {
     }
 
     /** @return the phyloreference this status is associated with. May be null. */
-    public OWLNamedIndividual getPhyloref() {
+    public OWLClass getPhyloref() {
       return phyloref;
     }
 
@@ -236,12 +260,11 @@ public class PhylorefHelper {
    * @return A list of phyloref statuses.
    */
   public static List<PhylorefStatus> getStatusesForPhyloref(
-      OWLNamedIndividual phyloref, OWLOntology ontology) {
+      OWLClass phyloref, OWLOntology ontology) {
     List<PhylorefStatus> statuses = new ArrayList<>();
 
     // Set up the OWL annotation properties we need to look up the phyloref statuses.
     OWLDataFactory dataFactory = ontology.getOWLOntologyManager().getOWLDataFactory();
-    OWLClass phylorefAsClass = dataFactory.getOWLClass(phyloref.getIRI());
 
     OWLAnnotationProperty pso_holdsStatusInTime =
         dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_PSO_HOLDS_STATUS_IN_TIME);
@@ -256,7 +279,7 @@ public class PhylorefHelper {
 
     // Retrieve holdsStatusInTime to determine the active status of this phyloreference.
     Collection<OWLAnnotation> holdsStatusInTime =
-        EntitySearcher.getAnnotations(phylorefAsClass, ontology, pso_holdsStatusInTime);
+        EntitySearcher.getAnnotations(phyloref, ontology, pso_holdsStatusInTime);
 
     // Read through the list of OWLAnnotations to create corresponding PhylorefStatus objects.
     for (OWLAnnotation statusInTime : holdsStatusInTime) {

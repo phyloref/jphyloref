@@ -16,8 +16,8 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -45,24 +45,14 @@ class PhylorefHelperTest {
       // Set up a phyloreference we can use for testing.
       List<OWLAxiom> axioms = new ArrayList<>();
       IRI phyloref1IRI = IRI.create("http://example.org/phyloref1");
-      OWLNamedIndividual phyloref1 = df.getOWLNamedIndividual(phyloref1IRI);
+      OWLClass phyloref1 = df.getOWLClass(phyloref1IRI);
 
-      // Mark it as a phyloreference.
-      // (Eventually we would like to test whether we can infer that an
-      // individual belongs to class phyloref:Phyloreference based on its
-      // properties alone, but so far no property does this.)
+      // Set it as a subclass of phyloref:Phyloreference.
       axioms.add(
-          df.getOWLClassAssertionAxiom(
+          df.getOWLSubClassOfAxiom(
+              phyloref1,
               df.getOWLClass(
-                  IRI.create("http://ontology.phyloref.org/phyloref.owl#Phyloreference")),
-              phyloref1));
-
-      // Make sure that SpecifiedGroups don't get confused for phylorefs.
-      axioms.add(
-          df.getOWLClassAssertionAxiom(
-              df.getOWLClass(
-                  IRI.create("http://ontology.phyloref.org/phyloref.owl#SpecifiedGroup")),
-              df.getOWLNamedIndividual(IRI.create("http://example.org/#aSpecifiedGroup"))));
+                  IRI.create("http://ontology.phyloref.org/phyloref.owl#Phyloreference"))));
 
       // Give the phyloreference a label.
       axioms.add(
@@ -77,11 +67,9 @@ class PhylorefHelperTest {
     @DisplayName("can retrieve lists of phylorefs without reasoning")
     void canRetrievePhylorefsWithoutReasoning() {
       OWLDataFactory df = ontologyManager.getOWLDataFactory();
-      OWLNamedIndividual phyloref =
-          df.getOWLNamedIndividual(IRI.create("http://example.org/phyloref1"));
+      OWLClass phyloref = df.getOWLClass(IRI.create("http://example.org/phyloref1"));
 
-      Set<OWLNamedIndividual> phylorefs =
-          PhylorefHelper.getPhyloreferencesWithoutReasoning(testOntology);
+      Set<OWLClass> phylorefs = PhylorefHelper.getPhyloreferencesWithoutReasoning(testOntology);
       assertEquals(1, phylorefs.size());
       assertTrue(
           phylorefs.contains(phyloref),
@@ -101,14 +89,13 @@ class PhylorefHelperTest {
     void canRetrievePhylorefsWithReasoning() {
       OWLDataFactory df = ontologyManager.getOWLDataFactory();
       OWLReasoner reasoner = new JFactFactory().createNonBufferingReasoner(testOntology);
-      OWLNamedIndividual phyloref =
-          df.getOWLNamedIndividual(IRI.create("http://example.org/phyloref1"));
+      OWLClass phyloref = df.getOWLClass(IRI.create("http://example.org/phyloref1"));
 
       // Note that this should be identical to the "without reasoning" code in
       // the absence of individuals that are implied to be Phyloreferences but
       // not explicitly stated to be phylorefs. This is not tested yet!
 
-      Set<OWLNamedIndividual> phylorefs = PhylorefHelper.getPhyloreferences(testOntology, reasoner);
+      Set<OWLClass> phylorefs = PhylorefHelper.getPhyloreferences(testOntology, reasoner);
       assertEquals(1, phylorefs.size());
       assertTrue(
           phylorefs.contains(phyloref), "Phyloref 'phyloref1' has been retrieved with reasoning");
@@ -146,7 +133,7 @@ class PhylorefHelperTest {
       // Set up a phyloreference we can use for testing.
       List<OWLAxiom> axioms = new ArrayList<>();
       IRI phyloref1IRI = IRI.create("http://example.org/phyloref1");
-      OWLNamedIndividual phyloref1 = df.getOWLNamedIndividual(phyloref1IRI);
+      OWLClass phyloref1 = df.getOWLClass(phyloref1IRI);
 
       // Set up annotation properties for setting statuses.
       axioms.addAll(
@@ -248,8 +235,7 @@ class PhylorefHelperTest {
     @DisplayName("can retrieve current statuses for a particular phyloreference")
     void canRetrieveStatuses() throws OWLOntologyStorageException {
       OWLDataFactory df = ontologyManager.getOWLDataFactory();
-      OWLNamedIndividual phyloref =
-          df.getOWLNamedIndividual(IRI.create("http://example.org/phyloref1"));
+      OWLClass phyloref = df.getOWLClass(IRI.create("http://example.org/phyloref1"));
 
       // Uncomment the next line to provide a copy of the test ontology for debugging.
       // testOntology.saveOntology(new FileDocumentTarget(new File("./output.txt")));

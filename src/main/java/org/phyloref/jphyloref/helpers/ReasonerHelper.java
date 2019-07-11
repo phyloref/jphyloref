@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
+import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -29,6 +30,7 @@ public class ReasonerHelper {
     reasonerFactories.put("null", null);
     reasonerFactories.put("jfact", new JFactFactory());
     reasonerFactories.put("fact++", new FaCTPlusPlusReasonerFactory());
+    reasonerFactories.put("elk", new ElkReasonerFactory());
   }
 
   /** Get reasoner factory by name. */
@@ -68,6 +70,17 @@ public class ReasonerHelper {
               + version.getBuild()
               + "."
               + version.getPatch();
+    } catch (NumberFormatException e) {
+      // Strangely, ELK appears to throw one of these when trying to figure out
+      // its own version string. If so, let's try to extract the version from
+      // the error string.
+      String errorMessage = e.getMessage();
+      if (errorMessage.startsWith("For input string: \"") && errorMessage.endsWith("\"")) {
+        versionString = errorMessage.substring(19, errorMessage.length() - 1);
+      } else {
+        // Report the error as the version string.
+        versionString = "(error: " + errorMessage + ")";
+      }
     } catch (OWLOntologyCreationException e) {
       // There was an error creating the OWL Ontology.
       versionString = "(error: " + e + ")";
@@ -93,8 +106,8 @@ public class ReasonerHelper {
     if (cmdLine.hasOption("reasoner")) {
       return getReasonerFactory(cmdLine.getOptionValue("reasoner"));
     } else {
-      // No reasoner provided? Default to JFact.
-      return new JFactFactory();
+      // No reasoner provided? Default to Elk.
+      return new ElkReasonerFactory();
     }
   }
 
