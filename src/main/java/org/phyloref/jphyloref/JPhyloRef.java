@@ -9,6 +9,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.phyloref.jphyloref.commands.Command;
+import org.phyloref.jphyloref.commands.ResolveCommand;
 import org.phyloref.jphyloref.commands.TestCommand;
 import org.phyloref.jphyloref.commands.WebserverCommand;
 import org.phyloref.jphyloref.helpers.ReasonerHelper;
@@ -25,7 +26,8 @@ public class JPhyloRef {
 
   /** List of all commands included in JPhyloRef. */
   private List<Command> commands =
-      Arrays.asList(new HelpCommand(), new TestCommand(), new WebserverCommand());
+      Arrays.asList(
+          new HelpCommand(), new TestCommand(), new WebserverCommand(), new ResolveCommand());
 
   /**
    * Interpret the command line arguments to determine which command to execute.
