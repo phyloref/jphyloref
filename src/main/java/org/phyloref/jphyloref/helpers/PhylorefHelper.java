@@ -186,23 +186,23 @@ public class PhylorefHelper {
   }
 
   /**
-   * Get the set of resolved nodes for a particular phyloreference. If `reasoner` is set to null,
-   * this will return all individuals asserted as belonging to the provided phyloref class, allowing
+   * Get the set of named individuals in a particular OWL class. If `reasoner` is set to null,
+   * this will return all individuals asserted as belonging to the provided class, allowing
    * it to be used on precomputed OWL ontologies.
    *
-   * @param phyloref The phyloreference to query.
-   * @param ontology The ontology to query.
+   * @param owlClass The OWL class to retrieve instances from.
+   * @param ontology The ontology containing the OWL class and its instances.
    * @param reasoner The reasoner to use. May be set to null if no reasoner if available.
    * @return A set of OWLNamedIndividuals asserted directly or indirectly as belonging to the
-   *     provided phyloreference.
+   *     provided class.
    */
-  public static Set<OWLNamedIndividual> getResolvedNodes(
-      OWLClass phyloref, OWLOntology ontology, OWLReasoner reasoner) {
+  public static Set<OWLNamedIndividual> getNodesInClass(
+      OWLClass owlClass, OWLOntology ontology, OWLReasoner reasoner) {
     if (reasoner != null) {
       // Return nodes that the reasoner has determined are instances of the provided phyloref.
       return reasoner
           .getInstances(
-              phyloref,
+              owlClass,
               false // include both direct and indirectly asserted members of this phyloref class
               )
           .getFlattened();
@@ -217,7 +217,7 @@ public class PhylorefHelper {
     for (OWLClassAssertionAxiom classAssertion : classAssertions) {
       // Does this assertion involve this phyloreference as a class and a named individual?
       if (classAssertion.getIndividual().isNamed()
-          && classAssertion.getClassesInSignature().contains(phyloref)) {
+          && classAssertion.getClassesInSignature().contains(owlClass)) {
         // If so, then the individual is a node that is included in this phyloreference.
         nodes.add(classAssertion.getIndividual().asOWLNamedIndividual());
       }

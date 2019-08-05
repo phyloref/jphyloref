@@ -181,7 +181,7 @@ public class WebserverCommand implements Command {
         // Identify all individuals contained in this phyloref class, but filter out
         // everything that is not an IRI_CDAO_NODE.
         Set<String> nodes =
-            PhylorefHelper.getResolvedNodes(phyloref, ontology, reasoner)
+            PhylorefHelper.getNodesInClass(phyloref, ontology, reasoner)
                 .stream()
                 .map(indiv -> indiv.getIRI().toString())
                 // Strip the default prefix on the node URI if present.

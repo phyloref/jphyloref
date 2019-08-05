@@ -234,7 +234,7 @@ public class TestCommand implements Command {
       result.setDescription("Phyloreference '" + phylorefLabel + "'");
 
       // Which nodes did this phyloreference resolved to?
-      Set<OWLNamedIndividual> nodes = PhylorefHelper.getResolvedNodes(phyloref, ontology, reasoner);
+      Set<OWLNamedIndividual> nodes = PhylorefHelper.getNodesInClass(phyloref, ontology, reasoner);
       // System.err.println("Phyloreference <" + phyloref + "> has nodes: " + nodes);
 
       if (nodes.isEmpty()) {
