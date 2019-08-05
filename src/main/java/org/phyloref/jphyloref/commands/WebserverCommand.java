@@ -22,7 +22,6 @@ import org.phyloref.jphyloref.helpers.JSONLDHelper;
 import org.phyloref.jphyloref.helpers.PhylorefHelper;
 import org.phyloref.jphyloref.helpers.ReasonerHelper;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.ClassExpressionType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -30,7 +29,6 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.search.EntitySearcher;
 import org.semanticweb.owlapi.util.AutoIRIMapper;
 import org.semanticweb.owlapi.util.VersionInfo;
 
@@ -183,24 +181,8 @@ public class WebserverCommand implements Command {
         // Identify all individuals contained in this phyloref class, but filter out
         // everything that is not an IRI_CDAO_NODE.
         Set<String> nodes =
-            reasoner
-                .getInstances(phyloref, false)
-                .getFlattened()
+            PhylorefHelper.getResolvedNodes(phyloref, ontology, reasoner)
                 .stream()
-                // This includes the phyloreference itself. We only want to
-                // look at phylogeny nodes here. So, let's filter down to named
-                // individuals that are asserted to be cdao:Nodes.
-                .filter(
-                    indiv ->
-                        EntitySearcher.getTypes(indiv, ontology)
-                            .stream()
-                            .anyMatch(
-                                type ->
-                                    (!type.getClassExpressionType()
-                                            .equals(ClassExpressionType.OWL_CLASS))
-                                        || type.asOWLClass()
-                                            .getIRI()
-                                            .equals(PhylorefHelper.IRI_CDAO_NODE)))
                 .map(indiv -> indiv.getIRI().toString())
                 // Strip the default prefix on the node URI if present.
                 .map(iri -> iri.replaceFirst("^" + DEFAULT_URI_PREFIX, ""))

@@ -16,8 +16,10 @@ import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -181,6 +183,47 @@ public class PhylorefHelper {
             .collect(Collectors.toSet());
 
     return classes;
+  }
+
+  /**
+   * Get the set of resolved nodes for a particular phyloreference. If `reasoner` is set to null,
+   * this will return all individuals asserted as belonging to the provided phyloref class, allowing
+   * it to be used on precomputed OWL ontologies.
+   *
+   * @param phyloref The phyloreference to query.
+   * @param ontology The ontology to query.
+   * @param reasoner The reasoner to use. May be set to null if no reasoner if available.
+   * @return A set of OWLNamedIndividuals asserted directly or indirectly as belonging to the
+   *     provided phyloreference.
+   */
+  public static Set<OWLNamedIndividual> getResolvedNodes(
+      OWLClass phyloref, OWLOntology ontology, OWLReasoner reasoner) {
+    if (reasoner != null) {
+      // Return nodes that the reasoner has determined are instances of the provided phyloref.
+      return reasoner
+          .getInstances(
+              phyloref,
+              false // include both direct and indirectly asserted members of this phyloref class
+              )
+          .getFlattened();
+    }
+
+    // No reasoner? We can also determine which nodes have been directly stated to
+    // be members of this phyloref as a class. This allows us to read a pre-reasoned
+    // OWL file and test whether phyloreferences resolved as expected.
+    Set<OWLNamedIndividual> nodes = new HashSet<>();
+    Set<OWLClassAssertionAxiom> classAssertions = ontology.getAxioms(AxiomType.CLASS_ASSERTION);
+
+    for (OWLClassAssertionAxiom classAssertion : classAssertions) {
+      // Does this assertion involve this phyloreference as a class and a named individual?
+      if (classAssertion.getIndividual().isNamed()
+          && classAssertion.getClassesInSignature().contains(phyloref)) {
+        // If so, then the individual is a node that is included in this phyloreference.
+        nodes.add(classAssertion.getIndividual().asOWLNamedIndividual());
+      }
+    }
+
+    return nodes;
   }
 
   /** A wrapper for a phyloref status at a particular point in time. */
