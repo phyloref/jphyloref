@@ -18,6 +18,7 @@ import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -99,6 +100,98 @@ class PhylorefHelperTest {
       assertEquals(1, phylorefs.size());
       assertTrue(
           phylorefs.contains(phyloref), "Phyloref 'phyloref1' has been retrieved with reasoning");
+    }
+  }
+
+  @Nested
+  @DisplayName("has methods for retrieving nodes in phylorefs that can")
+  class ResolvedNodesRetrievalTest {
+    OWLOntologyManager ontologyManager;
+    OWLOntology testOntology;
+
+    /** Set up the test ontology with annotations involving labels */
+    @BeforeEach
+    void setupOntology() throws OWLOntologyCreationException {
+      // Set up a set of axioms we will use to run these tests.
+      ontologyManager = OWLManager.createOWLOntologyManager();
+      OWLDataFactory df = ontologyManager.getOWLDataFactory();
+
+      // Set up a phyloreference we can use for testing.
+      List<OWLAxiom> axioms = new ArrayList<>();
+      IRI phyloref1IRI = IRI.create("http://example.org/phyloref1");
+      OWLClass phyloref1 = df.getOWLClass(phyloref1IRI);
+
+      // Set it as a subclass of phyloref:Phyloreference.
+      axioms.add(
+          df.getOWLSubClassOfAxiom(
+              phyloref1,
+              df.getOWLClass(
+                  IRI.create("http://ontology.phyloref.org/phyloref.owl#Phyloreference"))));
+
+      // Create a second phyloreference that is a subclass of the first.
+      IRI phyloref2IRI = IRI.create("http://example.org/phyloref2");
+      OWLClass phyloref2 = df.getOWLClass(phyloref2IRI);
+      axioms.add(df.getOWLSubClassOfAxiom(phyloref2, phyloref1));
+
+      // Create two nodes, one an instance of phyloref1, and the other an instance of phyloref2.
+      IRI node1IRI = IRI.create("http://example.org/node1");
+      OWLNamedIndividual node1 = df.getOWLNamedIndividual(node1IRI);
+      axioms.add(df.getOWLClassAssertionAxiom(phyloref1, node1));
+
+      IRI node2IRI = IRI.create("http://example.org/node2");
+      OWLNamedIndividual node2 = df.getOWLNamedIndividual(node2IRI);
+      axioms.add(df.getOWLClassAssertionAxiom(phyloref2, node2));
+
+      // Set up the test ontology.
+      testOntology = ontologyManager.createOntology(new HashSet<>(axioms));
+    }
+
+    @Test
+    @DisplayName("can retrieve nodes without reasoning")
+    void canRetrieveNodesWithoutReasoning() {
+      OWLDataFactory df = ontologyManager.getOWLDataFactory();
+      OWLClass phyloref1 = df.getOWLClass(IRI.create("http://example.org/phyloref1"));
+
+      Set<OWLClass> phylorefs = PhylorefHelper.getPhyloreferencesWithoutReasoning(testOntology);
+      assertEquals(1, phylorefs.size());
+      assertTrue(
+          phylorefs.contains(phyloref1),
+          "Phyloref 'phyloref1' has been retrieved without reasoning");
+
+      OWLNamedIndividual node1 = df.getOWLNamedIndividual(IRI.create("http://example.org/node1"));
+      Set<OWLNamedIndividual> nodes = PhylorefHelper.getNodesInClass(phyloref1, testOntology, null);
+      assertEquals(1, nodes.size());
+      assertTrue(
+          nodes.contains(node1),
+          "Phyloref 'phyloref1' contains 'node1' as expected without reasoning");
+    }
+
+    @Test
+    @DisplayName("can retrieve nodes with reasoning")
+    void canRetrieveNodesWithReasoning() {
+      OWLDataFactory df = ontologyManager.getOWLDataFactory();
+      OWLReasoner reasoner = new JFactFactory().createNonBufferingReasoner(testOntology);
+      OWLClass phyloref1 = df.getOWLClass(IRI.create("http://example.org/phyloref1"));
+      OWLClass phyloref2 = df.getOWLClass(IRI.create("http://example.org/phyloref2"));
+
+      Set<OWLClass> phylorefs = PhylorefHelper.getPhyloreferences(testOntology, reasoner);
+      assertEquals(2, phylorefs.size());
+      assertTrue(
+          phylorefs.contains(phyloref1), "Phyloref 'phyloref1' has been retrieved with reasoning");
+      assertTrue(
+          phylorefs.contains(phyloref2), "Phyloref 'phyloref2' has been retrieved with reasoning");
+
+      OWLNamedIndividual node1 = df.getOWLNamedIndividual(IRI.create("http://example.org/node1"));
+      OWLNamedIndividual node2 = df.getOWLNamedIndividual(IRI.create("http://example.org/node2"));
+      Set<OWLNamedIndividual> nodes =
+          PhylorefHelper.getNodesInClass(phyloref1, testOntology, reasoner);
+      assertEquals(2, nodes.size());
+      assertTrue(
+          nodes.contains(node1),
+          "Phyloref 'phyloref1' contains 'node1' as expected with reasoning");
+      assertTrue(
+          nodes.contains(node2),
+          "Phyloref 'phyloref1' contains 'node2' as expected with reasoning");
     }
   }
 

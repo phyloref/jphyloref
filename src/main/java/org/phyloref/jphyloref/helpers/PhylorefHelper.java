@@ -186,9 +186,9 @@ public class PhylorefHelper {
   }
 
   /**
-   * Get the set of named individuals in a particular OWL class. If `reasoner` is set to null,
-   * this will return all individuals asserted as belonging to the provided class, allowing
-   * it to be used on precomputed OWL ontologies.
+   * Get the set of named individuals in a particular OWL class. If `reasoner` is set to null, this
+   * will return all individuals asserted as belonging to the provided class, allowing it to be used
+   * on precomputed OWL ontologies.
    *
    * @param owlClass The OWL class to retrieve instances from.
    * @param ontology The ontology containing the OWL class and its instances.
