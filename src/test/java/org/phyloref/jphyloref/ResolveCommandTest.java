@@ -23,6 +23,9 @@ class ResolveCommandTest {
   static ByteArrayOutputStream output = new ByteArrayOutputStream();
   static ByteArrayOutputStream error = new ByteArrayOutputStream();
 
+  private static final String EXPECTED_DUMMY1_RESOLUTION =
+      "{\"http://phyloref.org/clade-ontology/clado.owl#CLADO_00000001\":[\"http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node2\"]}\n";
+
   /** Set up input and output streams */
   @BeforeAll
   static void setupIO() {
@@ -56,7 +59,7 @@ class ResolveCommandTest {
       }
 
       assertEquals(0, exitCode);
-      assertEquals(outputStr, "{\"http://phyloref.org/clade-ontology/clado.owl#CLADO_00000001\":[\"http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node2\"]}\n");
+      assertEquals(outputStr, EXPECTED_DUMMY1_RESOLUTION);
     }
   }
 
@@ -79,7 +82,7 @@ class ResolveCommandTest {
       }
 
       assertEquals(0, exitCode);
-      assertEquals(outputStr, "{\"http://phyloref.org/clade-ontology/clado.owl#CLADO_00000001\":[\"http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node2\"]}\n");
+      assertEquals(outputStr, EXPECTED_DUMMY1_RESOLUTION);
       resetIO();
 
       // Run 'resolve dummy1.txt' with the '--jsonld' option and see if we get the correct response.
@@ -95,7 +98,7 @@ class ResolveCommandTest {
       }
 
       assertEquals(0, exitCode);
-      assertEquals(outputStr, "{\"http://phyloref.org/clade-ontology/clado.owl#CLADO_00000001\":[\"http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node2\"]}\n");
+      assertEquals(outputStr, EXPECTED_DUMMY1_RESOLUTION);
       resetIO();
     }
 
@@ -128,7 +131,7 @@ class ResolveCommandTest {
 
         // Test whether the exit code, STDERR and STDOUT is as expected.
         assertEquals(0, exitCode);
-        assertEquals(outputStr, "{\"http://phyloref.org/clade-ontology/clado.owl#CLADO_00000001\":[\"http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node2\"]}\n");
+        assertEquals(outputStr, EXPECTED_DUMMY1_RESOLUTION);
       } catch (UnsupportedEncodingException ex) {
         // Could be thrown when converting STDOUT/STDERR to String as UTF-8.
         throw new RuntimeException("'UTF-8' is not supported as an encoding: " + ex);
