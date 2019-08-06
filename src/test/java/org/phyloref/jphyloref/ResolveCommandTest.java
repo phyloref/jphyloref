@@ -82,7 +82,7 @@ class ResolveCommandTest {
       }
 
       assertEquals(0, exitCode);
-      assertEquals(outputStr, EXPECTED_DUMMY1_RESOLUTION);
+      assertEquals(EXPECTED_DUMMY1_RESOLUTION, outputStr);
       resetIO();
 
       // Run 'resolve dummy1.txt' with the '--jsonld' option and see if we get the correct response.
@@ -98,7 +98,7 @@ class ResolveCommandTest {
       }
 
       assertEquals(0, exitCode);
-      assertEquals(outputStr, EXPECTED_DUMMY1_RESOLUTION);
+      assertEquals(EXPECTED_DUMMY1_RESOLUTION, outputStr);
       resetIO();
     }
 
@@ -131,7 +131,7 @@ class ResolveCommandTest {
 
         // Test whether the exit code, STDERR and STDOUT is as expected.
         assertEquals(0, exitCode);
-        assertEquals(outputStr, EXPECTED_DUMMY1_RESOLUTION);
+        assertEquals(EXPECTED_DUMMY1_RESOLUTION, outputStr);
       } catch (UnsupportedEncodingException ex) {
         // Could be thrown when converting STDOUT/STDERR to String as UTF-8.
         throw new RuntimeException("'UTF-8' is not supported as an encoding: " + ex);
