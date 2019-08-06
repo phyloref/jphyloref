@@ -104,7 +104,7 @@ class PhylorefHelperTest {
   }
 
   @Nested
-  @DisplayName("has methods for retrieving nodes in phylorefs that can")
+  @DisplayName("has methods for retrieving nodes in phylorefs that")
   class ResolvedNodesRetrievalTest {
     OWLOntologyManager ontologyManager;
     OWLOntology testOntology;
@@ -129,6 +129,9 @@ class PhylorefHelperTest {
                   IRI.create("http://ontology.phyloref.org/phyloref.owl#Phyloreference"))));
 
       // Create a second phyloreference that is a subclass of the first.
+      // Note that we won't actually retrieve phyloref2: the idea is to check
+      // whether the reasoner can correctly reason over phyloreferences that are
+      // subclasses of one another.
       IRI phyloref2IRI = IRI.create("http://example.org/phyloref2");
       OWLClass phyloref2 = df.getOWLClass(phyloref2IRI);
       axioms.add(df.getOWLSubClassOfAxiom(phyloref2, phyloref1));
@@ -151,14 +154,19 @@ class PhylorefHelperTest {
     void canRetrieveNodesWithoutReasoning() {
       OWLDataFactory df = ontologyManager.getOWLDataFactory();
       OWLClass phyloref1 = df.getOWLClass(IRI.create("http://example.org/phyloref1"));
+      OWLNamedIndividual node1 = df.getOWLNamedIndividual(IRI.create("http://example.org/node1"));
 
+      // Since phyloref1 is a subclass of phyloref:Phyloreference while phyloref2
+      // is a subclass of phyloref1, we would expect phyloref1 to be the only
+      // phyloreference identified without reasoning.
       Set<OWLClass> phylorefs = PhylorefHelper.getPhyloreferencesWithoutReasoning(testOntology);
       assertEquals(1, phylorefs.size());
       assertTrue(
           phylorefs.contains(phyloref1),
           "Phyloref 'phyloref1' has been retrieved without reasoning");
 
-      OWLNamedIndividual node1 = df.getOWLNamedIndividual(IRI.create("http://example.org/node1"));
+      // Since node1 is an instance of phyloref1 while node2 is an instance of phyloref2,
+      // we would expect getNodesInClass() to only return node1 without reasoning.
       Set<OWLNamedIndividual> nodes = PhylorefHelper.getNodesInClass(phyloref1, testOntology, null);
       assertEquals(1, nodes.size());
       assertTrue(
@@ -173,7 +181,12 @@ class PhylorefHelperTest {
       OWLReasoner reasoner = new JFactFactory().createNonBufferingReasoner(testOntology);
       OWLClass phyloref1 = df.getOWLClass(IRI.create("http://example.org/phyloref1"));
       OWLClass phyloref2 = df.getOWLClass(IRI.create("http://example.org/phyloref2"));
+      OWLNamedIndividual node1 = df.getOWLNamedIndividual(IRI.create("http://example.org/node1"));
+      OWLNamedIndividual node2 = df.getOWLNamedIndividual(IRI.create("http://example.org/node2"));
 
+      // Since phyloref1 is a subclass of phyloref:Phyloreference while phyloref2
+      // is a subclass of phyloref1, we would expect both phyloref1 and phyloref2
+      // to be identified as phyloreferences with reasoning.
       Set<OWLClass> phylorefs = PhylorefHelper.getPhyloreferences(testOntology, reasoner);
       assertEquals(2, phylorefs.size());
       assertTrue(
@@ -181,8 +194,8 @@ class PhylorefHelperTest {
       assertTrue(
           phylorefs.contains(phyloref2), "Phyloref 'phyloref2' has been retrieved with reasoning");
 
-      OWLNamedIndividual node1 = df.getOWLNamedIndividual(IRI.create("http://example.org/node1"));
-      OWLNamedIndividual node2 = df.getOWLNamedIndividual(IRI.create("http://example.org/node2"));
+      // Since node1 is an instance of phyloref1 while node2 is an instance of phyloref2,
+      // we would expect getNodesInClass() to return both node1 and node2 with reasoning.
       Set<OWLNamedIndividual> nodes =
           PhylorefHelper.getNodesInClass(phyloref1, testOntology, reasoner);
       assertEquals(2, nodes.size());
