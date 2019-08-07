@@ -3,6 +3,8 @@
 Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
 ## [Unreleased]
+- Added a "resolve" command that resolves phylorefs in input ontologies (in OWL
+  or JSON-LD) and returns the result as a JSON string (#52).
 - Centralized code for determining nodes in phylorefs (#53, #54).
 - Added support for the Elk reasoner (as "elk") and made it the default reasoner.
 - Phyloreferences were previously identified in input ontologies by looking for
