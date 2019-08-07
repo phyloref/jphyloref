@@ -3,6 +3,7 @@
 Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
 ## [Unreleased]
+- Centralized code for determining nodes in phylorefs (#53, #54).
 - Added support for the Elk reasoner (as "elk") and made it the default reasoner.
 - Phyloreferences were previously identified in input ontologies by looking for
   individuals defined as instances of the class phyloref:Phyloreference. They

@@ -19,11 +19,9 @@ import org.phyloref.jphyloref.helpers.OWLHelper;
 import org.phyloref.jphyloref.helpers.PhylorefHelper;
 import org.phyloref.jphyloref.helpers.ReasonerHelper;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
@@ -236,26 +234,7 @@ public class TestCommand implements Command {
       result.setDescription("Phyloreference '" + phylorefLabel + "'");
 
       // Which nodes did this phyloreference resolved to?
-      Set<OWLNamedIndividual> nodes;
-      if (reasoner != null) {
-        // Use the reasoner to determine which nodes are members of this phyloref as a class
-        nodes = reasoner.getInstances(phyloref, false).getFlattened();
-      } else {
-        // No reasoner? We can also determine which nodes have been directly stated to
-        // be members of this phyloref as a class. This allows us to read a pre-reasoned
-        // OWL file and test whether phyloreferences resolved as expected.
-        nodes = new HashSet<>();
-        Set<OWLClassAssertionAxiom> classAssertions = ontology.getAxioms(AxiomType.CLASS_ASSERTION);
-
-        for (OWLClassAssertionAxiom classAssertion : classAssertions) {
-          // Does this assertion involve this phyloreference as a class and a named individual?
-          if (classAssertion.getIndividual().isNamed()
-              && classAssertion.getClassesInSignature().contains(phyloref)) {
-            // If so, then the individual is a node that is included in this phyloreference.
-            nodes.add(classAssertion.getIndividual().asOWLNamedIndividual());
-          }
-        }
-      }
+      Set<OWLNamedIndividual> nodes = PhylorefHelper.getNodesInClass(phyloref, ontology, reasoner);
       // System.err.println("Phyloreference <" + phyloref + "> has nodes: " + nodes);
 
       if (nodes.isEmpty()) {
