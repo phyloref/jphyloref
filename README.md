@@ -31,11 +31,11 @@ Many command line options can be used for all included commands:
   should listen on (webserver only).
 - `--reasoner [name]` can be used to set the reasoner to use. The following reasoners
   are supported:
-  - [Elk 0.4.3](https://github.com/liveontologies/elk-reasoner) ("elk") is an OWL 2 EL
+  - [Elk 0.4.3](https://github.com/liveontologies/elk-reasoner) (`elk`) is an OWL 2 EL
     reasoner. Phyloreferences should currently be resolved using this reasoner.
-  - [FaCT++ 1.5.2](https://code.google.com/archive/p/factplusplus/) ("fact++") is
+  - [FaCT++ 1.5.2](https://code.google.com/archive/p/factplusplus/) (`fact++`) is
     an OWL 2 DL reasoner. It requires version 1.5.2 of the Java Native Library for
     your operating system, which needs to be
     [downloaded from Google Code](https://code.google.com/archive/p/factplusplus/downloads?page=2).
-  - [JFact 4.0.4](http://jfact.sourceforge.net/) ("jfact") is an OWL 2 DL reasoner.
+  - [JFact 4.0.4](http://jfact.sourceforge.net/) (`jfact`) is an OWL 2 DL reasoner.
     Since it is written in pure Java, it is the slowest reasoner currently supported.
