@@ -25,6 +25,8 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.util.AutoIRIMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Resolve an ontology of phyloreferences provided on the command line, and report on the resolution
@@ -38,6 +40,9 @@ import org.semanticweb.owlapi.util.AutoIRIMapper;
  * @author Gaurav Vaidya <gaurav@ggvaidya.com>
  */
 public class ResolveCommand implements Command {
+  /** Set up a logger to use for providing logging. */
+  private static final Logger logger = LoggerFactory.getLogger(ResolveCommand.class);
+
   /**
    * This command is named "resolve". It should be invoked as "java -jar jphyloref.jar resolve ..."
    */
@@ -115,13 +120,13 @@ public class ResolveCommand implements Command {
       try {
         inputStreamToReadFrom = new FileInputStream(inputFilename);
       } catch (FileNotFoundException ex) {
-        System.err.println("Could not open input file '" + inputFilename + "': " + ex);
+        logger.error("Could not open input file '{}': {}", inputFilename, ex);
         return 1;
       }
     }
 
     // Report the name of the file being tested.
-    System.err.println("Input: " + inputFilename);
+    logger.info("Input: {}", inputFilename);
 
     // Set up an OWL Ontology Manager to work with.
     OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -129,7 +134,7 @@ public class ResolveCommand implements Command {
     // Is purl.obolibrary.org down? No worries, you can access local copies
     // of your ontologies in the 'ontologies/' folder.
     AutoIRIMapper mapper = new AutoIRIMapper(new File("ontologies"), true);
-    System.err.println("Found local ontologies: " + mapper.getOntologyIRIs());
+    logger.info("Found local ontologies: {}", mapper.getOntologyIRIs());
     manager.addIRIMapper(mapper);
 
     // Is this a JSON or JSON-LD file?
