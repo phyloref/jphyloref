@@ -1,0 +1,35 @@
+[
+	{
+		"id": "reason",
+		"execute-command": "./exec_jphyloref_webhook.sh",
+		"command-working-directory": ".",
+		"pass-file-to-command": [
+			{
+				"source": "payload",
+				"name": "jsonld",
+				"envname": "JSONLD_FILENAME"
+			}
+		],
+		"include-command-output-in-response": true,
+		"response-headers": [
+			{
+				"name": "Content-type",
+				"value": "application/json"
+			},
+			{
+				"name": "Access-Control-Allow-Origin",
+				"value": "*"
+			}
+		],
+		"trigger-rule": {
+			"match": {
+				"type": "payload-hash-sha1",
+				"secret": "$SECRET",
+				"parameter": {
+					"source": "header",
+					"name": "X-Hub-Signature"
+				}
+			}
+		}
+	}
+]
