@@ -205,7 +205,7 @@ public class ResolveCommand implements Command {
                 .object()
                 .key("error")
                 .value("Could not create ontology (OWLOntologyCreationException)")
-                .key("stackTrace")
+                .key("message")
                 .value(ex.toString())
                 .endObject()
                 .toString());
@@ -221,7 +221,7 @@ public class ResolveCommand implements Command {
                 .object()
                 .key("error")
                 .value("Could not read and load ontology (IOException)")
-                .key("stackTrace")
+                .key("message")
                 .value(ex.toString())
                 .endObject()
                 .toString());
@@ -238,7 +238,7 @@ public class ResolveCommand implements Command {
                 .key("error")
                 .value(
                     "Arguments were invalid (IllegalArgumentException), likely because no phylorefs were present")
-                .key("stackTrace")
+                .key("message")
                 .value(ex.toString())
                 .endObject()
                 .toString());
@@ -258,7 +258,7 @@ public class ResolveCommand implements Command {
                 .object()
                 .key("error")
                 .value("Unexpected exception (" + ex.getClass().toString() + ")")
-                .key("stackTrace")
+                .key("message")
                 .value(ex.toString())
                 .endObject()
                 .toString());
