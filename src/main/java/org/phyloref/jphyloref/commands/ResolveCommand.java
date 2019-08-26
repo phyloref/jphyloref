@@ -209,10 +209,11 @@ public class ResolveCommand implements Command {
                 .value(ex.toString())
                 .endObject()
                 .toString());
+        return 0;
       } else {
         System.err.println("Could not create ontology '" + inputFilename + "': " + ex);
+        return 1;
       }
-      return 1;
     } catch (IOException ex) {
       if (flagErrorsAsJSON) {
         System.out.println(
@@ -224,10 +225,11 @@ public class ResolveCommand implements Command {
                 .value(ex.toString())
                 .endObject()
                 .toString());
+        return 0;
       } else {
         System.err.println("Could not create ontology '" + inputFilename + "': " + ex);
+        return 1;
       }
-      return 1;
     }
   }
 }
