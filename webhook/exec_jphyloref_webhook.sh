@@ -23,6 +23,4 @@ HTTPS_PROXY_HOST=$HTTP_PROXY_HOST
 HTTPS_PROXY_PORT=$HTTP_PROXY_PORT
 
 # Do it!
-echo "{\"phylorefs\":"
-srun $SHARE --ntasks=$NTASKS --cpus-per-task=$CPUS_PER_TASK --mem=$MEMORY -t $TIMEOUT java -Dhttp.proxyHost=$HTTP_PROXY_HOST -Dhttp.proxyPort=$HTTP_PROXY_PORT -Dhttps.proxyHost=$HTTPS_PROXY_HOST -Dhttps.proxyPort=$HTTP_PROXY_PORT -Xmx$MEMORY -jar $JARFILE resolve $JSONLD_FILENAME -j 2> /dev/null
-echo "}"
+srun $SHARE --ntasks=$NTASKS --cpus-per-task=$CPUS_PER_TASK --mem=$MEMORY -t $TIMEOUT java -Dhttp.proxyHost=$HTTP_PROXY_HOST -Dhttp.proxyPort=$HTTP_PROXY_PORT -Dhttps.proxyHost=$HTTPS_PROXY_HOST -Dhttps.proxyPort=$HTTP_PROXY_PORT -Xmx$MEMORY -jar $JARFILE resolve $JSONLD_FILENAME -j --errors-as-json 2> /dev/null

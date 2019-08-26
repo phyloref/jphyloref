@@ -1,11 +1,17 @@
 # Webhook configuration and scripts
 
 This folder documents the server settings needed to host JPhyloRef as a
-web server on a cluster that uses [SLURM](https://slurm.schedmd.com/) as its job manager. We use the
-[webhook](https://github.com/adnanh/webhook/) tool to set up a web server
-that accepts jobs for execution. To set this up requires the
-[`webhook` binary](https://github.com/adnanh/webhook/releases) to be
+web server using [Webhook](https://github.com/adnanh/webhook). This requires
+the [`webhook` binary](https://github.com/adnanh/webhook/releases) to be
 downloaded to the same folder as these scripts.
+
+Webhook will set up a web server that listens for HTTP requests on the specified
+port and will execute a program for each request that arrives. If you would like
+your web server to run on that webserver, you can have webhook run JPhyloRef
+directly with the "--errors-as-json" flag. If you need your web server to run
+JPhyloRef on a cluster that uses [SLURM](https://slurm.schedmd.com/) as its
+job manager, you can use the included `exec_jphyloref_webhook.sh` script to
+start the job instead.
 
 The files in this folder are:
 * [start.sh](./start.sh) should be executed to start the server. It sets up the
