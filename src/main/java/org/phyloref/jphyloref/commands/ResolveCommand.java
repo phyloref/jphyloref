@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.eclipse.rdf4j.rio.RDFParser;
-import org.json.JSONObject;
+import org.json.JSONStringer;
 import org.phyloref.jphyloref.helpers.JSONLDHelper;
 import org.phyloref.jphyloref.helpers.PhylorefHelper;
 import org.phyloref.jphyloref.helpers.ReasonerHelper;
@@ -74,6 +74,12 @@ public class ResolveCommand implements Command {
         "jsonld",
         false,
         "Treat the input file as a JSON-LD file. Files with a '.json' or '.jsonld' extension will automatically be treated as a JSON-LD file.");
+
+    opts.addOption(
+        "e",
+        "errors-as-json",
+        false,
+        "By default, errors during reasoning are reported to STDERR. Setting this flag collects all errors and includes them as part of the JSON output. This makes it easier to run JPhyloRef as a backend to a web server.");
   }
 
   /** Use a default base URI when reading JSON-LD file. */
@@ -86,6 +92,9 @@ public class ResolveCommand implements Command {
    */
   @Override
   public int execute(CommandLine cmdLine) throws RuntimeException {
+    // Check where errors should be sent.
+    boolean flagErrorsAsJSON = cmdLine.hasOption("errors-as-json");
+
     // Extract command-line options
     String inputFilename = cmdLine.getOptionValue("input");
 
@@ -142,52 +151,123 @@ public class ResolveCommand implements Command {
         // input stream (either STDIN or a file).
         ontology = manager.loadOntologyFromOntologyDocument(inputStreamToReadFrom);
       }
+
+      // Ontology loaded.
+      System.err.println("Loaded ontology: " + ontology);
+
+      // We have an ontology! Let's reason over it, and store the results as
+      // a map of a list of node IRIs matched by each phyloref IRI.
+      Map<String, Set<String>> nodesPerPhylorefAsString = new HashMap<>();
+
+      // Set up and start the reasoner.
+      OWLReasonerFactory factory = ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine);
+      OWLReasoner reasoner = factory.createReasoner(ontology);
+
+      // Go through all the phyloreferences, identifying all the nodes that have
+      // matched to that phyloreference.
+      for (OWLClass phyloref : PhylorefHelper.getPhyloreferences(ontology, reasoner)) {
+        IRI phylorefIRI = phyloref.getIRI();
+
+        // Identify all individuals contained in this phyloref class, but filter out
+        // everything that is not an IRI_CDAO_NODE.
+        Set<String> nodes =
+            PhylorefHelper.getNodesInClass(phyloref, ontology, reasoner)
+                .stream()
+                .map(indiv -> indiv.getIRI().toString())
+                // Strip the default prefix on the node URI if present.
+                .map(iri -> iri.replaceFirst("^" + DEFAULT_URI_PREFIX, ""))
+                .collect(Collectors.toSet());
+
+        // Strip the default prefix on the phyloref URI if present.
+        String nodeURI = phylorefIRI.toString();
+        nodeURI = nodeURI.replaceFirst("^" + DEFAULT_URI_PREFIX, "");
+
+        nodesPerPhylorefAsString.put(nodeURI, nodes);
+      }
+
+      // Dispose of the reasoner.
+      reasoner.dispose();
+
+      // Write the JSON response to STDOUT.
+      System.out.println(
+          new JSONStringer()
+              .object()
+              .key("phylorefs")
+              .value(nodesPerPhylorefAsString)
+              .endObject()
+              .toString());
+      return 0;
+
     } catch (OWLOntologyCreationException ex) {
-      System.err.println("Could not create ontology '" + inputFilename + "': " + ex);
-      return 1;
+      if (flagErrorsAsJSON) {
+        System.out.println(
+            new JSONStringer()
+                .object()
+                .key("error")
+                .value("Could not create ontology (OWLOntologyCreationException)")
+                .key("message")
+                .value(ex.toString())
+                .endObject()
+                .toString());
+        return 0;
+      } else {
+        System.err.println("Could not create ontology '" + inputFilename + "': " + ex);
+        return 1;
+      }
     } catch (IOException ex) {
-      System.err.println("Could not read and load ontology '" + inputFilename + "': " + ex);
-      return 1;
+      if (flagErrorsAsJSON) {
+        System.out.println(
+            new JSONStringer()
+                .object()
+                .key("error")
+                .value("Could not read and load ontology (IOException)")
+                .key("message")
+                .value(ex.toString())
+                .endObject()
+                .toString());
+        return 0;
+      } else {
+        System.err.println("Could not create ontology '" + inputFilename + "': " + ex);
+        return 1;
+      }
+    } catch (IllegalArgumentException ex) {
+      if (flagErrorsAsJSON) {
+        System.out.println(
+            new JSONStringer()
+                .object()
+                .key("error")
+                .value(
+                    "Arguments were invalid (IllegalArgumentException), likely because no phylorefs were present")
+                .key("message")
+                .value(ex.toString())
+                .endObject()
+                .toString());
+        return 0;
+      } else {
+        System.err.println(
+            "Arguments were invalid, likely because no phylorefs were present in '"
+                + inputFilename
+                + "': "
+                + ex);
+        return 1;
+      }
+    } catch (Exception ex) {
+      if (flagErrorsAsJSON) {
+        System.out.println(
+            new JSONStringer()
+                .object()
+                .key("error")
+                .value("Unexpected exception (" + ex.getClass().toString() + ")")
+                .key("message")
+                .value(ex.toString())
+                .endObject()
+                .toString());
+        return 0;
+      } else {
+        System.err.println(
+            "Unexcepted exception while reasoning over '" + inputFilename + "': " + ex);
+        return 1;
+      }
     }
-
-    // Ontology loaded.
-    System.err.println("Loaded ontology: " + ontology);
-
-    // We have an ontology! Let's reason over it, and store the results as
-    // a map of a list of node IRIs matched by each phyloref IRI.
-    Map<String, Set<String>> nodesPerPhylorefAsString = new HashMap<>();
-
-    // Set up and start the reasoner.
-    OWLReasonerFactory factory = ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine);
-    OWLReasoner reasoner = factory.createReasoner(ontology);
-
-    // Go through all the phyloreferences, identifying all the nodes that have
-    // matched to that phyloreference.
-    for (OWLClass phyloref : PhylorefHelper.getPhyloreferences(ontology, reasoner)) {
-      IRI phylorefIRI = phyloref.getIRI();
-
-      // Identify all individuals contained in this phyloref class, but filter out
-      // everything that is not an IRI_CDAO_NODE.
-      Set<String> nodes =
-          PhylorefHelper.getNodesInClass(phyloref, ontology, reasoner)
-              .stream()
-              .map(indiv -> indiv.getIRI().toString())
-              // Strip the default prefix on the node URI if present.
-              .map(iri -> iri.replaceFirst("^" + DEFAULT_URI_PREFIX, ""))
-              .collect(Collectors.toSet());
-
-      // Strip the default prefix on the phyloref URI if present.
-      String nodeURI = phylorefIRI.toString();
-      nodeURI = nodeURI.replaceFirst("^" + DEFAULT_URI_PREFIX, "");
-
-      nodesPerPhylorefAsString.put(nodeURI, nodes);
-    }
-
-    // Dispose of the reasoner.
-    reasoner.dispose();
-
-    // Write the JSON response to STDOUT.
-    System.out.println(new JSONObject(nodesPerPhylorefAsString).toString());
-    return 0;
   }
 }
