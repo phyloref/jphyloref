@@ -230,6 +230,44 @@ public class ResolveCommand implements Command {
         System.err.println("Could not create ontology '" + inputFilename + "': " + ex);
         return 1;
       }
+    } catch (IllegalArgumentException ex) {
+      if (flagErrorsAsJSON) {
+        System.out.println(
+            new JSONStringer()
+                .object()
+                .key("error")
+                .value(
+                    "Arguments were invalid (IllegalArgumentException), likely because no phylorefs were present")
+                .key("stackTrace")
+                .value(ex.toString())
+                .endObject()
+                .toString());
+        return 0;
+      } else {
+        System.err.println(
+            "Arguments were invalid, likely because no phylorefs were present in '"
+                + inputFilename
+                + "': "
+                + ex);
+        return 1;
+      }
+    } catch (Exception ex) {
+      if (flagErrorsAsJSON) {
+        System.out.println(
+            new JSONStringer()
+                .object()
+                .key("error")
+                .value("Unexpected exception (" + ex.getClass().toString() + ")")
+                .key("stackTrace")
+                .value(ex.toString())
+                .endObject()
+                .toString());
+        return 0;
+      } else {
+        System.err.println(
+            "Unexcepted exception while reasoning over '" + inputFilename + "': " + ex);
+        return 1;
+      }
     }
   }
 }
