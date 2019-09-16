@@ -39,3 +39,8 @@ Many command line options can be used for all included commands:
     [downloaded from Google Code](https://code.google.com/archive/p/factplusplus/downloads?page=2).
   - [JFact 4.0.4](http://jfact.sourceforge.net/) (`jfact`) is an OWL 2 DL reasoner.
     Since it is written in pure Java, it is the slowest reasoner currently supported.
+
+# Hosting a server with Webhook
+
+JPhyloRef can be [set up on a SLURM cluster using Webhook](webhook/README.md),
+allowing jobs to be executed on a separate computer from the web server.
