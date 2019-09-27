@@ -144,17 +144,21 @@ public class TestCommand implements Command {
     // Is this a JSON or JSON-LD file?
     OWLOntology ontology;
     String inputFileLowercase = inputFilename.toLowerCase();
+
+    String defaultURIPrefix = null;
     try {
       if (cmdLine.hasOption("jsonld")
           || inputFileLowercase.endsWith(".json")
           || inputFileLowercase.endsWith(".jsonld")) {
         // Use the JSONLD Helper to load the ontology.
-        String DEFAULT_URI_PREFIX = "http://example.org/jphyloref";
         ontology = manager.createOntology();
         RDFParser parser = JSONLDHelper.createRDFParserForOntology(ontology);
 
+        // Set a default URI prefix in case it is needed.
+        defaultURIPrefix = "http://example.org/jphyloref";
+
         // Read from the provided input stream (either STDIN or a file).
-        parser.parse(inputStreamToReadFrom, DEFAULT_URI_PREFIX);
+        parser.parse(inputStreamToReadFrom, defaultURIPrefix);
 
       } else {
         // Load the ontology using OWLManager, by reading from the provided
@@ -451,5 +455,28 @@ public class TestCommand implements Command {
     // Exit with error unless we have zero failures.
     if (countSuccess == 0) return -1;
     return countFailure;
+  }
+
+  /* Helper methods */
+
+  /** Given a list of IRIs, remove the defaultURIPrefix if one is set. */
+  private List<String> removeDefaultURIPrefixes(
+      Set<OWLNamedIndividual> indivs, String defaultURIPrefix) {
+    if (defaultURIPrefix == null) {
+      // Just convert the hasIRIs into strings and return.
+      return indivs.stream().map(indiv -> indiv.getIRI().toString()).collect(Collectors.toList());
+    }
+
+    // Remove the default URI prefix if one exists.
+    return indivs
+        .stream()
+        .map(
+            indiv -> {
+              String iriString = indiv.getIRI().toString();
+              if (iriString.startsWith(defaultURIPrefix))
+                return iriString.substring(defaultURIPrefix.length());
+              return iriString;
+            })
+        .collect(Collectors.toList());
   }
 }

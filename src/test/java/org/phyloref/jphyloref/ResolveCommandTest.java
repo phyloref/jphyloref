@@ -24,7 +24,7 @@ class ResolveCommandTest {
   static ByteArrayOutputStream error = new ByteArrayOutputStream();
 
   private static final String EXPECTED_DUMMY1_RESOLUTION =
-      "{\"phylorefs\":{\"http://phyloref.org/clade-ontology/clado.owl#CLADO_00000001\":[\"http://phyloref.org/clade-ontology/clado.owl#CLADO_00000002_node2\"]}}\n";
+      "{\"phylorefs\":{\"#phyloref0\":[\"#phylogeny0_node2\"]}}\n";
 
   /** Set up input and output streams */
   @BeforeAll
