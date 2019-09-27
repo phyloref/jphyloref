@@ -22,6 +22,7 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
@@ -247,83 +248,9 @@ public class TestCommand implements Command {
       Set<OWLNamedIndividual> nodes = PhylorefHelper.getNodesInClass(phyloref, ontology, reasoner);
       // System.err.println("Phyloreference <" + phyloref + "> has nodes: " + nodes);
 
-      if (nodes.isEmpty()) {
-        // Phyloref resolved to no nodes at all.
-        result.setStatus(StatusValues.NOT_OK);
-        result.addComment(new Comment("No nodes matched."));
-        testFailed = true;
-      } else {
-        // Look for nodes where either its label or its expected phyloreference label
-        // is equal to the phyloreference we are currently processing.
-        Set<String> nodeLabelsWithExpectedPhylorefs = new HashSet<>();
-        Set<String> nodeLabelsWithoutExpectedPhylorefs = new HashSet<>();
-
-        for (OWLNamedIndividual node : nodes) {
-          // Get a list of all expected phyloreference labels from the OWL file.
-          Set<String> expectedPhylorefsNamed =
-              EntitySearcher.getDataPropertyValues(
-                      node, expectedPhyloreferenceNamedProperty, ontology)
-                  .stream()
-                  .map(literal -> literal.getLiteral()) // We ignore languages for now.
-                  .collect(Collectors.toSet());
-
-          // Add the label of the node as well.
-          Set<String> nodeLabels = OWLHelper.getLabelsInEnglish(node, ontology);
-          expectedPhylorefsNamed.addAll(nodeLabels);
-
-          // Build a new node label that describes this node.
-          String nodeLabel =
-              new StringBuilder()
-                  .append("[")
-                  .append(String.join(", ", expectedPhylorefsNamed))
-                  .append("]")
-                  .toString();
-
-          // Is this blank? If so, let's use the node's IRI as its label so we can debug issues with
-          // resolution.
-          if (expectedPhylorefsNamed.isEmpty()) {
-            nodeLabel = node.getIRI().toString();
-          }
-
-          // Does this node have an expected phyloreference identical to the phyloref being tested?
-          if (expectedPhylorefsNamed.contains(phylorefLabel)) {
-            nodeLabelsWithExpectedPhylorefs.add(nodeLabel);
-          } else {
-            nodeLabelsWithoutExpectedPhylorefs.add(nodeLabel);
-          }
-        }
-
-        // What happened?
-        if (!nodeLabelsWithExpectedPhylorefs.isEmpty()
-            && !nodeLabelsWithoutExpectedPhylorefs.isEmpty()) {
-          // We found nodes that expected this phyloref, as well as nodes that did not -- success!
-          result.addComment(
-              new Comment(
-                  "The following nodes were matched and expected this phyloreference: "
-                      + String.join("; ", nodeLabelsWithExpectedPhylorefs)));
-          result.addComment(
-              new Comment(
-                  "Also, the following nodes were matched but did not expect this phyloreference: "
-                      + String.join("; ", nodeLabelsWithoutExpectedPhylorefs)));
-        } else if (!nodeLabelsWithExpectedPhylorefs.isEmpty()) {
-          // We only found nodes that expected this phyloref -- success!
-          result.addComment(
-              new Comment(
-                  "The following nodes were matched and expected this phyloreference: "
-                      + String.join("; ", nodeLabelsWithExpectedPhylorefs)));
-        } else if (!nodeLabelsWithoutExpectedPhylorefs.isEmpty()) {
-          // We only have nodes that did not expect this phyloref -- failure!
-          result.addComment(
-              new Comment(
-                  "The following nodes were matched but did not expect this phyloreference: "
-                      + String.join("; ", nodeLabelsWithoutExpectedPhylorefs)));
-          testFailed = true;
-        } else {
-          // No nodes matched. This should have been caught earlier, but just in case.
-          throw new RuntimeException(
-              "No nodes were matched, which should have been caught earlier. Programmer error!");
-        }
-      }
+      // Get a list of phyloref statuses for this phyloreference.
+      List<PhylorefHelper.PhylorefStatus> statuses =
+          PhylorefHelper.getStatusesForPhyloref(phyloref, ontology);
 
       // Look for all unmatched specifiers reported for this phyloreference
       Set<OWLAxiom> axioms = new HashSet<>(EntitySearcher.getReferencingAxioms(phyloref, ontology));
@@ -356,10 +283,6 @@ public class TestCommand implements Command {
         }
       }
 
-      // Get a list of phyloref statuses for this phyloreference.
-      List<PhylorefHelper.PhylorefStatus> statuses =
-          PhylorefHelper.getStatusesForPhyloref(phyloref, ontology);
-
       // Instead of checking which time interval we are currently in, we take a simpler approach:
       // we look for all statuses asserted to be "active", i.e. those with a start time but no end
       // time.
@@ -386,54 +309,100 @@ public class TestCommand implements Command {
                         ps.getStatus().equals(PhylorefHelper.IRI_PSO_SUBMITTED)
                             || ps.getStatus().equals(PhylorefHelper.IRI_PSO_PUBLISHED));
 
-      // Determine if this phyloreference has failed or succeeded.
-      if (testFailed) {
-        if (unmatched_specifiers.isEmpty()) {
-          if (flag_expected_to_resolve) {
-            // We expect this phyloreference to resolve. Report a failure.
-            countFailure++;
-            result.setStatus(StatusValues.NOT_OK);
-            testSet.addTapLine(result);
-          } else {
-            // No, we do not expect this phyloreference to resolve. Report a TODO.
-            countTODO++;
-            result.setStatus(StatusValues.NOT_OK);
-            result.setDirective(
-                new Directive(
-                    DirectiveValues.TODO,
-                    "Phyloreference did not resolve, but has status " + statuses));
-            testSet.addTapLine(result);
-          }
-        } else {
-          // Okay, it's a failure, but we do know that there are unmatched specifiers.
-          // So mark it as a to-do.
-          countTODO++;
-          result.setStatus(StatusValues.NOT_OK);
-          result.setDirective(
-              new Directive(
-                  DirectiveValues.TODO,
-                  "Phyloreference could not be tested, as one or more specifiers did not match."));
-          if (!activeStatuses
-              .stream()
-              .anyMatch(st -> st.getStatus().equals(PhylorefHelper.IRI_PSO_DRAFT))) {
+      if (nodes.isEmpty()) {
+        // Phyloref resolved to no nodes at all.
+        result.setStatus(StatusValues.NOT_OK);
+        result.addComment(new Comment("No nodes matched."));
+        testSet.addTapLine(result);
+        countFailure++;
+        continue;
+
+      } else {
+        result.addComment(
+            new Comment("Resolved nodes: " + removeDefaultURIPrefixes(nodes, defaultURIPrefix)));
+
+        // Given a phyloreference class, determine all the nodes that we expect to be
+        // resolved by that phyloreference class.
+        OWLClassExpression expectedNodesExpr =
+            dataFactory.getOWLObjectSomeValuesFrom(
+                dataFactory.getOWLObjectProperty(PhylorefHelper.IRI_OBI_IS_SPECIFIED_OUTPUT_OF),
+                dataFactory.getOWLObjectSomeValuesFrom(
+                    dataFactory.getOWLObjectProperty(PhylorefHelper.IRI_OBI_HAS_SPECIFIED_INPUT),
+                    phyloref));
+
+        Set<OWLNamedIndividual> expectedNodes = new HashSet<>();
+        if (reasoner == null) {
+          // If there's no reasoner, we can only look for individuals specifically
+          // marked as expected (see PhylorefHelper for an example).
+          throw new RuntimeException("Testing without reasoner not yet implemented.");
+        }
+
+        // Get direct and indirect instances of the expectedNodesExpr.
+        expectedNodes = reasoner.getInstances(expectedNodesExpr, false).getFlattened();
+        result.addComment(
+            new Comment(
+                "Expected nodes: " + removeDefaultURIPrefixes(expectedNodes, defaultURIPrefix)));
+
+        HashSet<OWLNamedIndividual> expectedButNotResolved = new HashSet<>(expectedNodes);
+        expectedButNotResolved.removeAll(nodes);
+
+        HashSet<OWLNamedIndividual> resolvedButNotExpected = new HashSet<>(nodes);
+        resolvedButNotExpected.removeAll(expectedNodes);
+
+        if (expectedButNotResolved.isEmpty() && resolvedButNotExpected.isEmpty()) {
+          result.setStatus(StatusValues.OK);
+          if (!flag_expected_to_resolve) {
             result.addComment(
                 new Comment(
                     "Since specifiers remain unmatched, this phyloreference should have a status of 'pso:draft' but instead its status is "
                         + activeStatuses));
           }
           testSet.addTapLine(result);
+          countSuccess++;
+          continue;
         }
-      } else {
-        // Oh no, success!
-        countSuccess++;
-        result.setStatus(StatusValues.OK);
+
+        // These are all failures. But are they TODOs?
+        boolean flagTODO = false;
+
+        result.setStatus(StatusValues.NOT_OK);
         if (!flag_expected_to_resolve) {
+          result.setDirective(
+              new Directive(
+                  DirectiveValues.TODO,
+                  "Phyloreference is not expected to resolve as it has a status of "
+                      + activeStatuses));
+          flagTODO = true;
+        }
+
+        if (!unmatched_specifiers.isEmpty()) {
+          result.setDirective(
+              new Directive(
+                  DirectiveValues.TODO,
+                  "Phyloreference could not be tested, as one or more specifiers did not match."));
+          flagTODO = true;
+        }
+
+        if (!resolvedButNotExpected.isEmpty()) {
           result.addComment(
               new Comment(
-                  "Phyloreference resolved correctly but was not expected to resolve; status should be changed to 'pso:submitted' from "
-                      + statuses));
+                  "Some nodes were resolved but were not expected: " + resolvedButNotExpected));
         }
+
+        if (!expectedButNotResolved.isEmpty()) {
+          result.addComment(
+              new Comment(
+                  "Some nodes were expected but were not resolved: " + expectedButNotResolved));
+        }
+
+        if (flagTODO) {
+          countTODO++;
+        } else {
+          countFailure++;
+        }
+
         testSet.addTapLine(result);
+        continue;
       }
     }
 

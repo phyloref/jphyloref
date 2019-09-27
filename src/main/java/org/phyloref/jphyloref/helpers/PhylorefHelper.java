@@ -60,6 +60,14 @@ public class PhylorefHelper {
   public static final IRI IRI_CLADE_DEFINITION =
       IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#clade_definition");
 
+  /** IRI for the OBI is_specified_output_of property. */
+  public static final IRI IRI_OBI_IS_SPECIFIED_OUTPUT_OF =
+      IRI.create("http://purl.obolibrary.org/obo/OBI_0000312");
+
+  /** IRI for the OBI has_specified_input property. */
+  public static final IRI IRI_OBI_HAS_SPECIFIED_INPUT =
+      IRI.create("http://purl.obolibrary.org/obo/OBI_0000293");
+
   /**
    * IRI for the OWL object property that associates a publication with its publication status at a
    * particular time.
