@@ -59,7 +59,7 @@ class ResolveCommandTest {
       }
 
       assertEquals(0, exitCode);
-      assertEquals(outputStr, EXPECTED_DUMMY1_RESOLUTION);
+      assertEquals(EXPECTED_DUMMY1_RESOLUTION, outputStr);
     }
   }
 
