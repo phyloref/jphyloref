@@ -240,11 +240,13 @@ public class TestCommand implements Command {
               .findFirst();
 
       String phylorefLabel;
+      // Use a phyloref label if we could find one.
       if (opt_phylorefLabel.isPresent()) phylorefLabel = opt_phylorefLabel.get();
+      // If we don't have labels, use the IRI of the phyloref.
       else phylorefLabel = phyloref.getIRI().toString();
       result.setDescription("Phyloreference '" + phylorefLabel + "'");
 
-      // Which nodes did this phyloreference resolved to?
+      // Which nodes did this phyloreference resolve to?
       Set<OWLNamedIndividual> nodes = PhylorefHelper.getNodesInClass(phyloref, ontology, reasoner);
       // System.err.println("Phyloreference <" + phyloref + "> has nodes: " + nodes);
 
@@ -252,7 +254,7 @@ public class TestCommand implements Command {
       List<PhylorefHelper.PhylorefStatus> statuses =
           PhylorefHelper.getStatusesForPhyloref(phyloref, ontology);
 
-      // Look for all unmatched specifiers reported for this phyloreference
+      // Look for all unmatched specifiers reported for this phyloreference.
       Set<OWLAxiom> axioms = new HashSet<>(EntitySearcher.getReferencingAxioms(phyloref, ontology));
       Set<OWLNamedIndividual> unmatched_specifiers = new HashSet<>();
       for (OWLAxiom axiom : axioms) {
@@ -309,8 +311,9 @@ public class TestCommand implements Command {
                         ps.getStatus().equals(PhylorefHelper.IRI_PSO_SUBMITTED)
                             || ps.getStatus().equals(PhylorefHelper.IRI_PSO_PUBLISHED));
 
+      // Time to figure out whether we resolved nodes correctly!
       if (nodes.isEmpty()) {
-        // Phyloref resolved to no nodes at all.
+        // This phyloref resolved to no nodes at all.
         result.setStatus(StatusValues.NOT_OK);
         result.addComment(new Comment("No nodes matched."));
         testSet.addTapLine(result);
@@ -318,6 +321,7 @@ public class TestCommand implements Command {
         continue;
 
       } else {
+        // Report which nodes were resolved.
         result.addComment(
             new Comment("Resolved nodes: " + removeDefaultURIPrefixes(nodes, defaultURIPrefix)));
 
@@ -332,8 +336,9 @@ public class TestCommand implements Command {
 
         Set<OWLNamedIndividual> expectedNodes = new HashSet<>();
         if (reasoner == null) {
-          // If there's no reasoner, we can only look for individuals specifically
-          // marked as expected (see PhylorefHelper for an example).
+          // If there's no reasoner, we could look for individuals specifically
+          // marked as expected (see PhylorefHelper for an example). However, we
+          // don't need to implement this until we actually have a need for this.
           throw new RuntimeException("Testing without reasoner not yet implemented.");
         }
 
@@ -343,19 +348,25 @@ public class TestCommand implements Command {
             new Comment(
                 "Expected nodes: " + removeDefaultURIPrefixes(expectedNodes, defaultURIPrefix)));
 
+        // Identify two sets of nodes: those we expected but that weren't resolved,
+        // and those that we resolved that weren't expected.
         HashSet<OWLNamedIndividual> expectedButNotResolved = new HashSet<>(expectedNodes);
         expectedButNotResolved.removeAll(nodes);
 
         HashSet<OWLNamedIndividual> resolvedButNotExpected = new HashSet<>(nodes);
         resolvedButNotExpected.removeAll(expectedNodes);
 
+        // If every node we resolved to was a node we expected to resolve to, this
+        // was a success.
         if (expectedButNotResolved.isEmpty() && resolvedButNotExpected.isEmpty()) {
           result.setStatus(StatusValues.OK);
+          // If this phyloref is marked as not expected to resolve, we can let
+          // the user know that they should mark it
           if (!flag_expected_to_resolve) {
             result.addComment(
                 new Comment(
-                    "Since specifiers remain unmatched, this phyloreference should have a status of 'pso:draft' but instead its status is "
-                        + activeStatuses));
+                    "This phyloref resolved as expected, and should be marked as pso:submitted instead of: "
+                      + activeStatuses));
           }
           testSet.addTapLine(result);
           countSuccess++;
@@ -363,9 +374,9 @@ public class TestCommand implements Command {
         }
 
         // These are all failures. But are they TODOs?
+        result.setStatus(StatusValues.NOT_OK);
         boolean flagTODO = false;
 
-        result.setStatus(StatusValues.NOT_OK);
         if (!flag_expected_to_resolve) {
           result.setDirective(
               new Directive(
