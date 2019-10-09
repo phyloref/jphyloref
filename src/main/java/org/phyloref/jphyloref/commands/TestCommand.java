@@ -254,37 +254,6 @@ public class TestCommand implements Command {
       List<PhylorefHelper.PhylorefStatus> statuses =
           PhylorefHelper.getStatusesForPhyloref(phyloref, ontology);
 
-      // Look for all unmatched specifiers reported for this phyloreference.
-      Set<OWLAxiom> axioms = new HashSet<>(EntitySearcher.getReferencingAxioms(phyloref, ontology));
-      Set<OWLNamedIndividual> unmatched_specifiers = new HashSet<>();
-      for (OWLAxiom axiom : axioms) {
-        if (axiom.containsEntityInSignature(unmatchedSpecifierProperty)) {
-          // This axiom references this phyloreference AND the unmatched specifier property!
-          // Therefore, any NamedIndividuals that are not phyloref should be added to
-          // unmatched_specifiers!
-          for (OWLNamedIndividual ni : axiom.getIndividualsInSignature()) {
-            if (ni != phyloref) unmatched_specifiers.add(ni);
-          }
-        }
-      }
-
-      // Report all unmatched specifiers
-      for (OWLNamedIndividual unmatched_specifier : unmatched_specifiers) {
-        Set<String> unmatched_specifier_label =
-            OWLHelper.getAnnotationLiteralsForEntity(
-                ontology, unmatched_specifier, labelAnnotationProperty, Arrays.asList("en"));
-        if (!unmatched_specifier_label.isEmpty()) {
-          result.addComment(
-              new Comment("Specifier '" + unmatched_specifier_label + "' is marked as unmatched."));
-        } else {
-          result.addComment(
-              new Comment(
-                  "Specifier '"
-                      + unmatched_specifier.getIRI().getShortForm()
-                      + "' is marked as unmatched."));
-        }
-      }
-
       // Instead of checking which time interval we are currently in, we take a simpler approach:
       // we look for all statuses asserted to be "active", i.e. those with a start time but no end
       // time.
@@ -383,14 +352,6 @@ public class TestCommand implements Command {
                   DirectiveValues.TODO,
                   "Phyloreference is not expected to resolve as it has a status of "
                       + activeStatuses));
-          flagTODO = true;
-        }
-
-        if (!unmatched_specifiers.isEmpty()) {
-          result.setDirective(
-              new Directive(
-                  DirectiveValues.TODO,
-                  "Phyloreference could not be tested, as one or more specifiers did not match."));
           flagTODO = true;
         }
 
