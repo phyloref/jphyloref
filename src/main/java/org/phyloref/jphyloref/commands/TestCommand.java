@@ -443,8 +443,10 @@ public class TestCommand implements Command {
   private List<String> removeDefaultURIPrefixes(
       Set<OWLNamedIndividual> indivs, String defaultURIPrefix) {
     if (defaultURIPrefix == null) {
-      // Just convert the hasIRIs into strings and return.
-      return indivs.stream().map(indiv -> indiv.getIRI().toString()).collect(Collectors.toList());
+      // Nothing to remove! Just convert the hasIRIs into strings and return.
+      return indivs.stream()
+        .map(indiv -> indiv.getIRI().toString())
+        .collect(Collectors.toList());
     }
 
     // Remove the default URI prefix if one exists.
@@ -453,7 +455,9 @@ public class TestCommand implements Command {
         .map(
             indiv -> {
               String iriString = indiv.getIRI().toString();
+              // Does this IRI string start with the default URI prefix?
               if (iriString.startsWith(defaultURIPrefix))
+                // If so, remove them!
                 return iriString.substring(defaultURIPrefix.length());
               return iriString;
             })
