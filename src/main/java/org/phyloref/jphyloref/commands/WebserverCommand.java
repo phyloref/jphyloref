@@ -265,6 +265,20 @@ public class WebserverCommand implements Command {
       System.out.println(">> Request received to '" + path + "': " + params);
 
       if (path.equals("/reason")) {
+        // If it is an OPTIONS request, it's probably someone wanting a
+        // pre-flight CORS request. Let's give them that.
+        if (session.getMethod().equals(Method.OPTIONS)) {
+          Response preflightResponse =
+              newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, "Options");
+
+          // Indicate that any resource can access this resource.
+          preflightResponse.addHeader("Access-Control-Allow-Origin", "*");
+          preflightResponse.addHeader("Access-Control-Allow-Methods", "POST");
+          preflightResponse.addHeader("Access-Control-Allow-Headers", "x-hub-signature");
+
+          return preflightResponse;
+        }
+
         // We accept two kinds of inputs:
         //  1. A form containing 'jsonld' as a JSON-LD string to process.
         //  2. A form containing 'jsonldFile' as a JSON-LD file to read.
