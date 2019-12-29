@@ -3,15 +3,20 @@ package org.phyloref.jphyloref.commands;
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.Response.IStatus;
 import fi.iki.elonen.NanoHTTPD.Response.Status;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.zip.GZIPInputStream;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.eclipse.rdf4j.rio.RDFParseException;
@@ -283,20 +288,37 @@ public class WebserverCommand implements Command {
         //  1. A form containing 'jsonld' as a JSON-LD string to process.
         //  2. A form containing 'jsonldFile' as a JSON-LD file to read.
         String filename;
-        File jsonldFile;
+        File jsonldFile = null;
+        String jsonld = null;
 
         try {
           if (params.containsKey("jsonldFile")) {
             filename = String.join("; ", params.get("jsonldFile"));
             jsonldFile = new File(files.get("jsonldFile"));
+          } else if (params.containsKey("jsonldGzipped")) {
+            String jsonldgzBase64 = String.join("", params.get("jsonldGzipped"));
+            byte[] jsonldGzipped = Base64.getDecoder().decode(jsonldgzBase64);
+            GZIPInputStream gzis = new GZIPInputStream(new ByteArrayInputStream(jsonldGzipped));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(gzis, "UTF-8"));
+            StringBuffer jsonldStringBuffer = new StringBuffer();
+            String readed;
+            while ((readed = reader.readLine()) != null) {
+              jsonldStringBuffer.append(readed);
+            }
+            jsonld = jsonldStringBuffer.toString();
           } else if (params.containsKey("jsonld")) {
+            jsonld = String.join("", params.get("jsonld"));
+          }
+
+          if (jsonld != null) {
             jsonldFile = File.createTempFile("jphyloref", null);
 
             FileWriter writer = new FileWriter(jsonldFile);
-            writer.write(String.join(";", params.get("jsonld")));
+            writer.write(String.join(";", jsonld));
             writer.close();
+          }
 
-          } else {
+          if (jsonldFile == null) {
             response.put("status", "error");
             response.put(
                 "error",
