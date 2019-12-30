@@ -292,7 +292,7 @@ public class WebserverCommand implements Command {
         // For simplicity's sake, we convert all the possible forms into a
         // File for processing.
         try {
-          String jsonldFile = null;
+          File jsonldFile = null;
 
           if (params.containsKey("jsonldFile")) {
             // It's already a file!
@@ -320,9 +320,9 @@ public class WebserverCommand implements Command {
               BufferedReader reader = new BufferedReader(new InputStreamReader(gzis, "UTF-8"));
               StringBuffer jsonldStringBuffer = new StringBuffer();
 
-              String read;
-              while ((read = reader.readLine()) != null) {
-                jsonldStringBuffer.append(readed);
+              String buffer;
+              while ((buffer = reader.readLine()) != null) {
+                jsonldStringBuffer.append(buffer);
               }
 
               // Store UTF-8 string for further processing.
@@ -338,7 +338,6 @@ public class WebserverCommand implements Command {
             // Store the JSON-LD into a file for further processing.
             if (jsonld != null) {
               jsonldFile = File.createTempFile("jphyloref", null);
-
               FileWriter writer = new FileWriter(jsonldFile);
               writer.write(String.join(";", jsonld));
               writer.close();
