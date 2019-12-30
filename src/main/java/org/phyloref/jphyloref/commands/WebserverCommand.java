@@ -284,49 +284,70 @@ public class WebserverCommand implements Command {
           return preflightResponse;
         }
 
-        // We accept two kinds of inputs:
+        // We accept three kinds of inputs:
         //  1. A form containing 'jsonld' as a JSON-LD string to process.
-        //  2. A form containing 'jsonldFile' as a JSON-LD file to read.
-        String filename;
-        File jsonldFile = null;
-        String jsonld = null;
-
+        //  2. A form containing 'jsonldGzipped' as a Base64-encoded Gzipped string
+        //     containing a JSON-LD string to process.
+        //  3. A form containing 'jsonldFile' as a JSON-LD file to read.
+        // For simplicity's sake, we convert all the possible forms into a
+        // File for processing.
         try {
+          String jsonldFile = null;
+
           if (params.containsKey("jsonldFile")) {
-            filename = String.join("; ", params.get("jsonldFile"));
+            // It's already a file!
             jsonldFile = new File(files.get("jsonldFile"));
-          } else if (params.containsKey("jsonldGzipped")) {
-            String jsonldgzBase64 = String.join("", params.get("jsonldGzipped"));
-            byte[] jsonldGzipped = Base64.getDecoder().decode(jsonldgzBase64);
-            GZIPInputStream gzis = new GZIPInputStream(new ByteArrayInputStream(jsonldGzipped));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(gzis, "UTF-8"));
-            StringBuffer jsonldStringBuffer = new StringBuffer();
-            String readed;
-            while ((readed = reader.readLine()) != null) {
-              jsonldStringBuffer.append(readed);
+
+          } else {
+            // It's a string, which we need to write to a temporary file.
+            String jsonld = null;
+
+            if (params.containsKey("jsonld")) {
+              // Read JSON-LD as string.
+              jsonld = String.join("", params.get("jsonld"));
+
+            } else if (params.containsKey("jsonldGzipped")) {
+              // Read JSON-LD as Gzipped string.
+              String jsonldgzBase64 = String.join("", params.get("jsonldGzipped"));
+
+              // Convert to a byte stream using Base64.
+              byte[] jsonldGzipped = Base64.getDecoder().decode(jsonldgzBase64);
+
+              // Convert unzip byte stream.
+              GZIPInputStream gzis = new GZIPInputStream(new ByteArrayInputStream(jsonldGzipped));
+
+              // Read unzipped byte stream as a UTF-8 string, which has to be done line by line.
+              BufferedReader reader = new BufferedReader(new InputStreamReader(gzis, "UTF-8"));
+              StringBuffer jsonldStringBuffer = new StringBuffer();
+
+              String read;
+              while ((read = reader.readLine()) != null) {
+                jsonldStringBuffer.append(readed);
+              }
+
+              // Store UTF-8 string for further processing.
+              jsonld = jsonldStringBuffer.toString();
+            } else {
+              response.put("status", "error");
+              response.put(
+                  "error",
+                  "Expected a form with a file upload in the 'jsonldFile' field or a JSON-LD string in the 'jsonld' or 'jsonldGzipped' field, but no such field was found");
+              return createResponse(Status.BAD_REQUEST, response);
             }
-            jsonld = jsonldStringBuffer.toString();
-          } else if (params.containsKey("jsonld")) {
-            jsonld = String.join("", params.get("jsonld"));
+
+            // Store the JSON-LD into a file for further processing.
+            if (jsonld != null) {
+              jsonldFile = File.createTempFile("jphyloref", null);
+
+              FileWriter writer = new FileWriter(jsonldFile);
+              writer.write(String.join(";", jsonld));
+              writer.close();
+            }
           }
 
-          if (jsonld != null) {
-            jsonldFile = File.createTempFile("jphyloref", null);
-
-            FileWriter writer = new FileWriter(jsonldFile);
-            writer.write(String.join(";", jsonld));
-            writer.close();
-          }
-
-          if (jsonldFile == null) {
-            response.put("status", "error");
-            response.put(
-                "error",
-                "Expected a form with a file upload in the 'jsonldFile' field or a JSON-LD string in the 'jsonld' field, but no such field was found");
-            return createResponse(Status.BAD_REQUEST, response);
-          }
-
+          // Process JSON-LD file and return response.
           return createResponse(Status.OK, serveReason(jsonldFile));
+
         } catch (OWLOntologyCreationException | RDFParseException | IOException ex) {
           response.put("status", "error");
           response.put("error", "Exception thrown: " + ex.getMessage());
