@@ -163,7 +163,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.2</version>
+        <version>0.8.4</version>
         <configuration>
           <!-- These rules are to ensure that CI output records that we still
           haven't finished testing this code, which is why we don't halt on failure. -->
