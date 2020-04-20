@@ -133,7 +133,7 @@ public class WebserverCommand implements Command {
       this.cmdLine = cmdLine;
 
       start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
-      System.out.println(
+      logger.info(
           "Webserver started with reasoner "
               + ReasonerHelper.getReasonerNameAndVersion(
                   ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine))
