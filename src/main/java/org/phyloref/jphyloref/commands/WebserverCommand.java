@@ -134,14 +134,11 @@ public class WebserverCommand implements Command {
 
       start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
       logger.info(
-          "Webserver started with reasoner "
-              + ReasonerHelper.getReasonerNameAndVersion(
-                  ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine))
-              + ". Try accessing it at http://"
-              + hostname
-              + ":"
-              + port
-              + "/");
+          "Webserver started with reasoner {}. Try accessing it at http://{}:{}/",
+          ReasonerHelper.getReasonerNameAndVersion(
+              ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine)),
+          hostname,
+          port);
     }
 
     /** Respond to a request for reasoning over a JSON-LD file (/reason). */
