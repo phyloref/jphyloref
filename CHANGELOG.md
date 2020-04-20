@@ -3,6 +3,7 @@
 Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
 ## [Unreleased]
+- Replaced `System.err` and `System.out` with calls to SLF4J (#51).
 - Added a "resolve" command that resolves phylorefs in input ontologies (in OWL
   or JSON-LD) and returns the result as a JSON string (#52).
 - Centralized code for determining nodes in phylorefs (#53, #54).
