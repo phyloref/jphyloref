@@ -188,6 +188,7 @@ public class TestCommand implements Command {
     TapProducer tapProducer = TapProducerFactory.makeTap13Producer();
     TestSet testSet = new TestSet();
     testSet.setPlan(new Plan(phylorefs.size()));
+    testSet.addComment(new Comment("From file: " + inputFilename));
     testSet.addComment(
         new Comment(
             "Using reasoner: "
