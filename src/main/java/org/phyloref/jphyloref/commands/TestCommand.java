@@ -34,6 +34,8 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.search.EntitySearcher;
 import org.semanticweb.owlapi.util.AutoIRIMapper;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tap4j.model.Comment;
 import org.tap4j.model.Directive;
 import org.tap4j.model.Plan;
@@ -54,6 +56,9 @@ import org.tap4j.util.StatusValues;
  * @author Gaurav Vaidya <gaurav@ggvaidya.com>
  */
 public class TestCommand implements Command {
+  /** Set up a logger to use for providing logging. */
+  private static final Logger logger = LoggerFactory.getLogger(TestCommand.class);
+
   /** This command is named "test". It should be invoked as "java -jar jphyloref.jar test ..." */
   @Override
   public String getName() {
@@ -119,13 +124,13 @@ public class TestCommand implements Command {
       try {
         inputStreamToReadFrom = new FileInputStream(inputFilename);
       } catch (FileNotFoundException ex) {
-        System.err.println("Could not open input file '" + inputFilename + "': " + ex);
+        logger.error("Could not open input file '{}': {}", inputFilename, ex);
         return 1;
       }
     }
 
     // Report the name of the file being tested.
-    System.err.println("Input: " + inputFilename);
+    logger.info("Input: {}", inputFilename);
 
     // Set up an OWL Ontology Manager to work with.
     OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -133,7 +138,7 @@ public class TestCommand implements Command {
     // Is purl.obolibrary.org down? No worries, you can access local copies
     // of your ontologies in the 'ontologies/' folder.
     AutoIRIMapper mapper = new AutoIRIMapper(new File("ontologies"), true);
-    System.err.println("Found local ontologies: " + mapper.getOntologyIRIs());
+    logger.info("Found local ontologies: {}", mapper.getOntologyIRIs());
     manager.addIRIMapper(mapper);
 
     // Is this a JSON or JSON-LD file?
@@ -157,15 +162,15 @@ public class TestCommand implements Command {
         ontology = manager.loadOntologyFromOntologyDocument(inputStreamToReadFrom);
       }
     } catch (OWLOntologyCreationException ex) {
-      System.err.println("Could not create ontology '" + inputFilename + "': " + ex);
+      logger.error("Could not create ontology '{}': {}", inputFilename, ex);
       return 1;
     } catch (IOException ex) {
-      System.err.println("Could not read and load ontology '" + inputFilename + "': " + ex);
+      logger.error("Could not read and load ontology '{}': {}", inputFilename, ex);
       return 1;
     }
 
     // Ontology loaded.
-    System.err.println("Loaded ontology: " + ontology);
+    logger.info("Loaded ontology: {}", ontology);
 
     // Reason over the loaded ontology -- but only if the user wants that!
     // Set up an OWLReasoner to work with.
@@ -175,7 +180,7 @@ public class TestCommand implements Command {
 
     // Get a list of all phyloreferences.
     Set<OWLClass> phylorefs = PhylorefHelper.getPhyloreferences(ontology, reasoner);
-    System.err.println("Phyloreferences identified: " + phylorefs);
+    logger.info("Phyloreferences identified: {}", phylorefs);
 
     // Okay, time to start testing! Each phyloreference counts as one test.
     // TAP (https://testanything.org/) can be read by downstream software

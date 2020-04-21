@@ -15,12 +15,17 @@ import org.phyloref.jphyloref.commands.WebserverCommand;
 import org.phyloref.jphyloref.helpers.ReasonerHelper;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.util.VersionInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Main class for JPhyloRef. Contains a list of Commands, as well as the code for determining which
  * Command to execute.
  */
 public class JPhyloRef {
+  /** Set up a logger to use for providing logging. */
+  private static final Logger logger = LoggerFactory.getLogger(JPhyloRef.class);
+
   /** Version of JPhyloRef. */
   public static final String VERSION = "0.2-SNAPSHOT";
 
@@ -51,7 +56,7 @@ public class JPhyloRef {
     try {
       cmdLine = new DefaultParser().parse(opts, args);
     } catch (ParseException ex) {
-      System.err.println("Could not parse command line options: " + ex);
+      logger.error("Could not parse command line options: {}", ex.toString());
       return 1;
     }
 
@@ -77,7 +82,7 @@ public class JPhyloRef {
       }
 
       // Could not find any command.
-      System.err.println("Error: command '" + command + "' has not been implemented.");
+      logger.error("Command '{}' has not been implemented.", command);
       return 1;
     }
   }

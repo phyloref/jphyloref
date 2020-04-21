@@ -73,7 +73,9 @@ class AppTest {
 
     try {
       assertEquals("", output.toString("UTF-8"));
-      assertEquals("Error: command 'unknown' has not been implemented.\n", error.toString("UTF-8"));
+      assertEquals(
+          "[main] ERROR org.phyloref.jphyloref.JPhyloRef - Command 'unknown' has not been implemented.\n",
+          error.toString("UTF-8"));
     } catch (UnsupportedEncodingException ex) {
       throw new RuntimeException("'UTF-8' is not supported as an encoding: " + ex);
     }
@@ -89,7 +91,7 @@ class AppTest {
     try {
       assertEquals("", output.toString("UTF-8"));
       assertEquals(
-          "Could not parse command line options: org.apache.commons.cli.UnrecognizedOptionException: Unrecognized option: ----\n",
+          "[main] ERROR org.phyloref.jphyloref.JPhyloRef - Could not parse command line options: org.apache.commons.cli.UnrecognizedOptionException: Unrecognized option: ----\n",
           error.toString("UTF-8"));
     } catch (UnsupportedEncodingException ex) {
       throw new RuntimeException("'UTF-8' is not supported as an encoding: " + ex);

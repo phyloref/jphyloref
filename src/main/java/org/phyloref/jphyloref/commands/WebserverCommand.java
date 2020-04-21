@@ -36,6 +36,8 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.util.AutoIRIMapper;
 import org.semanticweb.owlapi.util.VersionInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Sets up a webserver that allows reasoning over phyloreferences over HTTP.
@@ -50,6 +52,9 @@ import org.semanticweb.owlapi.util.VersionInfo;
  * @author Gaurav Vaidya <gaurav@ggvaidya.com>
  */
 public class WebserverCommand implements Command {
+  /** Set up a logger to use for providing logging. */
+  private static final Logger logger = LoggerFactory.getLogger(WebserverCommand.class);
+
   /**
    * This command is named "webserver". It should be invoked as "java -jar jphyloref.jar webserver
    * ..."
@@ -97,7 +102,7 @@ public class WebserverCommand implements Command {
       Webserver webserver = new Webserver(this, hostname, port, cmdLine);
       while (webserver.isAlive()) {}
     } catch (IOException ex) {
-      System.err.println("An error occurred while running webserver: " + ex);
+      logger.error("An error occurred while running webserver: {}", ex.toString());
     }
 
     return 0;
@@ -128,15 +133,12 @@ public class WebserverCommand implements Command {
       this.cmdLine = cmdLine;
 
       start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
-      System.out.println(
-          "Webserver started with reasoner "
-              + ReasonerHelper.getReasonerNameAndVersion(
-                  ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine))
-              + ". Try accessing it at http://"
-              + hostname
-              + ":"
-              + port
-              + "/");
+      logger.info(
+          "Webserver started with reasoner {}. Try accessing it at http://{}:{}/",
+          ReasonerHelper.getReasonerNameAndVersion(
+              ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine)),
+          hostname,
+          port);
     }
 
     /** Respond to a request for reasoning over a JSON-LD file (/reason). */
@@ -150,7 +152,7 @@ public class WebserverCommand implements Command {
       // Is purl.obolibrary.org down? No worries, you can access local copies
       // of your ontologies in the 'ontologies/' folder.
       AutoIRIMapper mapper = new AutoIRIMapper(new File("ontologies"), true);
-      System.err.println("Found local ontologies: " + mapper.getOntologyIRIs());
+      logger.info("Found local ontologies: {}", mapper.getOntologyIRIs());
       manager.addIRIMapper(mapper);
 
       // Setup ready; parse the file!
@@ -204,7 +206,7 @@ public class WebserverCommand implements Command {
       reasoner.dispose();
 
       // Log reasoning results.
-      System.err.println("Phyloreferencing reasoning results: " + nodesPerPhylorefAsString);
+      logger.info("Phyloreferencing reasoning results: {}", nodesPerPhylorefAsString);
 
       // Record phyloreferences and matching nodes in JSON response.
       response.put("phylorefs", nodesPerPhylorefAsString);
@@ -267,7 +269,7 @@ public class WebserverCommand implements Command {
       String path = session.getUri();
       Map<String, List<String>> params = session.getParameters();
 
-      System.out.println(">> Request received to '" + path + "': " + params);
+      logger.info(">> Request received to '{}': {}", path, params);
 
       if (path.equals("/reason")) {
         // If it is an OPTIONS request, it's probably someone wanting a
