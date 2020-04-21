@@ -102,7 +102,7 @@ public class WebserverCommand implements Command {
       Webserver webserver = new Webserver(this, hostname, port, cmdLine);
       while (webserver.isAlive()) {}
     } catch (IOException ex) {
-      logger.error("An error occurred while running webserver: {}", (Object) ex);
+      logger.error("An error occurred while running webserver: {}", ex.toString());
     }
 
     return 0;

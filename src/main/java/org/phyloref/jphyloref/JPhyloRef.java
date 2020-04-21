@@ -56,7 +56,7 @@ public class JPhyloRef {
     try {
       cmdLine = new DefaultParser().parse(opts, args);
     } catch (ParseException ex) {
-      logger.error("Could not parse command line options: {}", (Object) ex);
+      logger.error("Could not parse command line options: {}", ex.toString());
       return 1;
     }
 
