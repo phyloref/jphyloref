@@ -51,7 +51,9 @@ class TestCommandTest {
             "Testing complete:1 successes, 0 failures, 0 failures marked TODO, 0 skipped.\n"),
         "Stderr should end with single success but returned: " + stderrStr);
     assertEquals(
-        "1..1\n# Using reasoner: ELK/2016-01-11T13:41:15Z\nok 1 "
+        "1..1\n# From file: "
+            + filename
+            + "\n# Using reasoner: ELK/2016-01-11T13:41:15Z\nok 1 "
             + phylorefName
             + "\n# The following nodes were matched and expected this phyloreference: [1]\n\n",
         stdoutStr);
