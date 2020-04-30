@@ -7,7 +7,31 @@
     <version>0.3</version>
     <packaging>jar</packaging>
 
-    <name>jphyloref</name>
+    <name>JPhyloRef</name>
+    <description>A tool for testing and resolving phyloreferences as OWL ontologies.</description>
+    <url>https://github.com/phyloref/jphyloref</url>
+
+    <scm>
+        <connection>scm:git:git://github.com/phyloref/jphyloref.git</connection>
+        <developerConnection>scm:git:ssh://github.com:phyloref/jphyloref.git</developerConnection>
+        <url>http://github.com/phyloref/jphyloref/</url>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Gaurav Vaidya</name>
+            <email>gaurav@ggvaidya.com</email>
+            <organization>Renaissance Computing Institute, University of North Carolina</organization>
+            <organizationUrl>https://renci.org/</organizationUrl>
+        </developer>
+    </developers>
 
     <properties>
         <mainClass>org.phyloref.jphyloref.JPhyloRef</mainClass>
