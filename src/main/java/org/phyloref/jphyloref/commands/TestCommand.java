@@ -53,7 +53,7 @@ import org.tap4j.util.StatusValues;
  * <p>Testing output is produced using the Test Anything Protocol, which has nice libraries in both
  * Python and Java.
  *
- * @author Gaurav Vaidya <gaurav@ggvaidya.com>
+ * @author Gaurav Vaidya
  */
 public class TestCommand implements Command {
   /** Set up a logger to use for providing logging. */

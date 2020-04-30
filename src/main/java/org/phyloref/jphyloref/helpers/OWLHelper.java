@@ -17,7 +17,7 @@ import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 /**
  * OWLHelper contains methods simplify accessing information from the OWL API.
  *
- * @author Gaurav Vaidya <gaurav@ggvaidya.com>
+ * @author Gaurav Vaidya
  */
 public final class OWLHelper {
   /** A variable we use to cache rdfs:label */
@@ -26,6 +26,9 @@ public final class OWLHelper {
   /**
    * Returns OWL property rdfs:label, using a cache so we don't need to load the property using the
    * data property.
+   *
+   * @param ontology The ontology whose OWLAnnotationProperty we want.
+   * @return The OWLAnnotationProperty of rdfs:label.
    */
   public static OWLAnnotationProperty getLabelProperty(OWLOntology ontology) {
     if (cache_labelProperty != null) return cache_labelProperty;

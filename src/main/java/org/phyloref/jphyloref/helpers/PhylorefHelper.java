@@ -32,7 +32,7 @@ import org.semanticweb.owlapi.search.EntitySearcher;
  * <p>Eventually, this will be reorganized into a Phyloreferencing Java library, but we don't need
  * that level of sophistication just yet.
  *
- * @author Gaurav Vaidya <gaurav@ggvaidya.com>
+ * @author Gaurav Vaidya
  */
 public class PhylorefHelper {
   // IRIs used in this package.

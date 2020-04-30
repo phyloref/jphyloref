@@ -38,6 +38,7 @@ public class JPhyloRef {
    * Interpret the command line arguments to determine which command to execute.
    *
    * @param args Command line arguments
+   * @return The exit code to return to the shell (0 = success, other values = errors).
    */
   public int execute(String[] args) {
     // Prepare to parse command line arguments.
