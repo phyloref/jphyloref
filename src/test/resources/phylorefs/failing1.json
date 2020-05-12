@@ -1,0 +1,70 @@
+{
+    "phylorefs": [
+        {
+            "label": "1",
+            "internalSpecifiers": [
+                {
+                    "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
+                    "hasName": {
+                        "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
+                        "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
+                        "label": "Cc c",
+                        "nameComplete": "Cc c",
+                        "genusPart": "Cc",
+                        "specificEpithet": "c"
+                    },
+                    "label": "Cc c"
+                },
+                {
+                    "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
+                    "hasName": {
+                        "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
+                        "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
+                        "label": "Ee e",
+                        "nameComplete": "Ee e",
+                        "genusPart": "Ee",
+                        "specificEpithet": "e"
+                    },
+                    "label": "Ee e"
+                }
+            ],
+            "externalSpecifiers": []
+        },
+        {
+            "label": "2",
+            "internalSpecifiers": [
+                {
+                    "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
+                    "hasName": {
+                        "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
+                        "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
+                        "label": "Cc c",
+                        "nameComplete": "Cc c",
+                        "genusPart": "Cc",
+                        "specificEpithet": "c"
+                    },
+                    "label": "Cc c"
+                },
+                {
+                    "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
+                    "hasName": {
+                        "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
+                        "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
+                        "label": "Ee e",
+                        "nameComplete": "Ee e",
+                        "genusPart": "Ee",
+                        "specificEpithet": "e"
+                    },
+                    "label": "Ee e"
+                }
+            ],
+            "externalSpecifiers": []
+        }
+
+    ],
+    "phylogenies": [
+        {
+            "newick": "(Aa_a, (Bb_b, (Cc_c, Dd_d, Ee_e)1)2)3"
+        }
+    ]
+}
