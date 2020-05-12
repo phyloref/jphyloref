@@ -3,7 +3,10 @@
 Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
 ## [Unreleased]
-- None as yet.
+- JPhyloRef was incorrectly returning an exit code of `0` whether or not
+  testing succeeded. It now returns `0` only if all testing succeeded,
+  `-1` if no phyloreferences succeeded, and the number of failing
+  phyloreferences otherwise.
 
 ## [0.3] - 2020-04-20
 - Replaced `System.err` and `System.out` with calls to SLF4J (#51).
