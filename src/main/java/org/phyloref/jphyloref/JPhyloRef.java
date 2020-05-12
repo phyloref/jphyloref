@@ -77,8 +77,7 @@ public class JPhyloRef {
       for (Command cmd : commands) {
         if (cmd.getName().equalsIgnoreCase(command)) {
           // Found a match!
-          cmd.execute(cmdLine);
-          return 0;
+          return cmd.execute(cmdLine);
         }
       }
 
