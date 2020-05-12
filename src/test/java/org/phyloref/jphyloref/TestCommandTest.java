@@ -185,7 +185,7 @@ class TestCommandTest {
         // Reset STDOUT and STDERR and set STDIN.
         resetIO();
 
-        // Test the contents of STDIN.
+        // Test the test file, which we expect to have one success and one failure.
         int exitCode = jphyloref.execute(new String[] {"test", "--jsonld", testFilename});
 
         // Obtain STDOUT and STDERR.
