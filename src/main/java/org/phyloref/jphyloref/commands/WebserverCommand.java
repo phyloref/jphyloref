@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * which the keys are the IRIs for each phyloreference, and the values are lists of the IRIs of each
  * node matched by that phyloreference.
  *
- * @author Gaurav Vaidya <gaurav@ggvaidya.com>
+ * @author Gaurav Vaidya
  */
 public class WebserverCommand implements Command {
   /** Set up a logger to use for providing logging. */

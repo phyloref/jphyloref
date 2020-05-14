@@ -44,3 +44,21 @@ Many command line options can be used for all included commands:
 
 JPhyloRef can be [set up on a SLURM cluster using Webhook](webhook/README.md),
 allowing jobs to be executed on a separate computer from the web server.
+
+# Publishing to Sonatype OSSRH
+
+To publish this package to the [Sonatype OSSRH], we follow the workflow
+detailed on [the Sonatype website]. Note that you will need to set up a
+[Maven settings.xml file] with your GPG settings in order to sign the
+package for publication.
+
+Once you're set up, you can run `mvn clean deploy` to publish the package
+to the OSSRH. If your version number ends in `-SNAPSHOT`, this will be
+published to the OSSRH Snapshots repository. Otherwise, it will be
+published to a staging repository. Once you have confirmed that OSSRH is
+happy with the package to be published, you can run
+`mvn clean deploy -P release` to release it to Maven Central.
+
+  [Sonatype OSSRH]: https://central.sonatype.org/pages/ossrh-guide.html
+  [the Sonatype website]: https://central.sonatype.org/pages/apache-maven.html
+  [Maven settings.xml file]: https://central.sonatype.org/pages/apache-maven.html

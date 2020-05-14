@@ -17,7 +17,7 @@ import uk.ac.manchester.cs.jfact.JFactFactory;
  * The ReasonerHelper provides methods to help create and manage OWL Reasoners, and to allow the
  * user to choose a different reasoner to carry out any specified task.
  *
- * @author Gaurav Vaidya <gaurav@ggvaidya.com>
+ * @author Gaurav Vaidya
  */
 public class ReasonerHelper {
   /** A map of reasoner names and the corresponding reasoner factory */

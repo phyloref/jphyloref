@@ -3,6 +3,9 @@
 Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
 ## [Unreleased]
+- None as yet.
+
+## [0.3] - 2020-04-20
 - Replaced `System.err` and `System.out` with calls to SLF4J (#51).
 - Display the filename of the input file in the testing output.
 - Added a "resolve" command that resolves phylorefs in input ontologies (in OWL
@@ -11,7 +14,7 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 - Added support for the Elk reasoner (as "elk") and made it the default reasoner.
 - Phyloreferences were previously identified in input ontologies by looking for
   individuals defined as instances of the class phyloref:Phyloreference. They
-  are now identified as subclasses of phyloref:Phyloreference. This is in line 
+  are now identified as subclasses of phyloref:Phyloreference. This is in line
   with the changes introduced by moving from the 2018-12-04 release of the
   Phyloref Ontology to the 2018-12-14 release.
 - Removed ReasonCommand, which is no longer useful.
@@ -25,18 +28,22 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
   internally.
 - WebserverCommand now looks for ontologies in the local 'ontologies/' directory.
 
-## 0.2 - 2018-06-20
+## [0.2] - 2018-06-20
 - Added support for phyloreference statuses using the Publication Status Ontology
   as per [phyloref/curation-tool#25].
 - Added a `--no-reasoner` mode to testing, allowing pre-reasoned ontologies to be
   tested.
 - Fixed some spacing and line-ending issues.
 
-## 0.1 - 2018-06-20
+## [0.1] - 2018-06-20
 - Initial release, with support for testing phyloreferences expressed in OWL
   and stored in RDF/XML.
 
-[Unreleased]: https://github.com/phyloref/jphyloref/compare/v0.2...HEAD
+[Unreleased]: https://github.com/phyloref/jphyloref/compare/v0.3...HEAD
+[0.3]: https://github.com/phyloref/jphyloref/releases/tag/v0.3
+[0.2]: https://github.com/phyloref/jphyloref/releases/tag/v0.2
+[0.1]: https://github.com/phyloref/jphyloref/releases/tag/v0.1
+
 [phyloref/curation-tool#25]: https://github.com/phyloref/curation-tool/issues/25
 [phyloref/jphyloref#13]: https://github.com/phyloref/jphyloref/pull/13
 [phyloref/jphyloref#12]: https://github.com/phyloref/jphyloref/pull/12

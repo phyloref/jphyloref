@@ -7,7 +7,7 @@ import org.apache.commons.cli.Options;
  * Commands provide commands for jphyloref to run. These are usually in the form 'jphyloref
  * <em>command</em> ...'
  *
- * @author Gaurav Vaidya <gaurav@ggvaidya.com>
+ * @author Gaurav Vaidya
  */
 public interface Command {
   /**
@@ -20,7 +20,7 @@ public interface Command {
   /**
    * A one-line description of this command.
    *
-   * @return
+   * @return A one-line description of this command as a String.
    */
   public String getDescription();
 
@@ -30,6 +30,8 @@ public interface Command {
   /**
    * Execute this command with the provided command line options, and provide an exit value to
    * return to the operating system.
+   *
+   * @param cmdLine The CommandLine to be executed.
    */
   public int execute(CommandLine cmdLine);
 }

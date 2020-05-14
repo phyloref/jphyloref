@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * command line, which is while for now it returns its results in the JSON format. We might
  * eventually want to switch over to YAML or another more command line friendly format.
  *
- * @author Gaurav Vaidya <gaurav@ggvaidya.com>
+ * @author Gaurav Vaidya
  */
 public class ResolveCommand implements Command {
   /** Set up a logger to use for providing logging. */
