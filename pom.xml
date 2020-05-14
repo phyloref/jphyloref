@@ -4,7 +4,7 @@
 
     <groupId>org.phyloref</groupId>
     <artifactId>jphyloref</artifactId>
-    <version>0.3</version>
+    <version>0.3.1</version>
     <packaging>jar</packaging>
 
     <name>JPhyloRef</name>
