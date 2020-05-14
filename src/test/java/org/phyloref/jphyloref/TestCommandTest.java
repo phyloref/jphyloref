@@ -169,5 +169,59 @@ class TestCommandTest {
         resetIO();
       }
     }
+
+    @Test
+    @DisplayName(
+        "can report an ontology with one correctly resolved and one incorrectly resolved phyloref")
+    void testJSONLDWithFailure() {
+      // The test file we're going to use in this test.
+      String testFilename = "src/test/resources/phylorefs/failing1.jsonld";
+
+      // We're going to take over STDIN, so let's save the real STDIN so we can
+      // restore it.
+      InputStream actualStdin = System.in;
+
+      try {
+        // Reset STDOUT and STDERR and set STDIN.
+        resetIO();
+
+        // Test the test file, which we expect to have one success and one failure.
+        int exitCode = jphyloref.execute(new String[] {"test", "--jsonld", testFilename});
+
+        // Obtain STDOUT and STDERR.
+        String outputStr = output.toString("UTF-8");
+        String errorStr = error.toString("UTF-8");
+
+        // Test whether the exit code, STDERR and STDOUT is as expected.
+        assertEquals(1, exitCode);
+        assertTrue(
+            errorStr.contains("Input: " + testFilename),
+            "Make sure JPhyloRef reports the name of the file being processed");
+        assertTrue(
+            errorStr.endsWith(
+                "Testing complete:1 successes, 1 failures, 0 failures marked TODO, 0 skipped.\n"),
+            "Stderr should end with single success but returned: " + errorStr);
+        assertEquals(
+            "1..2\n# From file: "
+                + testFilename
+                + "\n# Using reasoner: ELK/2016-01-11T13:41:15Z\n"
+                + "ok 1 Phyloreference '1'\n"
+                + "# The following nodes were matched and expected this phyloreference: [1]\n"
+                + "not ok 2 Phyloreference '2'\n"
+                + "# The following nodes were matched but did not expect this phyloreference: [1]\n\n",
+            outputStr);
+
+      } catch (UnsupportedEncodingException ex) {
+        // Could be thrown when converting STDOUT/STDERR to String as UTF-8.
+        throw new RuntimeException("'UTF-8' is not supported as an encoding: " + ex);
+      } catch (IOException ex) {
+        // Could be thrown if there were errors reading the testing file.
+        throw new RuntimeException(
+            "Expected testing file '" + testFilename + "' not found or could not be read: " + ex);
+      } finally {
+        // Reset STDOUT and STDERR.
+        resetIO();
+      }
+    }
   }
 }
