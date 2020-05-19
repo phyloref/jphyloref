@@ -54,10 +54,7 @@ package for publication.
 
 Once you're set up, you can run `mvn clean deploy` to publish the package
 to the OSSRH. If your version number ends in `-SNAPSHOT`, this will be
-published to the OSSRH Snapshots repository. Otherwise, it will be
-published to a staging repository. Once you have confirmed that OSSRH is
-happy with the package to be published, you can run
-`mvn clean deploy -P release` to release it to Maven Central.
+published to the OSSRH Snapshots repository.
 
   [Sonatype OSSRH]: https://central.sonatype.org/pages/ossrh-guide.html
   [the Sonatype website]: https://central.sonatype.org/pages/apache-maven.html
