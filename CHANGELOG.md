@@ -2,7 +2,7 @@
 
 Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
-## [Unreleased]
+## [0.3.1] - 2020-05-13
 - JPhyloRef was incorrectly returning an exit code of `0` whether or not
   testing succeeded. It now returns `0` only if all testing succeeded,
   `-1` if no phyloreferences succeeded, and the number of failing
@@ -43,6 +43,7 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
   and stored in RDF/XML.
 
 [Unreleased]: https://github.com/phyloref/jphyloref/compare/v0.3...HEAD
+[0.3.1]: https://github.com/phyloref/jphyloref/releases/tag/v0.3.1
 [0.3]: https://github.com/phyloref/jphyloref/releases/tag/v0.3
 [0.2]: https://github.com/phyloref/jphyloref/releases/tag/v0.2
 [0.1]: https://github.com/phyloref/jphyloref/releases/tag/v0.1
