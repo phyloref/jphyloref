@@ -90,7 +90,7 @@ class TestCommandTest {
       expectSinglePhylorefResolvingCorrectly(
           "src/test/resources/phylorefs/dummy1.owl",
           "Phyloreference '1'",
-          "#phylogeny0_node2",
+          "file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node2",
           outputStr,
           errorStr);
     }
@@ -228,9 +228,13 @@ class TestCommandTest {
                 + testFilename
                 + "\n# Using reasoner: ELK/2016-01-11T13:41:15Z\n"
                 + "ok 1 Phyloreference '1'\n"
-                + "# The following nodes were matched and expected this phyloreference: [1]\n"
+                + "# Resolved nodes: [#phylogeny0_node2]\n"
+                + "# Expected nodes: [#phylogeny0_node2]\n"
                 + "not ok 2 Phyloreference '2'\n"
-                + "# The following nodes were matched but did not expect this phyloreference: [1]\n\n",
+                + "# Resolved nodes: [#phylogeny0_node2]\n"
+                + "# Expected nodes: [#phylogeny0_node1]\n"
+                + "# Some nodes were resolved but were not expected: [<http://example.org/jphyloref#phylogeny0_node2>]\n"
+                + "# Some nodes were expected but were not resolved: [<http://example.org/jphyloref#phylogeny0_node1>]\n\n",
             outputStr);
 
       } catch (UnsupportedEncodingException ex) {
