@@ -48,7 +48,7 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 - Initial release, with support for testing phyloreferences expressed in OWL
   and stored in RDF/XML.
 
-[Unreleased]: https://github.com/phyloref/jphyloref/compare/v0.3...HEAD
+[Unreleased]: https://github.com/phyloref/jphyloref/compare/v0.3.1...HEAD
 [0.3.1]: https://github.com/phyloref/jphyloref/releases/tag/v0.3.1
 [0.3]: https://github.com/phyloref/jphyloref/releases/tag/v0.3
 [0.2]: https://github.com/phyloref/jphyloref/releases/tag/v0.2
