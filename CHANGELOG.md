@@ -2,6 +2,12 @@
 
 Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
+## [Unreleased]
+- Updated JPhyloRef to use model 2.0 expectations, encoded as logical expressions
+  on the phylogeny node, rather than comparing labels or using text-based properties.
+  You will need to use Phyx.js 0.2.0 or higher to generate ontologies that can be
+  tested with this version of JPhyloRef.
+
 ## [0.3.1] - 2020-05-13
 - JPhyloRef was incorrectly returning an exit code of `0` whether or not
   testing succeeded. It now returns `0` only if all testing succeeded,
