@@ -20,7 +20,6 @@ import org.phyloref.jphyloref.helpers.PhylorefHelper;
 import org.phyloref.jphyloref.helpers.ReasonerHelper;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -32,7 +31,6 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.search.EntitySearcher;
 import org.semanticweb.owlapi.util.AutoIRIMapper;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 import org.slf4j.Logger;
@@ -335,7 +333,7 @@ public class TestCommand implements Command {
             result.addComment(
                 new Comment(
                     "This phyloref resolved as expected, and should be marked as pso:submitted instead of: "
-                      + activeStatuses));
+                        + activeStatuses));
           }
           testSet.addTapLine(result);
           countSuccess++;
@@ -405,9 +403,7 @@ public class TestCommand implements Command {
       Set<OWLNamedIndividual> indivs, String defaultURIPrefix) {
     if (defaultURIPrefix == null) {
       // Nothing to remove! Just convert the hasIRIs into strings and return.
-      return indivs.stream()
-        .map(indiv -> indiv.getIRI().toString())
-        .collect(Collectors.toList());
+      return indivs.stream().map(indiv -> indiv.getIRI().toString()).collect(Collectors.toList());
     }
 
     // Remove the default URI prefix if one exists.
