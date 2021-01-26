@@ -332,6 +332,25 @@ public class TestCommand implements Command {
           continue;
         }
 
+        // Any phyloreference that is not expected to resolve should be ignored.
+        if (expectedNodes.isEmpty()) {
+          countSkipped++;
+          result.setStatus(StatusValues.NOT_OK);
+          result.setDirective(
+              new Directive(
+                  DirectiveValues.SKIP,
+                  "Phyloreference has no expected resolution, and so cannot be tested."));
+          if (nodes.isEmpty()) {
+            result.addComment(new Comment("It did not resolve to any nodes."));
+          } else {
+            result.addComment(
+                new Comment("It resolved to the following " + nodes.size() + " nodes: " + nodes));
+          }
+
+          testSet.addTapLine(result);
+          continue;
+        }
+
         // These are all failures. But are they TODOs?
         result.setStatus(StatusValues.NOT_OK);
         boolean flagTODO = false;
