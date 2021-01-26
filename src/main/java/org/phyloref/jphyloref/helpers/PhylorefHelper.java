@@ -44,22 +44,6 @@ public class PhylorefHelper {
   public static final IRI IRI_PHYLOREFERENCE =
       IRI.create("http://ontology.phyloref.org/phyloref.owl#Phyloreference");
 
-  /** IRI for the OWL object property indicating which phylogeny a node belongs to */
-  public static final IRI IRI_PHYLOGENY_CONTAINING_NODE =
-      IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#in_phylogeny");
-
-  /** IRI for the OWL data property indicating the label of the expected phyloreference */
-  public static final IRI IRI_NAME_OF_EXPECTED_PHYLOREF =
-      IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#expected_phyloreference_named");
-
-  /** IRI for the OWL object property indicating which specifiers had not been matched */
-  public static final IRI IRI_PHYLOREF_UNMATCHED_SPECIFIER =
-      IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#has_unmatched_specifier");
-
-  /** IRI for the OWL data property with the verbatim clade definition */
-  public static final IRI IRI_CLADE_DEFINITION =
-      IRI.create("http://vocab.phyloref.org/phyloref/testcase.owl#clade_definition");
-
   /** IRI for the OBI is_specified_output_of property. */
   public static final IRI IRI_OBI_IS_SPECIFIED_OUTPUT_OF =
       IRI.create("http://purl.obolibrary.org/obo/OBI_0000312");

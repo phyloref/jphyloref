@@ -23,9 +23,7 @@ import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -207,12 +205,6 @@ public class TestCommand implements Command {
     // Terms associated with phyloreferences
     OWLAnnotationProperty labelAnnotationProperty =
         dataFactory.getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI());
-    OWLDataProperty expectedPhyloreferenceNamedProperty =
-        dataFactory.getOWLDataProperty(PhylorefHelper.IRI_NAME_OF_EXPECTED_PHYLOREF);
-    OWLObjectProperty unmatchedSpecifierProperty =
-        dataFactory.getOWLObjectProperty(PhylorefHelper.IRI_PHYLOREF_UNMATCHED_SPECIFIER);
-    // OWLDataProperty specifierDefinitionProperty =
-    // dataFactory.getOWLDataProperty(PhylorefHelper.IRI_CLADE_DEFINITION);
 
     // Count the number of test results.
     int testNumber = 0;
