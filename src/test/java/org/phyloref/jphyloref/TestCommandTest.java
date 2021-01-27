@@ -59,12 +59,13 @@ class TestCommandTest {
             + filename
             + "\n# Using reasoner: ELK/2016-01-11T13:41:15Z\nok 1 "
             + phylorefName
-            + "\n# Resolved nodes: ["
-            + resolvedNode
-            + "]"
             + "\n# Expected nodes: ["
             + resolvedNode
-            + "]\n\n",
+            + "]\n"
+            + "# Resolved nodes: ["
+            + resolvedNode
+            + "]\n"
+            + "\n",
         stdoutStr);
   }
 
@@ -228,15 +229,14 @@ class TestCommandTest {
                 + testFilename
                 + "\n# Using reasoner: ELK/2016-01-11T13:41:15Z\n"
                 + "ok 1 Phyloreference '1'\n"
-                + "# Resolved nodes: [#phylogeny0_node2]\n"
                 + "# Expected nodes: [#phylogeny0_node2]\n"
-                + "not ok 2 Phyloreference '2'\n"
                 + "# Resolved nodes: [#phylogeny0_node2]\n"
+                + "not ok 2 Phyloreference '2'\n"
                 + "# Expected nodes: [#phylogeny0_node1]\n"
+                + "# Resolved nodes: [#phylogeny0_node2]\n"
                 + "# Some nodes were resolved but were not expected: [<http://example.org/jphyloref#phylogeny0_node2>]\n"
                 + "# Some nodes were expected but were not resolved: [<http://example.org/jphyloref#phylogeny0_node1>]\n"
                 + "not ok 3 Phyloreference '4' # SKIP Phyloreference has no expected resolution, and so cannot be tested.\n"
-                + "# Resolved nodes: [#phylogeny0_node2]\n"
                 + "# Expected nodes: []\n"
                 + "# It resolved to the following 1 nodes: [<http://example.org/jphyloref#phylogeny0_node2>]\n"
                 + "\n",

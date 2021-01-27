@@ -236,10 +236,6 @@ public class TestCommand implements Command {
       else phylorefLabel = phyloref.getIRI().toString();
       result.setDescription("Phyloreference '" + phylorefLabel + "'");
 
-      // Which nodes did this phyloreference resolve to?
-      Set<OWLNamedIndividual> nodes = PhylorefHelper.getNodesInClass(phyloref, ontology, reasoner);
-      // System.err.println("Phyloreference <" + phyloref + "> has nodes: " + nodes);
-
       // Get a list of phyloref statuses for this phyloreference.
       List<PhylorefHelper.PhylorefStatus> statuses =
           PhylorefHelper.getStatusesForPhyloref(phyloref, ontology);
@@ -270,6 +266,52 @@ public class TestCommand implements Command {
                         ps.getStatus().equals(PhylorefHelper.IRI_PSO_SUBMITTED)
                             || ps.getStatus().equals(PhylorefHelper.IRI_PSO_PUBLISHED));
 
+      // Given a phyloreference class, determine all the nodes that we expect to be
+      // resolved by that phyloreference class.
+      OWLClassExpression expectedNodesExpr =
+          dataFactory.getOWLObjectSomeValuesFrom(
+              dataFactory.getOWLObjectProperty(PhylorefHelper.IRI_OBI_IS_SPECIFIED_OUTPUT_OF),
+              dataFactory.getOWLObjectSomeValuesFrom(
+                  dataFactory.getOWLObjectProperty(PhylorefHelper.IRI_OBI_HAS_SPECIFIED_INPUT),
+                  phyloref));
+
+      Set<OWLNamedIndividual> expectedNodes = new HashSet<>();
+      if (reasoner == null) {
+        // If there's no reasoner, we could look for individuals specifically
+        // marked as expected (see PhylorefHelper for an example). However, we
+        // don't need to implement this until we actually have a need for this.
+        throw new RuntimeException("Testing without reasoner not yet implemented.");
+      }
+
+      // Get direct and indirect instances of the expectedNodesExpr.
+      expectedNodes = reasoner.getInstances(expectedNodesExpr, false).getFlattened();
+      result.addComment(
+          new Comment(
+              "Expected nodes: " + removeDefaultURIPrefixes(expectedNodes, defaultURIPrefix)));
+
+      // Which nodes did this phyloreference resolve to?
+      Set<OWLNamedIndividual> nodes = PhylorefHelper.getNodesInClass(phyloref, ontology, reasoner);
+      // System.err.println("Phyloreference <" + phyloref + "> has nodes: " + nodes);
+
+      // Any phyloreference that is not expected to resolve should be ignored.
+      if (expectedNodes.isEmpty()) {
+        countSkipped++;
+        result.setStatus(StatusValues.NOT_OK);
+        result.setDirective(
+            new Directive(
+                DirectiveValues.SKIP,
+                "Phyloreference has no expected resolution, and so cannot be tested."));
+        if (nodes.isEmpty()) {
+          result.addComment(new Comment("It did not resolve to any nodes."));
+        } else {
+          result.addComment(
+              new Comment("It resolved to the following " + nodes.size() + " nodes: " + nodes));
+        }
+
+        testSet.addTapLine(result);
+        continue;
+      }
+
       // Time to figure out whether we resolved nodes correctly!
       if (nodes.isEmpty()) {
         // This phyloref resolved to no nodes at all.
@@ -283,29 +325,6 @@ public class TestCommand implements Command {
         // Report which nodes were resolved.
         result.addComment(
             new Comment("Resolved nodes: " + removeDefaultURIPrefixes(nodes, defaultURIPrefix)));
-
-        // Given a phyloreference class, determine all the nodes that we expect to be
-        // resolved by that phyloreference class.
-        OWLClassExpression expectedNodesExpr =
-            dataFactory.getOWLObjectSomeValuesFrom(
-                dataFactory.getOWLObjectProperty(PhylorefHelper.IRI_OBI_IS_SPECIFIED_OUTPUT_OF),
-                dataFactory.getOWLObjectSomeValuesFrom(
-                    dataFactory.getOWLObjectProperty(PhylorefHelper.IRI_OBI_HAS_SPECIFIED_INPUT),
-                    phyloref));
-
-        Set<OWLNamedIndividual> expectedNodes = new HashSet<>();
-        if (reasoner == null) {
-          // If there's no reasoner, we could look for individuals specifically
-          // marked as expected (see PhylorefHelper for an example). However, we
-          // don't need to implement this until we actually have a need for this.
-          throw new RuntimeException("Testing without reasoner not yet implemented.");
-        }
-
-        // Get direct and indirect instances of the expectedNodesExpr.
-        expectedNodes = reasoner.getInstances(expectedNodesExpr, false).getFlattened();
-        result.addComment(
-            new Comment(
-                "Expected nodes: " + removeDefaultURIPrefixes(expectedNodes, defaultURIPrefix)));
 
         // Identify two sets of nodes: those we expected but that weren't resolved,
         // and those that we resolved that weren't expected.
@@ -329,25 +348,6 @@ public class TestCommand implements Command {
           }
           testSet.addTapLine(result);
           countSuccess++;
-          continue;
-        }
-
-        // Any phyloreference that is not expected to resolve should be ignored.
-        if (expectedNodes.isEmpty()) {
-          countSkipped++;
-          result.setStatus(StatusValues.NOT_OK);
-          result.setDirective(
-              new Directive(
-                  DirectiveValues.SKIP,
-                  "Phyloreference has no expected resolution, and so cannot be tested."));
-          if (nodes.isEmpty()) {
-            result.addComment(new Comment("It did not resolve to any nodes."));
-          } else {
-            result.addComment(
-                new Comment("It resolved to the following " + nodes.size() + " nodes: " + nodes));
-          }
-
-          testSet.addTapLine(result);
           continue;
         }
 
