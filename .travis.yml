@@ -1,6 +1,0 @@
-language: java
-cache:
-  directories:
-  - $HOME/.m2
-install: skip   # This tries to install dependencies, which fail for some
-                # reason. Just running the tests directly works fine.
