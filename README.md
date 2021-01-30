@@ -1,6 +1,6 @@
 # JPhyloRef
 
-[![Build Status](https://travis-ci.org/phyloref/jphyloref.svg?branch=master)](https://travis-ci.org/phyloref/jphyloref)
+[![Build Status](https://github.com/phyloref/jphyloref/workflows/Build+with+Maven/badge.svg)](https://github.com/phyloref/jphyloref/actions?query=workflow%3A%22Build+with+Maven%22)
 
 JPhyloRef wraps multiple OWL 2 reasoners and provides three ways in which they
 can be used to resolve [phyloreferences](http://phyloref.org):
