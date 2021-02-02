@@ -90,7 +90,7 @@ class TestCommandTest {
       expectSinglePhylorefResolvingCorrectly(
           "src/test/resources/phylorefs/dummy1.owl",
           "Phyloreference '1'",
-          "file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node2",
+          "#phylogeny0_node2",
           outputStr,
           errorStr);
     }

@@ -25,8 +25,6 @@ class ResolveCommandTest {
 
   private static final String EXPECTED_DUMMY1_RESOLUTION =
       "{\"phylorefs\":{\"#phyloref0\":[\"#phylogeny0_node2\"]}}\n";
-  private static final String EXPECTED_DUMMY1_RESOLUTION_RDF =
-      "{\"phylorefs\":{\"file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref0\":[\"file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node2\"]}}\n";
 
   /** Set up input and output streams */
   @BeforeAll
@@ -61,7 +59,7 @@ class ResolveCommandTest {
       }
 
       assertEquals(0, exitCode);
-      assertEquals(EXPECTED_DUMMY1_RESOLUTION_RDF, outputStr);
+      assertEquals(EXPECTED_DUMMY1_RESOLUTION, outputStr);
     }
   }
 

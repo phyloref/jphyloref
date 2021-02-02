@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rdf:RDF
+   xmlns="http://example.org/jphyloref-test-dummy1"
    xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
    xmlns:ns1="http://rs.tdwg.org/ontology/voc/TaxonName#"
    xmlns:ns2="http://rs.tdwg.org/ontology/voc/TaxonConcept#"
@@ -11,13 +12,13 @@
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:testcase="http://vocab.phyloref.org/phyloref/testcase.owl#"
 >
-  <rdf:Description rdf:about="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node5">
-    <obo:CDAO_0000179 rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node2"/>
+  <rdf:Description rdf:about="#phylogeny0_node5">
+    <obo:CDAO_0000179 rdf:resource="#phylogeny0_node2"/>
     <obo:CDAO_0000187 rdf:nodeID="N50286511daa9461baf2e1bd1dbc42a76"/>
     <rdf:type rdf:nodeID="Ncd0b3127b3f246159933ab17fe43103e"/>
-    <phyloref:has_Sibling rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node4"/>
+    <phyloref:has_Sibling rdf:resource="#phylogeny0_node4"/>
     <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cc_c</rdfs:label>
-    <phyloref:has_Sibling rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node3"/>
+    <phyloref:has_Sibling rdf:resource="#phylogeny0_node3"/>
     <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
   </rdf:Description>
   <rdf:Description rdf:nodeID="N21dc675474324a3ca8d6d794f6c16306">
@@ -38,7 +39,7 @@
     <ns1:nomenclaturalCode rdf:resource="http://purl.obolibrary.org/obo/NOMEN_0000036"/>
     <rdf:type rdf:resource="http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName"/>
   </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref0">
+  <rdf:Description rdf:about="#phyloref0">
     <rdfs:subClassOf rdf:resource="http://ontology.phyloref.org/phyloref.owl#Phyloreference"/>
     <testcase:internal_specifier rdf:nodeID="N475c97f1ee8244869ee8ca23600d907c"/>
     <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1</rdfs:label>
@@ -47,37 +48,37 @@
     <owl:equivalentClass rdf:nodeID="Nb361e884855a4498b9728ad8f5a798cb"/>
     <obo:IAO_0000115 rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Node-based, includes C and E, should resolve to (C, D, E) clade.</obo:IAO_0000115>
   </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node2">
-    <obo:CDAO_0000149 rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node3"/>
+  <rdf:Description rdf:about="#phylogeny0_node2">
+    <obo:CDAO_0000149 rdf:resource="#phylogeny0_node3"/>
     <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
-    <obo:CDAO_0000149 rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node4"/>
-    <obo:CDAO_0000149 rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node5"/>
-    <phyloref:has_Sibling rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node6"/>
+    <obo:CDAO_0000149 rdf:resource="#phylogeny0_node4"/>
+    <obo:CDAO_0000149 rdf:resource="#phylogeny0_node5"/>
+    <phyloref:has_Sibling rdf:resource="#phylogeny0_node6"/>
     <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1</rdfs:label>
     <rdf:type rdf:nodeID="N2d6dfe5fc05a4a1f8d61d316de50c79c"/>
-    <obo:CDAO_0000179 rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node1"/>
+    <obo:CDAO_0000179 rdf:resource="#phylogeny0_node1"/>
   </rdf:Description>
   <rdf:Description rdf:nodeID="Ncd0b3127b3f246159933ab17fe43103e">
     <owl:someValuesFrom rdf:nodeID="N3c77b9d699a949108444226360c6ad4d"/>
     <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000187"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
   </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node7">
-    <phyloref:has_Sibling rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node1"/>
+  <rdf:Description rdf:about="#phylogeny0_node7">
+    <phyloref:has_Sibling rdf:resource="#phylogeny0_node1"/>
     <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Aa_a</rdfs:label>
     <obo:CDAO_0000187 rdf:nodeID="Ne4346cb347104b90af66f788a9fcea7f"/>
-    <obo:CDAO_0000179 rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node0"/>
+    <obo:CDAO_0000179 rdf:resource="#phylogeny0_node0"/>
     <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
     <rdf:type rdf:nodeID="N757b154d50464b14a76f6521ee0eed60"/>
   </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node3">
+  <rdf:Description rdf:about="#phylogeny0_node3">
     <rdf:type rdf:nodeID="N411c3d2b75cf43c9a8a59ec5f87be486"/>
     <obo:CDAO_0000187 rdf:nodeID="Neecad25a9fb54815ae366ed8cad53706"/>
-    <obo:CDAO_0000179 rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node2"/>
+    <obo:CDAO_0000179 rdf:resource="#phylogeny0_node2"/>
     <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
-    <phyloref:has_Sibling rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node5"/>
+    <phyloref:has_Sibling rdf:resource="#phylogeny0_node5"/>
     <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ee_e</rdfs:label>
-    <phyloref:has_Sibling rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node4"/>
+    <phyloref:has_Sibling rdf:resource="#phylogeny0_node4"/>
   </rdf:Description>
   <rdf:Description rdf:nodeID="Ne4346cb347104b90af66f788a9fcea7f">
     <rdf:type rdf:resource="http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept"/>
@@ -89,18 +90,18 @@
     <owl:someValuesFrom rdf:nodeID="Nbdfd836174dc42ce8d8d8d2fdd47ccd7"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
   </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0">
-    <testcase:has_node rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node6"/>
-    <testcase:has_node rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node7"/>
-    <testcase:has_node rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node3"/>
-    <testcase:has_node rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node4"/>
-    <testcase:has_node rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node5"/>
+  <rdf:Description rdf:about="#phylogeny0">
+    <testcase:has_node rdf:resource="#phylogeny0_node6"/>
+    <testcase:has_node rdf:resource="#phylogeny0_node7"/>
+    <testcase:has_node rdf:resource="#phylogeny0_node3"/>
+    <testcase:has_node rdf:resource="#phylogeny0_node4"/>
+    <testcase:has_node rdf:resource="#phylogeny0_node5"/>
     <phyloref:newick_expression rdf:datatype="http://www.w3.org/2001/XMLSchema#string">(Aa_a, (Bb_b, (Cc_c, Dd_d, Ee_e)1)2)3</phyloref:newick_expression>
-    <testcase:has_node rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node0"/>
-    <testcase:has_node rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node2"/>
+    <testcase:has_node rdf:resource="#phylogeny0_node0"/>
+    <testcase:has_node rdf:resource="#phylogeny0_node2"/>
     <rdf:type rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#PhyloreferenceTestPhylogeny"/>
-    <testcase:has_root_node rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node0"/>
-    <testcase:has_node rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node1"/>
+    <testcase:has_root_node rdf:resource="#phylogeny0_node0"/>
+    <testcase:has_node rdf:resource="#phylogeny0_node1"/>
   </rdf:Description>
   <rdf:Description rdf:nodeID="Nf81c6ce94e4843b3ba39d9316423e8c8">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
@@ -112,22 +113,22 @@
     <owl:hasValue rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ee e</owl:hasValue>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
   </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node0">
+  <rdf:Description rdf:about="#phylogeny0_node0">
     <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
-    <obo:CDAO_0000149 rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node7"/>
-    <obo:CDAO_0000149 rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node1"/>
+    <obo:CDAO_0000149 rdf:resource="#phylogeny0_node7"/>
+    <obo:CDAO_0000149 rdf:resource="#phylogeny0_node1"/>
     <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">3</rdfs:label>
   </rdf:Description>
   <rdf:Description rdf:nodeID="N475c97f1ee8244869ee8ca23600d907c">
     <ns2:hasName rdf:nodeID="N9054b41ff5db4a109dd44fd89402a902"/>
     <rdf:type rdf:resource="http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept"/>
   </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node1">
-    <obo:CDAO_0000179 rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node0"/>
-    <obo:CDAO_0000149 rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node2"/>
-    <phyloref:has_Sibling rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node7"/>
+  <rdf:Description rdf:about="#phylogeny0_node1">
+    <obo:CDAO_0000179 rdf:resource="#phylogeny0_node0"/>
+    <obo:CDAO_0000149 rdf:resource="#phylogeny0_node2"/>
+    <phyloref:has_Sibling rdf:resource="#phylogeny0_node7"/>
     <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2</rdfs:label>
-    <obo:CDAO_0000149 rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node6"/>
+    <obo:CDAO_0000149 rdf:resource="#phylogeny0_node6"/>
     <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
   </rdf:Description>
   <rdf:Description rdf:nodeID="Ne961b24ed802407eb8cdd3e57f4c6e7f">
@@ -140,7 +141,7 @@
   <rdf:Description rdf:nodeID="N9fbd2039a3b649409d6c4f6e5b879bda">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
     <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/OBI_0000293"/>
-    <owl:someValuesFrom rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref0"/>
+    <owl:someValuesFrom rdf:resource="#phyloref0"/>
   </rdf:Description>
   <rdf:Description rdf:nodeID="Neecad25a9fb54815ae366ed8cad53706">
     <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ee_e</rdfs:label>
@@ -163,8 +164,8 @@
     <owl:onProperty rdf:resource="http://rs.tdwg.org/ontology/voc/TaxonName#nameComplete"/>
   </rdf:Description>
   <rdf:Description rdf:nodeID="N770bec34455f4a728018936ce284756c">
-    <testcase:has_phyloreference rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phyloref0"/>
-    <testcase:has_phylogeny rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0"/>
+    <testcase:has_phyloreference rdf:resource="#phyloref0"/>
+    <testcase:has_phylogeny rdf:resource="#phylogeny0"/>
     <owl:imports rdf:resource="http://ontology.phyloref.org/2018-12-14/phyloref.owl"/>
     <owl:imports rdf:resource="http://ontology.phyloref.org/2018-12-14/tcan.owl"/>
     <rdf:type rdf:resource="http://vocab.phyloref.org/phyloref/testcase.owl#PhyloreferenceTestCase"/>
@@ -182,12 +183,12 @@
     <owl:onProperty rdf:resource="http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName"/>
     <owl:someValuesFrom rdf:nodeID="N1640e782d42b4929a9b669553f226b03"/>
   </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node6">
+  <rdf:Description rdf:about="#phylogeny0_node6">
     <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
     <obo:CDAO_0000187 rdf:nodeID="N5f8395cc7ac149db8305a61f9f6c9fa8"/>
-    <obo:CDAO_0000179 rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node1"/>
+    <obo:CDAO_0000179 rdf:resource="#phylogeny0_node1"/>
     <rdf:type rdf:nodeID="N068a3af710b24327b1a47c38e89245dc"/>
-    <phyloref:has_Sibling rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node2"/>
+    <phyloref:has_Sibling rdf:resource="#phylogeny0_node2"/>
     <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Bb_b</rdfs:label>
   </rdf:Description>
   <rdf:Description rdf:nodeID="N757b154d50464b14a76f6521ee0eed60">
@@ -297,14 +298,14 @@
     <rdf:first rdf:resource="http://purl.obolibrary.org/obo/OBI_0302910"/>
     <rdf:rest rdf:nodeID="Nfa7688e0bd924fe6a6ea56063713648e"/>
   </rdf:Description>
-  <rdf:Description rdf:about="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node4">
-    <phyloref:has_Sibling rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node3"/>
+  <rdf:Description rdf:about="#phylogeny0_node4">
+    <phyloref:has_Sibling rdf:resource="#phylogeny0_node3"/>
     <rdf:type rdf:resource="http://purl.obolibrary.org/obo/CDAO_0000140"/>
-    <obo:CDAO_0000179 rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node2"/>
+    <obo:CDAO_0000179 rdf:resource="#phylogeny0_node2"/>
     <obo:CDAO_0000187 rdf:nodeID="N45edb26335da457a9c7b8319fbd2f86c"/>
     <rdf:type rdf:nodeID="Ne5704532ac804df5a8f254a2f9c1a050"/>
     <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Dd_d</rdfs:label>
-    <phyloref:has_Sibling rdf:resource="file:///Users/gaurav/Development/phyloref/jphyloref/src/test/resources/phylorefs/dummy1.jsonld#phylogeny0_node5"/>
+    <phyloref:has_Sibling rdf:resource="#phylogeny0_node5"/>
   </rdf:Description>
   <rdf:Description rdf:nodeID="Nd5e2488796784c5c95a92c9ced95c82b">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
