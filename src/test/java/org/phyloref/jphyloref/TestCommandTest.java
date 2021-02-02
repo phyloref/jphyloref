@@ -42,7 +42,11 @@ class TestCommandTest {
    * succeeded.
    */
   private void expectSinglePhylorefResolvingCorrectly(
-      String filename, String phylorefName, String stdoutStr, String stderrStr) {
+      String filename,
+      String phylorefName,
+      String resolvedNode,
+      String stdoutStr,
+      String stderrStr) {
     assertTrue(
         stderrStr.contains("Input: " + filename),
         "Make sure JPhyloRef reports the name of the file being processed");
@@ -55,7 +59,12 @@ class TestCommandTest {
             + filename
             + "\n# Using reasoner: ELK/2016-01-11T13:41:15Z\nok 1 "
             + phylorefName
-            + "\n# The following nodes were matched and expected this phyloreference: [1]\n\n",
+            + "\n# Resolved nodes: ["
+            + resolvedNode
+            + "]"
+            + "\n# Expected nodes: ["
+            + resolvedNode
+            + "]\n\n",
         stdoutStr);
   }
 
@@ -79,7 +88,11 @@ class TestCommandTest {
 
       assertEquals(0, exitCode);
       expectSinglePhylorefResolvingCorrectly(
-          "src/test/resources/phylorefs/dummy1.owl", "Phyloreference '1'", outputStr, errorStr);
+          "src/test/resources/phylorefs/dummy1.owl",
+          "Phyloreference '1'",
+          "#phylogeny0_node2",
+          outputStr,
+          errorStr);
     }
   }
 
@@ -103,7 +116,11 @@ class TestCommandTest {
 
       assertEquals(0, exitCode);
       expectSinglePhylorefResolvingCorrectly(
-          "src/test/resources/phylorefs/dummy1.jsonld", "Phyloreference '1'", outputStr, errorStr);
+          "src/test/resources/phylorefs/dummy1.jsonld",
+          "Phyloreference '1'",
+          "#phylogeny0_node2",
+          outputStr,
+          errorStr);
       resetIO();
 
       // Run 'test dummy1.txt' with the '--jsonld' option and see if we get the correct response.
@@ -120,7 +137,11 @@ class TestCommandTest {
 
       assertEquals(0, exitCode);
       expectSinglePhylorefResolvingCorrectly(
-          "src/test/resources/phylorefs/dummy1.txt", "Phyloreference '1'", outputStr, errorStr);
+          "src/test/resources/phylorefs/dummy1.txt",
+          "Phyloreference '1'",
+          "#phylogeny0_node2",
+          outputStr,
+          errorStr);
       resetIO();
     }
 
@@ -153,7 +174,8 @@ class TestCommandTest {
 
         // Test whether the exit code, STDERR and STDOUT is as expected.
         assertEquals(0, exitCode);
-        expectSinglePhylorefResolvingCorrectly("-", "Phyloreference '1'", outputStr, errorStr);
+        expectSinglePhylorefResolvingCorrectly(
+            "-", "Phyloreference '1'", "#phylogeny0_node2", outputStr, errorStr);
       } catch (UnsupportedEncodingException ex) {
         // Could be thrown when converting STDOUT/STDERR to String as UTF-8.
         throw new RuntimeException("'UTF-8' is not supported as an encoding: " + ex);
@@ -206,9 +228,13 @@ class TestCommandTest {
                 + testFilename
                 + "\n# Using reasoner: ELK/2016-01-11T13:41:15Z\n"
                 + "ok 1 Phyloreference '1'\n"
-                + "# The following nodes were matched and expected this phyloreference: [1]\n"
+                + "# Resolved nodes: [#phylogeny0_node2]\n"
+                + "# Expected nodes: [#phylogeny0_node2]\n"
                 + "not ok 2 Phyloreference '2'\n"
-                + "# The following nodes were matched but did not expect this phyloreference: [1]\n\n",
+                + "# Resolved nodes: [#phylogeny0_node2]\n"
+                + "# Expected nodes: [#phylogeny0_node1]\n"
+                + "# Some nodes were resolved but were not expected: [<http://example.org/jphyloref#phylogeny0_node2>]\n"
+                + "# Some nodes were expected but were not resolved: [<http://example.org/jphyloref#phylogeny0_node1>]\n\n",
             outputStr);
 
       } catch (UnsupportedEncodingException ex) {

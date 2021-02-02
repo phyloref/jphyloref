@@ -1,5 +1,5 @@
 {
-    "@context": "http://www.phyloref.org/phyx.js/context/v0.1.0/phyx.json",
+    "@context": "http://www.phyloref.org/phyx.js/context/v0.2.0/phyx.json",
     "citation": "Dummy phyloreference for testing",
     "phylogenies": [
         {
@@ -13,26 +13,18 @@
             "cladeDefinition": "Node-based, includes C and E, should resolve to (C, D, E) clade.",
             "internalSpecifiers": [
                 {
-                    "referencesTaxonomicUnits": [
-                        {
-                            "scientificNames": [
-                                {
-                                    "scientificName": "Cc c"
-                                }
-                            ]
-                        }
-                    ]
+                    "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
+                    "hasName": {
+                        "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
+                        "nameComplete": "Cc c"
+                    }
                 },
                 {
-                    "referencesTaxonomicUnits": [
-                        {
-                            "scientificNames": [
-                                {
-                                    "scientificName": "Ee e"
-                                }
-                            ]
-                        }
-                    ]
+                  "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
+                  "hasName": {
+                      "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
+                      "nameComplete": "Ee e"
+                  }
                 }
             ],
             "externalSpecifiers": []

@@ -1,442 +1,477 @@
-[
+{
+  "phylorefs": [
     {
-        "phylorefs": [
+      "label": "1",
+      "internalSpecifiers": [
+        {
+          "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
+          "hasName": {
+            "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
+            "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
+            "label": "Cc c",
+            "nameComplete": "Cc c",
+            "genusPart": "Cc",
+            "specificEpithet": "c"
+          },
+          "label": "Cc c"
+        },
+        {
+          "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
+          "hasName": {
+            "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
+            "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
+            "label": "Dd d",
+            "nameComplete": "Dd d",
+            "genusPart": "Dd",
+            "specificEpithet": "d"
+          },
+          "label": "Dd d"
+        }
+      ],
+      "externalSpecifiers": [],
+      "@id": "#phyloref0",
+      "@type": "owl:Class",
+      "subClassOf": "phyloref:Phyloreference",
+      "hasAdditionalClass": [],
+      "equivalentClass": [
+        {
+          "@type": "owl:Restriction",
+          "onProperty": "obo:CDAO_0000149",
+          "someValuesFrom": {
+            "@type": "owl:Class",
+            "intersectionOf": [
+              {
+                "@type": "owl:Restriction",
+                "onProperty": "phyloref:excludes_TU",
+                "someValuesFrom": {
+                  "@type": "owl:Restriction",
+                  "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName",
+                  "someValuesFrom": {
+                    "@type": "owl:Restriction",
+                    "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonName#nameComplete",
+                    "hasValue": "Cc c"
+                  }
+                }
+              },
+              {
+                "@type": "owl:Restriction",
+                "onProperty": "phyloref:includes_TU",
+                "someValuesFrom": {
+                  "@type": "owl:Restriction",
+                  "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName",
+                  "someValuesFrom": {
+                    "@type": "owl:Restriction",
+                    "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonName#nameComplete",
+                    "hasValue": "Dd d"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "label": "2",
+      "internalSpecifiers": [
+        {
+          "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
+          "hasName": {
+            "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
+            "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
+            "label": "Cc c",
+            "nameComplete": "Cc c",
+            "genusPart": "Cc",
+            "specificEpithet": "c"
+          },
+          "label": "Cc c"
+        },
+        {
+          "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
+          "hasName": {
+            "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
+            "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
+            "label": "Ee e",
+            "nameComplete": "Ee e",
+            "genusPart": "Ee",
+            "specificEpithet": "e"
+          },
+          "label": "Ee e"
+        }
+      ],
+      "externalSpecifiers": [],
+      "@id": "#phyloref1",
+      "@type": "owl:Class",
+      "subClassOf": "phyloref:Phyloreference",
+      "hasAdditionalClass": [],
+      "equivalentClass": [
+        {
+          "@type": "owl:Restriction",
+          "onProperty": "obo:CDAO_0000149",
+          "someValuesFrom": {
+            "@type": "owl:Class",
+            "intersectionOf": [
+              {
+                "@type": "owl:Restriction",
+                "onProperty": "phyloref:excludes_TU",
+                "someValuesFrom": {
+                  "@type": "owl:Restriction",
+                  "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName",
+                  "someValuesFrom": {
+                    "@type": "owl:Restriction",
+                    "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonName#nameComplete",
+                    "hasValue": "Cc c"
+                  }
+                }
+              },
+              {
+                "@type": "owl:Restriction",
+                "onProperty": "phyloref:includes_TU",
+                "someValuesFrom": {
+                  "@type": "owl:Restriction",
+                  "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName",
+                  "someValuesFrom": {
+                    "@type": "owl:Restriction",
+                    "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonName#nameComplete",
+                    "hasValue": "Ee e"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "phylogenies": [
+    {
+      "newick": "(Aa_a, (Bb_b, (Cc_c, Dd_d, Ee_e)1)2)3",
+      "@id": "#phylogeny0",
+      "@type": "testcase:PhyloreferenceTestPhylogeny",
+      "nodes": [
+        {
+          "@id": "#phylogeny0_node0",
+          "rdf:type": [
             {
-                "label": "1",
-                "internalSpecifiers": [
-                    {
-                        "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
-                        "hasName": {
-                            "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
-                            "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
-                            "label": "Cc c",
-                            "nameComplete": "Cc c",
-                            "genusPart": "Cc",
-                            "specificEpithet": "c"
-                        },
-                        "label": "Cc c"
-                    },
-                    {
-                        "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
-                        "hasName": {
-                            "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
-                            "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
-                            "label": "Ee e",
-                            "nameComplete": "Ee e",
-                            "genusPart": "Ee",
-                            "specificEpithet": "e"
-                        },
-                        "label": "Ee e"
-                    }
-                ],
-                "externalSpecifiers": [],
-                "@id": "#phyloref0",
-                "@type": "owl:Class",
-                "subClassOf": "phyloref:Phyloreference",
-                "hasAdditionalClass": [],
-                "equivalentClass": [
-                    {
-                        "@type": "owl:Restriction",
-                        "onProperty": "obo:CDAO_0000149",
-                        "someValuesFrom": {
-                            "@type": "owl:Class",
-                            "intersectionOf": [
-                                {
-                                    "@type": "owl:Restriction",
-                                    "onProperty": "phyloref:excludes_TU",
-                                    "someValuesFrom": {
-                                        "@type": "owl:Restriction",
-                                        "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName",
-                                        "someValuesFrom": {
-                                            "@type": "owl:Restriction",
-                                            "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonName#nameComplete",
-                                            "hasValue": "Cc c"
-                                        }
-                                    }
-                                },
-                                {
-                                    "@type": "owl:Restriction",
-                                    "onProperty": "phyloref:includes_TU",
-                                    "someValuesFrom": {
-                                        "@type": "owl:Restriction",
-                                        "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName",
-                                        "someValuesFrom": {
-                                            "@type": "owl:Restriction",
-                                            "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonName#nameComplete",
-                                            "hasValue": "Ee e"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                ]
+              "@id": "obo:CDAO_0000140"
+            }
+          ],
+          "labels": [
+            "3"
+          ],
+          "representsTaxonomicUnits": [],
+          "children": [
+            "#phylogeny0_node1",
+            "#phylogeny0_node7"
+          ]
+        },
+        {
+          "@id": "#phylogeny0_node1",
+          "rdf:type": [
+            {
+              "@id": "obo:CDAO_0000140"
             },
             {
-                "label": "2",
-                "internalSpecifiers": [
-                    {
-                        "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
-                        "hasName": {
-                            "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
-                            "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
-                            "label": "Cc c",
-                            "nameComplete": "Cc c",
-                            "genusPart": "Cc",
-                            "specificEpithet": "c"
-                        },
-                        "label": "Cc c"
-                    },
-                    {
-                        "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
-                        "hasName": {
-                            "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
-                            "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
-                            "label": "Ee e",
-                            "nameComplete": "Ee e",
-                            "genusPart": "Ee",
-                            "specificEpithet": "e"
-                        },
-                        "label": "Ee e"
-                    }
-                ],
-                "externalSpecifiers": [],
-                "@id": "#phyloref1",
+              "@type": "owl:Restriction",
+              "onProperty": "obo:OBI_0000312",
+              "someValuesFrom": {
                 "@type": "owl:Class",
-                "subClassOf": "phyloref:Phyloreference",
-                "hasAdditionalClass": [],
-                "equivalentClass": [
-                    {
-                        "@type": "owl:Restriction",
-                        "onProperty": "obo:CDAO_0000149",
-                        "someValuesFrom": {
-                            "@type": "owl:Class",
-                            "intersectionOf": [
-                                {
-                                    "@type": "owl:Restriction",
-                                    "onProperty": "phyloref:excludes_TU",
-                                    "someValuesFrom": {
-                                        "@type": "owl:Restriction",
-                                        "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName",
-                                        "someValuesFrom": {
-                                            "@type": "owl:Restriction",
-                                            "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonName#nameComplete",
-                                            "hasValue": "Cc c"
-                                        }
-                                    }
-                                },
-                                {
-                                    "@type": "owl:Restriction",
-                                    "onProperty": "phyloref:includes_TU",
-                                    "someValuesFrom": {
-                                        "@type": "owl:Restriction",
-                                        "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName",
-                                        "someValuesFrom": {
-                                            "@type": "owl:Restriction",
-                                            "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonName#nameComplete",
-                                            "hasValue": "Ee e"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
+                "intersectionOf": [
+                  {
+                    "@id": "obo:OBI_0302910"
+                  },
+                  {
+                    "@type": "owl:Restriction",
+                    "onProperty": "obo:OBI_0000293",
+                    "someValuesFrom": {
+                      "@id": "#phyloref1"
                     }
+                  }
                 ]
+              }
             }
-        ],
-        "phylogenies": [
+          ],
+          "labels": [
+            "2"
+          ],
+          "representsTaxonomicUnits": [],
+          "parent": "#phylogeny0_node0",
+          "siblings": [
+            "#phylogeny0_node7"
+          ],
+          "children": [
+            "#phylogeny0_node2",
+            "#phylogeny0_node6"
+          ]
+        },
+        {
+          "@id": "#phylogeny0_node2",
+          "rdf:type": [
             {
-                "newick": "(Aa_a, (Bb_b, (Cc_c, Dd_d, Ee_e)1)2)3",
-                "@id": "#phylogeny0",
-                "@type": "testcase:PhyloreferenceTestPhylogeny",
-                "nodes": [
-                    {
-                        "@id": "#phylogeny0_node0",
-                        "rdf:type": [
-                            {
-                                "@id": "obo:CDAO_0000140"
-                            }
-                        ],
-                        "labels": [
-                            "3"
-                        ],
-                        "representsTaxonomicUnits": [],
-                        "children": [
-                            "#phylogeny0_node1",
-                            "#phylogeny0_node7"
-                        ]
-                    },
-                    {
-                        "@id": "#phylogeny0_node1",
-                        "rdf:type": [
-                            {
-                                "@id": "obo:CDAO_0000140"
-                            }
-                        ],
-                        "labels": [
-                            "2"
-                        ],
-                        "representsTaxonomicUnits": [],
-                        "parent": "#phylogeny0_node0",
-                        "siblings": [
-                            "#phylogeny0_node7"
-                        ],
-                        "children": [
-                            "#phylogeny0_node2",
-                            "#phylogeny0_node6"
-                        ]
-                    },
-                    {
-                        "@id": "#phylogeny0_node2",
-                        "rdf:type": [
-                            {
-                                "@id": "obo:CDAO_0000140"
-                            }
-                        ],
-                        "labels": [
-                            "1"
-                        ],
-                        "representsTaxonomicUnits": [],
-                        "parent": "#phylogeny0_node1",
-                        "siblings": [
-                            "#phylogeny0_node6"
-                        ],
-                        "children": [
-                            "#phylogeny0_node3",
-                            "#phylogeny0_node4",
-                            "#phylogeny0_node5"
-                        ]
-                    },
-                    {
-                        "@id": "#phylogeny0_node3",
-                        "rdf:type": [
-                            {
-                                "@id": "obo:CDAO_0000140"
-                            },
-                            {
-                                "@type": "owl:Restriction",
-                                "onProperty": "obo:CDAO_0000187",
-                                "someValuesFrom": {
-                                    "@type": "owl:Restriction",
-                                    "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName",
-                                    "someValuesFrom": {
-                                        "@type": "owl:Restriction",
-                                        "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonName#nameComplete",
-                                        "hasValue": "Ee e"
-                                    }
-                                }
-                            }
-                        ],
-                        "labels": [
-                            "Ee_e"
-                        ],
-                        "representsTaxonomicUnits": [
-                            {
-                                "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
-                                "hasName": {
-                                    "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
-                                    "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
-                                    "label": "Ee_e",
-                                    "nameComplete": "Ee e",
-                                    "genusPart": "Ee",
-                                    "specificEpithet": "e"
-                                },
-                                "label": "Ee_e"
-                            }
-                        ],
-                        "parent": "#phylogeny0_node2",
-                        "siblings": [
-                            "#phylogeny0_node4",
-                            "#phylogeny0_node5"
-                        ]
-                    },
-                    {
-                        "@id": "#phylogeny0_node4",
-                        "rdf:type": [
-                            {
-                                "@id": "obo:CDAO_0000140"
-                            },
-                            {
-                                "@type": "owl:Restriction",
-                                "onProperty": "obo:CDAO_0000187",
-                                "someValuesFrom": {
-                                    "@type": "owl:Restriction",
-                                    "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName",
-                                    "someValuesFrom": {
-                                        "@type": "owl:Restriction",
-                                        "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonName#nameComplete",
-                                        "hasValue": "Dd d"
-                                    }
-                                }
-                            }
-                        ],
-                        "labels": [
-                            "Dd_d"
-                        ],
-                        "representsTaxonomicUnits": [
-                            {
-                                "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
-                                "hasName": {
-                                    "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
-                                    "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
-                                    "label": "Dd_d",
-                                    "nameComplete": "Dd d",
-                                    "genusPart": "Dd",
-                                    "specificEpithet": "d"
-                                },
-                                "label": "Dd_d"
-                            }
-                        ],
-                        "parent": "#phylogeny0_node2",
-                        "siblings": [
-                            "#phylogeny0_node3",
-                            "#phylogeny0_node5"
-                        ]
-                    },
-                    {
-                        "@id": "#phylogeny0_node5",
-                        "rdf:type": [
-                            {
-                                "@id": "obo:CDAO_0000140"
-                            },
-                            {
-                                "@type": "owl:Restriction",
-                                "onProperty": "obo:CDAO_0000187",
-                                "someValuesFrom": {
-                                    "@type": "owl:Restriction",
-                                    "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName",
-                                    "someValuesFrom": {
-                                        "@type": "owl:Restriction",
-                                        "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonName#nameComplete",
-                                        "hasValue": "Cc c"
-                                    }
-                                }
-                            }
-                        ],
-                        "labels": [
-                            "Cc_c"
-                        ],
-                        "representsTaxonomicUnits": [
-                            {
-                                "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
-                                "hasName": {
-                                    "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
-                                    "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
-                                    "label": "Cc_c",
-                                    "nameComplete": "Cc c",
-                                    "genusPart": "Cc",
-                                    "specificEpithet": "c"
-                                },
-                                "label": "Cc_c"
-                            }
-                        ],
-                        "parent": "#phylogeny0_node2",
-                        "siblings": [
-                            "#phylogeny0_node3",
-                            "#phylogeny0_node4"
-                        ]
-                    },
-                    {
-                        "@id": "#phylogeny0_node6",
-                        "rdf:type": [
-                            {
-                                "@id": "obo:CDAO_0000140"
-                            },
-                            {
-                                "@type": "owl:Restriction",
-                                "onProperty": "obo:CDAO_0000187",
-                                "someValuesFrom": {
-                                    "@type": "owl:Restriction",
-                                    "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName",
-                                    "someValuesFrom": {
-                                        "@type": "owl:Restriction",
-                                        "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonName#nameComplete",
-                                        "hasValue": "Bb b"
-                                    }
-                                }
-                            }
-                        ],
-                        "labels": [
-                            "Bb_b"
-                        ],
-                        "representsTaxonomicUnits": [
-                            {
-                                "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
-                                "hasName": {
-                                    "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
-                                    "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
-                                    "label": "Bb_b",
-                                    "nameComplete": "Bb b",
-                                    "genusPart": "Bb",
-                                    "specificEpithet": "b"
-                                },
-                                "label": "Bb_b"
-                            }
-                        ],
-                        "parent": "#phylogeny0_node1",
-                        "siblings": [
-                            "#phylogeny0_node2"
-                        ]
-                    },
-                    {
-                        "@id": "#phylogeny0_node7",
-                        "rdf:type": [
-                            {
-                                "@id": "obo:CDAO_0000140"
-                            },
-                            {
-                                "@type": "owl:Restriction",
-                                "onProperty": "obo:CDAO_0000187",
-                                "someValuesFrom": {
-                                    "@type": "owl:Restriction",
-                                    "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName",
-                                    "someValuesFrom": {
-                                        "@type": "owl:Restriction",
-                                        "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonName#nameComplete",
-                                        "hasValue": "Aa a"
-                                    }
-                                }
-                            }
-                        ],
-                        "labels": [
-                            "Aa_a"
-                        ],
-                        "representsTaxonomicUnits": [
-                            {
-                                "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
-                                "hasName": {
-                                    "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
-                                    "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
-                                    "label": "Aa_a",
-                                    "nameComplete": "Aa a",
-                                    "genusPart": "Aa",
-                                    "specificEpithet": "a"
-                                },
-                                "label": "Aa_a"
-                            }
-                        ],
-                        "parent": "#phylogeny0_node0",
-                        "siblings": [
-                            "#phylogeny0_node1"
-                        ]
+              "@id": "obo:CDAO_0000140"
+            },
+            {
+              "@type": "owl:Restriction",
+              "onProperty": "obo:OBI_0000312",
+              "someValuesFrom": {
+                "@type": "owl:Class",
+                "intersectionOf": [
+                  {
+                    "@id": "obo:OBI_0302910"
+                  },
+                  {
+                    "@type": "owl:Restriction",
+                    "onProperty": "obo:OBI_0000293",
+                    "someValuesFrom": {
+                      "@id": "#phyloref0"
                     }
-                ],
-                "hasRootNode": {
-                    "@id": "#phylogeny0_node0"
-                }
+                  }
+                ]
+              }
             }
-        ],
-        "hasTaxonomicUnitMatches": [],
-        "@id": "",
-        "@type": [
-            "testcase:PhyloreferenceTestCase",
-            "owl:Ontology"
-        ],
-        "owl:imports": [
-            "http://raw.githubusercontent.com/phyloref/curation-workflow/develop/ontologies/phyloref_testcase.owl",
-            "http://ontology.phyloref.org/2018-12-14/phyloref.owl",
-            "http://ontology.phyloref.org/2018-12-14/tcan.owl"
-        ],
-        "@context": "http://www.phyloref.org/phyx.js/context/v0.2.0/phyx.json"
+          ],
+          "labels": [
+            "1"
+          ],
+          "representsTaxonomicUnits": [],
+          "parent": "#phylogeny0_node1",
+          "siblings": [
+            "#phylogeny0_node6"
+          ],
+          "children": [
+            "#phylogeny0_node3",
+            "#phylogeny0_node4",
+            "#phylogeny0_node5"
+          ]
+        },
+        {
+          "@id": "#phylogeny0_node3",
+          "rdf:type": [
+            {
+              "@id": "obo:CDAO_0000140"
+            },
+            {
+              "@type": "owl:Restriction",
+              "onProperty": "obo:CDAO_0000187",
+              "someValuesFrom": {
+                "@type": "owl:Restriction",
+                "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName",
+                "someValuesFrom": {
+                  "@type": "owl:Restriction",
+                  "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonName#nameComplete",
+                  "hasValue": "Ee e"
+                }
+              }
+            }
+          ],
+          "labels": [
+            "Ee_e"
+          ],
+          "representsTaxonomicUnits": [
+            {
+              "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
+              "hasName": {
+                "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
+                "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
+                "label": "Ee_e",
+                "nameComplete": "Ee e",
+                "genusPart": "Ee",
+                "specificEpithet": "e"
+              },
+              "label": "Ee_e"
+            }
+          ],
+          "parent": "#phylogeny0_node2",
+          "siblings": [
+            "#phylogeny0_node4",
+            "#phylogeny0_node5"
+          ]
+        },
+        {
+          "@id": "#phylogeny0_node4",
+          "rdf:type": [
+            {
+              "@id": "obo:CDAO_0000140"
+            },
+            {
+              "@type": "owl:Restriction",
+              "onProperty": "obo:CDAO_0000187",
+              "someValuesFrom": {
+                "@type": "owl:Restriction",
+                "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName",
+                "someValuesFrom": {
+                  "@type": "owl:Restriction",
+                  "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonName#nameComplete",
+                  "hasValue": "Dd d"
+                }
+              }
+            }
+          ],
+          "labels": [
+            "Dd_d"
+          ],
+          "representsTaxonomicUnits": [
+            {
+              "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
+              "hasName": {
+                "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
+                "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
+                "label": "Dd_d",
+                "nameComplete": "Dd d",
+                "genusPart": "Dd",
+                "specificEpithet": "d"
+              },
+              "label": "Dd_d"
+            }
+          ],
+          "parent": "#phylogeny0_node2",
+          "siblings": [
+            "#phylogeny0_node3",
+            "#phylogeny0_node5"
+          ]
+        },
+        {
+          "@id": "#phylogeny0_node5",
+          "rdf:type": [
+            {
+              "@id": "obo:CDAO_0000140"
+            },
+            {
+              "@type": "owl:Restriction",
+              "onProperty": "obo:CDAO_0000187",
+              "someValuesFrom": {
+                "@type": "owl:Restriction",
+                "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName",
+                "someValuesFrom": {
+                  "@type": "owl:Restriction",
+                  "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonName#nameComplete",
+                  "hasValue": "Cc c"
+                }
+              }
+            }
+          ],
+          "labels": [
+            "Cc_c"
+          ],
+          "representsTaxonomicUnits": [
+            {
+              "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
+              "hasName": {
+                "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
+                "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
+                "label": "Cc_c",
+                "nameComplete": "Cc c",
+                "genusPart": "Cc",
+                "specificEpithet": "c"
+              },
+              "label": "Cc_c"
+            }
+          ],
+          "parent": "#phylogeny0_node2",
+          "siblings": [
+            "#phylogeny0_node3",
+            "#phylogeny0_node4"
+          ]
+        },
+        {
+          "@id": "#phylogeny0_node6",
+          "rdf:type": [
+            {
+              "@id": "obo:CDAO_0000140"
+            },
+            {
+              "@type": "owl:Restriction",
+              "onProperty": "obo:CDAO_0000187",
+              "someValuesFrom": {
+                "@type": "owl:Restriction",
+                "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName",
+                "someValuesFrom": {
+                  "@type": "owl:Restriction",
+                  "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonName#nameComplete",
+                  "hasValue": "Bb b"
+                }
+              }
+            }
+          ],
+          "labels": [
+            "Bb_b"
+          ],
+          "representsTaxonomicUnits": [
+            {
+              "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
+              "hasName": {
+                "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
+                "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
+                "label": "Bb_b",
+                "nameComplete": "Bb b",
+                "genusPart": "Bb",
+                "specificEpithet": "b"
+              },
+              "label": "Bb_b"
+            }
+          ],
+          "parent": "#phylogeny0_node1",
+          "siblings": [
+            "#phylogeny0_node2"
+          ]
+        },
+        {
+          "@id": "#phylogeny0_node7",
+          "rdf:type": [
+            {
+              "@id": "obo:CDAO_0000140"
+            },
+            {
+              "@type": "owl:Restriction",
+              "onProperty": "obo:CDAO_0000187",
+              "someValuesFrom": {
+                "@type": "owl:Restriction",
+                "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonConcept#hasName",
+                "someValuesFrom": {
+                  "@type": "owl:Restriction",
+                  "onProperty": "http://rs.tdwg.org/ontology/voc/TaxonName#nameComplete",
+                  "hasValue": "Aa a"
+                }
+              }
+            }
+          ],
+          "labels": [
+            "Aa_a"
+          ],
+          "representsTaxonomicUnits": [
+            {
+              "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
+              "hasName": {
+                "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
+                "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
+                "label": "Aa_a",
+                "nameComplete": "Aa a",
+                "genusPart": "Aa",
+                "specificEpithet": "a"
+              },
+              "label": "Aa_a"
+            }
+          ],
+          "parent": "#phylogeny0_node0",
+          "siblings": [
+            "#phylogeny0_node1"
+          ]
+        }
+      ],
+      "hasRootNode": {
+        "@id": "#phylogeny0_node0"
+      }
     }
-]
+  ],
+  "hasTaxonomicUnitMatches": [],
+  "@type": [
+    "testcase:PhyloreferenceTestCase",
+    "owl:Ontology"
+  ],
+  "owl:imports": [
+    "http://raw.githubusercontent.com/phyloref/curation-workflow/develop/ontologies/phyloref_testcase.owl",
+    "http://ontology.phyloref.org/2018-12-14/phyloref.owl",
+    "http://ontology.phyloref.org/2018-12-14/tcan.owl"
+  ],
+  "@context": "http://www.phyloref.org/phyx.js/context/v0.2.0/phyx.json"
+}
