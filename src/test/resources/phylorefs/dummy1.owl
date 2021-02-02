@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rdf:RDF
-   xmlns="http://example.org/jphyloref-test-dummy1"
    xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
    xmlns:ns1="http://rs.tdwg.org/ontology/voc/TaxonName#"
    xmlns:ns2="http://rs.tdwg.org/ontology/voc/TaxonConcept#"
