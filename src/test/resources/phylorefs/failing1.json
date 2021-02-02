@@ -59,8 +59,37 @@
                 }
             ],
             "externalSpecifiers": []
+        },
+        {
+            "label": "4",
+            "internalSpecifiers": [
+                {
+                    "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
+                    "hasName": {
+                        "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
+                        "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
+                        "label": "Ee e",
+                        "nameComplete": "Ee e",
+                        "genusPart": "Ee",
+                        "specificEpithet": "e"
+                    },
+                    "label": "Ee e"
+                },
+                {
+                    "@type": "http://rs.tdwg.org/ontology/voc/TaxonConcept#TaxonConcept",
+                    "hasName": {
+                        "@type": "http://rs.tdwg.org/ontology/voc/TaxonName#TaxonName",
+                        "nomenclaturalCode": "http://purl.obolibrary.org/obo/NOMEN_0000036",
+                        "label": "Dd d",
+                        "nameComplete": "Dd d",
+                        "genusPart": "Dd",
+                        "specificEpithet": "d"
+                    },
+                    "label": "Dd d"
+                }
+            ],
+            "externalSpecifiers": []
         }
-
     ],
     "phylogenies": [
         {
