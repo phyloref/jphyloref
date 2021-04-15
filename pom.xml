@@ -40,14 +40,6 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>BBOP</id>
-            <name>Berkeley BOP</name>
-            <url>http://code.berkeleybop.org/maven/repository/</url>
-        </repository>
-    </repositories>
-
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -129,13 +121,6 @@
       	    <artifactId>jfact</artifactId>
       	    <version>4.0.4</version>
       	</dependency>
-
-        <!-- Fact++ is a very fast JNI-based reasoner -->
-        <dependency>
-            <groupId>uk.ac.manchester.cs</groupId>
-            <artifactId>factplusplus</artifactId>
-            <version>1.5.2</version>
-        </dependency>
 
         <!-- Adds a StaticLoggerBinder for logging (as per phyloref/jphyloref#18) -->
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
