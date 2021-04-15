@@ -10,7 +10,6 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.util.Version;
-import uk.ac.manchester.cs.factplusplus.owlapiv3.FaCTPlusPlusReasonerFactory;
 import uk.ac.manchester.cs.jfact.JFactFactory;
 
 /**
@@ -29,7 +28,6 @@ public class ReasonerHelper {
      */
     reasonerFactories.put("null", null);
     reasonerFactories.put("jfact", new JFactFactory());
-    reasonerFactories.put("fact++", new FaCTPlusPlusReasonerFactory());
     reasonerFactories.put("elk", new ElkReasonerFactory());
   }
 
