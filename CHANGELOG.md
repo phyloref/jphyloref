@@ -6,7 +6,7 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
 ## [1.0.0] - 2021-04-15
 - Improved README by adding badges and build and execution instructions.
-- Updated Berkeley BOP URL from HTTP to HTTPS.
+- Removed FaCT++ JNI reasoner (JFact is still included.)
 
 ## [0.4.0] - 2021-02-03
 - Updated JPhyloRef to use model 2.0 expectations, encoded as logical expressions
