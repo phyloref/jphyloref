@@ -44,7 +44,7 @@
         <repository>
             <id>BBOP</id>
             <name>Berkeley BOP</name>
-            <url>http://code.berkeleybop.org/maven/repository/</url>
+            <url>https://code.berkeleybop.org/maven/repository/</url>
         </repository>
     </repositories>
 
