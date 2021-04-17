@@ -45,7 +45,7 @@ JPhyloRef is currently in active use for integrating the digitization of phyloge
 
 # Acknowledgements
 
-This work was funded by the US National Science Foundation through collaborative grants [DBI-1458484] and DBI-1458604 to Hilmar Lapp (Duke University) and Nico Cellinese (University of Florida), respectively.
+This work was funded by the US National Science Foundation through collaborative grants [DBI-1458484] and [DBI-1458604] to Hilmar Lapp (Duke University) and Nico Cellinese (University of Florida), respectively.
 
 # References
 
