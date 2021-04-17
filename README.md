@@ -28,7 +28,7 @@ JPhyloRef can be built from source by running `mvn package` from the root direct
 for example:
 
 ```
-$ java -jar target/jphyloref-0.4.0.jar test src/test/resources/phylorefs/dummy1.owl
+$ java -jar target/jphyloref-1.0.0.jar test src/test/resources/phylorefs/dummy1.owl
 ```
 
 You can also download any published version of this software directly from Maven
@@ -38,7 +38,7 @@ If you have [Coursier] installed, you can download and run JPhyloRef in one step
 by running:
 
 ```
-$ coursier launch org.phyloref:jphyloref:0.4.0 -- test input.owl
+$ coursier launch org.phyloref:jphyloref:1.0.0 -- test input.owl
 ```
 
 # Command line options

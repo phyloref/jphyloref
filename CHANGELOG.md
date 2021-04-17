@@ -4,6 +4,10 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
 ## [Unreleased]
 
+## [1.0.0] - 2021-04-15
+- Improved README by adding badges and build and execution instructions.
+- Removed FaCT++ JNI reasoner (JFact is still included.)
+
 ## [0.4.0] - 2021-02-03
 - Updated JPhyloRef to use model 2.0 expectations, encoded as logical expressions
   on the phylogeny node, rather than comparing labels or using text-based properties.
@@ -52,7 +56,8 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 - Initial release, with support for testing phyloreferences expressed in OWL
   and stored in RDF/XML.
 
-[Unreleased]: https://github.com/phyloref/jphyloref/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/phyloref/jphyloref/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/phyloref/jphyloref/releases/tag/v1.0.0
 [0.4.0]: https://github.com/phyloref/jphyloref/releases/tag/v0.4.0
 [0.3.1]: https://github.com/phyloref/jphyloref/releases/tag/v0.3.1
 [0.3]: https://github.com/phyloref/jphyloref/releases/tag/v0.3
