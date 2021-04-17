@@ -3,6 +3,7 @@
 [![Build Status](https://github.com/phyloref/jphyloref/workflows/Build%20with%20Maven/badge.svg)](https://github.com/phyloref/jphyloref/actions?query=workflow%3A%22Build+with+Maven%22)
 [![Maven Central](https://img.shields.io/maven-central/v/org.phyloref/jphyloref.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.phyloref%22%20AND%20a:%22jphyloref%22)
 [![javadoc](https://javadoc.io/badge2/org.phyloref/jphyloref/javadoc.svg)](https://javadoc.io/doc/org.phyloref/jphyloref)
+[![DOI](https://zenodo.org/badge/104808310.svg)](https://zenodo.org/badge/latestdoi/104808310)
 
 JPhyloRef wraps multiple OWL 2 reasoners and provides three ways in which they
 can be used to resolve [phyloreferences](http://phyloref.org):
