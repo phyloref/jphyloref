@@ -26,6 +26,8 @@ can be used to resolve [phyloreferences](http://phyloref.org):
 
 # Build and execution instructions
 
+Once you have downloaded the source code to your computer, you can compile and test the code by running `mvn test`.
+
 JPhyloRef can be built from source by running `mvn package` from the root directory of this repository. This will create a JAR file in the `target/` directory, which can be executed by running,
 for example:
 
