@@ -25,6 +25,10 @@ can be used to resolve [phyloreferences](http://phyloref.org):
 
 Full documentation of the API is included in the source code as [Javadoc] comments. It is also available online [at javadoc.io].
 
+# Community guidelines
+
+Development of JPhyloRef takes place in [our GitHub repository]. This includes [an issue tracker] for reporting any bugs you find or requesting any features you need. We welcome any pull requests to add additional features, tests or documentation. All new pull requests are tested with a [continuous testing workflow].
+
 # Build and execution instructions
 
 JPhyloRef can be built from source by running `mvn package` from the root directory of this repository. This will create a JAR file in the `target/` directory, which can be executed by running,
@@ -86,3 +90,6 @@ published to the OSSRH Snapshots repository.
   [Coursier]: https://get-coursier.io/
   [Javadoc]: https://en.wikipedia.org/wiki/Javadoc
   [at javadoc.io]: https://javadoc.io/doc/org.phyloref/jphyloref
+  [our Github repository]: https://github.com/phyloref/jphyloref
+  [an issue tracker]: https://github.com/phyloref/jphyloref/issues
+  [continuous testing workflow]: https://github.com/phyloref/jphyloref/actions?query=workflow%3A%22Build+with+Maven%22
