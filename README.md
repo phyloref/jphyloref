@@ -19,6 +19,8 @@ can be used to resolve [phyloreferences](http://phyloref.org):
     - You can also use the `/version` endpoint to test whether the software is
       working. It will report on the version of JPhyloRef, OWLAPI and reasoner
       being used.
+    - Note that no content is served at `/`; you will need to use `/version` to
+      test that the server is running.
 - `java -jar jphyloref.jar test input.owl`: Test all the phyloreferences in
   `input.owl` by comparing their resolution with the expected resolution recorded
   in the file.
