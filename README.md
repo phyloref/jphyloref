@@ -23,7 +23,7 @@ can be used to resolve [phyloreferences](http://phyloref.org):
   `input.owl` by comparing their resolution with the expected resolution recorded
   in the file.
 
-Full documentation of the API is included in the source code as [Javadoc] comments. It is also available online [at javadoc.io].
+Documentation of the API is included in the source code as [Javadoc] comments. It is also available online [at javadoc.io].
 
 # Community guidelines
 
