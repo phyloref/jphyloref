@@ -23,6 +23,8 @@ can be used to resolve [phyloreferences](http://phyloref.org):
   `input.owl` by comparing their resolution with the expected resolution recorded
   in the file.
 
+Full documentation of the API is included in the source code as [Javadoc] comments. It is also available online [at javadoc.io].
+
 # Build and execution instructions
 
 JPhyloRef can be built from source by running `mvn package` from the root directory of this repository. This will create a JAR file in the `target/` directory, which can be executed by running,
@@ -82,3 +84,5 @@ published to the OSSRH Snapshots repository.
   [the Sonatype website]: https://central.sonatype.org/pages/apache-maven.html
   [Maven settings.xml file]: https://central.sonatype.org/pages/apache-maven.html
   [Coursier]: https://get-coursier.io/
+  [Javadoc]: https://en.wikipedia.org/wiki/Javadoc
+  [at javadoc.io]: https://javadoc.io/doc/org.phyloref/jphyloref
