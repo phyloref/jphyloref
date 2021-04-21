@@ -19,6 +19,8 @@ can be used to resolve [phyloreferences](http://phyloref.org):
     - You can also use the `/version` endpoint to test whether the software is
       working. It will report on the version of JPhyloRef, OWLAPI and reasoner
       being used.
+    - Note that no content is served at `/`; you will need to use `/version` to
+      test that the server is running.
 - `java -jar jphyloref.jar test input.owl`: Test all the phyloreferences in
   `input.owl` by comparing their resolution with the expected resolution recorded
   in the file.
@@ -30,6 +32,8 @@ Documentation of the API is included in the source code as [Javadoc] comments. I
 Development of JPhyloRef takes place in [our GitHub repository]. This includes [an issue tracker] for reporting any bugs you find or requesting any features you need. We welcome any pull requests to add additional features, tests or documentation. All new pull requests are tested with a [continuous testing workflow].
 
 # Build and execution instructions
+
+Once you have downloaded the source code to your computer, you can compile and test the code by running `mvn test`.
 
 JPhyloRef can be built from source by running `mvn package` from the root directory of this repository. This will create a JAR file in the `target/` directory, which can be executed by running,
 for example:
