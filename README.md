@@ -3,6 +3,7 @@
 [![Build Status](https://github.com/phyloref/jphyloref/workflows/Build%20with%20Maven/badge.svg)](https://github.com/phyloref/jphyloref/actions?query=workflow%3A%22Build+with+Maven%22)
 [![Maven Central](https://img.shields.io/maven-central/v/org.phyloref/jphyloref.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.phyloref%22%20AND%20a:%22jphyloref%22)
 [![javadoc](https://javadoc.io/badge2/org.phyloref/jphyloref/javadoc.svg)](https://javadoc.io/doc/org.phyloref/jphyloref)
+[![DOI](https://zenodo.org/badge/104808310.svg)](https://zenodo.org/badge/latestdoi/104808310)
 
 JPhyloRef wraps multiple OWL 2 reasoners and provides three ways in which they
 can be used to resolve [phyloreferences](http://phyloref.org):
@@ -21,6 +22,12 @@ can be used to resolve [phyloreferences](http://phyloref.org):
 - `java -jar jphyloref.jar test input.owl`: Test all the phyloreferences in
   `input.owl` by comparing their resolution with the expected resolution recorded
   in the file.
+
+Documentation of the API is included in the source code as [Javadoc] comments. It is also available online [at javadoc.io].
+
+# Community guidelines
+
+Development of JPhyloRef takes place in [our GitHub repository]. This includes [an issue tracker] for reporting any bugs you find or requesting any features you need. We welcome any pull requests to add additional features, tests or documentation. All new pull requests are tested with a [continuous testing workflow].
 
 # Build and execution instructions
 
@@ -81,3 +88,8 @@ published to the OSSRH Snapshots repository.
   [the Sonatype website]: https://central.sonatype.org/pages/apache-maven.html
   [Maven settings.xml file]: https://central.sonatype.org/pages/apache-maven.html
   [Coursier]: https://get-coursier.io/
+  [Javadoc]: https://en.wikipedia.org/wiki/Javadoc
+  [at javadoc.io]: https://javadoc.io/doc/org.phyloref/jphyloref
+  [our Github repository]: https://github.com/phyloref/jphyloref
+  [an issue tracker]: https://github.com/phyloref/jphyloref/issues
+  [continuous testing workflow]: https://github.com/phyloref/jphyloref/actions?query=workflow%3A%22Build+with+Maven%22
