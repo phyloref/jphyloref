@@ -12,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.phyloref.jphyloref.helpers.PhylorefHelper.PhylorefStatus;
+import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
@@ -25,7 +26,6 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.vocab.OWL2Datatype;
-import uk.ac.manchester.cs.jfact.JFactFactory;
 
 /** A unit test for the PhylorefHelper class. */
 @DisplayName("PhylorefHelper")
@@ -89,7 +89,7 @@ class PhylorefHelperTest {
     @DisplayName("can retrieve lists of phylorefs with reasoning")
     void canRetrievePhylorefsWithReasoning() {
       OWLDataFactory df = ontologyManager.getOWLDataFactory();
-      OWLReasoner reasoner = new JFactFactory().createNonBufferingReasoner(testOntology);
+      OWLReasoner reasoner = new ElkReasonerFactory().createNonBufferingReasoner(testOntology);
       OWLClass phyloref = df.getOWLClass(IRI.create("http://example.org/phyloref1"));
 
       // Note that this should be identical to the "without reasoning" code in
@@ -178,7 +178,7 @@ class PhylorefHelperTest {
     @DisplayName("can retrieve nodes with reasoning")
     void canRetrieveNodesWithReasoning() {
       OWLDataFactory df = ontologyManager.getOWLDataFactory();
-      OWLReasoner reasoner = new JFactFactory().createNonBufferingReasoner(testOntology);
+      OWLReasoner reasoner = new ElkReasonerFactory().createNonBufferingReasoner(testOntology);
       OWLClass phyloref1 = df.getOWLClass(IRI.create("http://example.org/phyloref1"));
       OWLClass phyloref2 = df.getOWLClass(IRI.create("http://example.org/phyloref2"));
       OWLNamedIndividual node1 = df.getOWLNamedIndividual(IRI.create("http://example.org/node1"));

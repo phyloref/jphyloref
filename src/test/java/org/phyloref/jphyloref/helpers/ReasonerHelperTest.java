@@ -34,16 +34,6 @@ class ReasonerHelperTest {
     }
 
     @Test
-    @DisplayName("can access the JFact reasoner")
-    void canAccessJFact() {
-      OWLReasonerFactory jFactFactory = ReasonerHelper.getReasonerFactory("jfact");
-      assertEquals("uk.ac.manchester.cs.jfact.JFactFactory", jFactFactory.getClass().getName());
-      assertTrue(
-          ReasonerHelper.getReasonerNameAndVersion(jFactFactory).startsWith("JFact/1."),
-          "'jfact' should refer to JFact version 1.x");
-    }
-
-    @Test
     @DisplayName("fails correctly when given an incorrect reasoner name")
     void failsCorrectly() {
       assertThrows(
@@ -66,12 +56,10 @@ class ReasonerHelperTest {
             new DefaultParser().parse(cmdLineOptions, new String[] {"--reasoner", "null"});
         assertNull(ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine));
 
-        cmdLine = new DefaultParser().parse(cmdLineOptions, new String[] {"--reasoner", "jfact"});
-        OWLReasonerFactory jFactFactory = ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine);
-        assertEquals("uk.ac.manchester.cs.jfact.JFactFactory", jFactFactory.getClass().getName());
-        assertTrue(
-            ReasonerHelper.getReasonerNameAndVersion(jFactFactory).startsWith("JFact/1."),
-            "'--reasoner jfact' should load JFact version 1.x");
+        cmdLine = new DefaultParser().parse(cmdLineOptions, new String[] {"--reasoner", "elk"});
+        OWLReasonerFactory elkFactory = ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine);
+        assertEquals(
+            "org.semanticweb.elk.owlapi.ElkReasonerFactory", elkFactory.getClass().getName());
 
       } catch (ParseException ex) {
         throw new RuntimeException("Pre-written command line arguments could not be parsed: " + ex);
