@@ -114,13 +114,6 @@
             <version>0.4.3</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.semanticweb.elk/elk-owlapi -->
-        <dependency>
-            <groupId>org.semanticweb.elk</groupId>
-            <artifactId>elk-owlapi</artifactId>
-            <version>0.4.3</version>
-        </dependency>
-
         <!-- To access OWL-API -->
         <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/owlapi-distribution -->
         <dependency>
