@@ -175,7 +175,10 @@
                       <include>**/*.md</include>
                       <include>**/*.json</include>
                     </includes>
-
+                    <excludes>
+                      <exclude>target/**</exclude>
+                      <exclude>dependency-reduced-pom.xml</exclude>
+                    </excludes>
 
                     <trimTrailingWhitespace/>
                     <endWithNewline/>
