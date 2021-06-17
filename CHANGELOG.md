@@ -3,6 +3,7 @@
 Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
 ## [Unreleased]
+- Removed JFact reasoner as it no longer works with Java 16.
 
 ## [1.0.0] - 2021-04-15
 - Improved README by adding badges and build and execution instructions.
