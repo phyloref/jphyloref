@@ -108,10 +108,10 @@
         </dependency>
 
         <!-- To access OWL-API -->
-        <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/owlapi-distribution -->
+        <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/owlapi-apibinding -->
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
-            <artifactId>owlapi-distribution</artifactId>
+            <artifactId>owlapi-apibinding</artifactId>
             <version>4.5.19</version>
         </dependency>
 
