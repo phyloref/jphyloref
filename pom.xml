@@ -114,13 +114,29 @@
             <version>0.4.3</version>
         </dependency>
 
-        <!-- JFact is our default reasoner -->
-        <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/jfact -->
-      	<dependency>
-      	    <groupId>net.sourceforge.owlapi</groupId>
-      	    <artifactId>jfact</artifactId>
-      	    <version>4.0.4</version>
-      	</dependency>
+        <!-- https://mvnrepository.com/artifact/org.semanticweb.elk/elk-owlapi -->
+        <dependency>
+            <groupId>org.semanticweb.elk</groupId>
+            <artifactId>elk-owlapi</artifactId>
+            <version>0.4.3</version>
+        </dependency>
+
+        <!-- To access OWL-API -->
+        <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/owlapi-distribution -->
+        <dependency>
+            <groupId>net.sourceforge.owlapi</groupId>
+            <artifactId>owlapi-distribution</artifactId>
+            <version>4.5.19</version>
+        </dependency>
+
+        <!-- To support JSON-LD input -->
+        <!-- https://mvnrepository.com/artifact/org.openrdf/openrdf-model -->
+        <dependency>
+            <groupId>org.openrdf</groupId>
+            <artifactId>openrdf-model</artifactId>
+            <version>1.2.7</version>
+        </dependency>
+
 
         <!-- Adds a StaticLoggerBinder for logging (as per phyloref/jphyloref#18) -->
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
