@@ -10,7 +10,6 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.util.Version;
-import uk.ac.manchester.cs.jfact.JFactFactory;
 
 /**
  * The ReasonerHelper provides methods to help create and manage OWL Reasoners, and to allow the
@@ -27,7 +26,6 @@ public class ReasonerHelper {
      * Set up a list of reasoner names and their corresponding reasoner factory.
      */
     reasonerFactories.put("null", null);
-    reasonerFactories.put("jfact", new JFactFactory());
     reasonerFactories.put("elk", new ElkReasonerFactory());
   }
 

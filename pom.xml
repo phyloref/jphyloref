@@ -4,7 +4,7 @@
 
     <groupId>org.phyloref</groupId>
     <artifactId>jphyloref</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>JPhyloRef</name>
@@ -114,13 +114,22 @@
             <version>0.4.3</version>
         </dependency>
 
-        <!-- JFact is our default reasoner -->
-        <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/jfact -->
-      	<dependency>
-      	    <groupId>net.sourceforge.owlapi</groupId>
-      	    <artifactId>jfact</artifactId>
-      	    <version>4.0.4</version>
-      	</dependency>
+        <!-- To access OWL-API -->
+        <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/owlapi-distribution -->
+        <dependency>
+            <groupId>net.sourceforge.owlapi</groupId>
+            <artifactId>owlapi-distribution</artifactId>
+            <version>4.5.19</version>
+        </dependency>
+
+        <!-- To support JSON-LD input -->
+        <!-- https://mvnrepository.com/artifact/org.openrdf/openrdf-model -->
+        <dependency>
+            <groupId>org.openrdf</groupId>
+            <artifactId>openrdf-model</artifactId>
+            <version>1.2.7</version>
+        </dependency>
+
 
         <!-- Adds a StaticLoggerBinder for logging (as per phyloref/jphyloref#18) -->
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->

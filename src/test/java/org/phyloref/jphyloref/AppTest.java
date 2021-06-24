@@ -60,8 +60,6 @@ class AppTest {
     assertTrue(
         outputStr.contains("Synopsis: jphyloref <command> <options>"),
         "We see the synopsis in the output: " + outputStr);
-    assertTrue(
-        outputStr.contains("'jfact': JFact/"), "We see JFact reported in the output: " + outputStr);
   }
 
   /** Test how JPhyloRef responds to an unknown command. */
