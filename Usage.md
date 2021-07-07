@@ -4,20 +4,20 @@ Some example phyloreferences are included as part of the test suite. They can be
 [examples directory], and are tested as part of the [test suite] included with this package.
 You can try these out yourself by setting up [Apache Maven] and running:
 
-```
+```console
 $ mvn clean package
 ```
 
-This will create `target/JPhyloRef-${version}.jar`. You can run this using Java. For example, the
-following command will provide a comprehensive list of command line options for JPhyloRef.
+This will create `target/JPhyloRef-${version}.jar`. You can run this using Java. For example, and assuming a version
+number of `1.1.0-SNAPSHOT`, the following command will provide a comprehensive list of command line options for JPhyloRef.
 
-```
+```console
 $ java -jar target/JPhyloRef-1.1.0-SNAPSHOT.jar
 ```
 
 You can test one of the example files by running:
 
-```
+```console
 $ java -jar target/jphyloref-1.1.0-SNAPSHOT.jar test src/test/resources/phylorefs/dummy1.owl > output.txt
 [main] INFO org.phyloref.jphyloref.commands.TestCommand - Input: src/test/resources/phylorefs/dummy1.owl
 [main] INFO org.phyloref.jphyloref.commands.TestCommand - Found local ontologies: []
@@ -29,7 +29,7 @@ Testing complete:1 successes, 0 failures, 0 failures marked TODO, 0 skipped.
 A more detailed description of the test results is written out on the standard output. In this example,
 this is written in the [Test Anything Protocol] (TAP) format to `output.txt`.
 
-```
+```console
 1..1
 # From file: src/test/resources/phylorefs/dummy1.owl
 # Using reasoner: null/0.0.0.0
@@ -43,7 +43,7 @@ indicate that this is where this phyloreference was expected resolve. Thus, it w
 
 Another example file shows how a resolution error is reported.
 
-```
+```console
 $ java -jar target/jphyloref-1.1.0-SNAPSHOT.jar test src/test/resources/phylorefs/failing1.jsonld > output.txt
 [main] INFO org.phyloref.jphyloref.commands.TestCommand - Input: src/test/resources/phylorefs/failing1.jsonld
 [main] INFO org.phyloref.jphyloref.commands.TestCommand - Found local ontologies: []
@@ -54,7 +54,7 @@ Testing complete:1 successes, 1 failures, 0 failures marked TODO, 1 skipped.
 
 Once again, detailed explanations are available on standard output, here redirected to `output.txt`:
 
-```
+```console
 1..3
 # From file: src/test/resources/phylorefs/failing1.jsonld
 # Using reasoner: null/0.0.0.0
@@ -79,7 +79,7 @@ it should probably be annotated to indicate that phyloreference '3' should resol
 Instead of testing the phyloreference, we could also ask JPhyloRef for information on which node each
 phyloreference resolved to:
 
-```
+```console
 $ java -jar target/jphyloref-1.1.0-SNAPSHOT.jar resolve src/test/resources/phylorefs/failing1.jsonld > output.txt
 [main] INFO org.phyloref.jphyloref.commands.TestCommand - Input: src/test/resources/phylorefs/failing1.jsonld
 [main] INFO org.phyloref.jphyloref.commands.TestCommand - Found local ontologies: []
