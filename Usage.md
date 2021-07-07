@@ -27,7 +27,7 @@ Testing complete:1 successes, 0 failures, 0 failures marked TODO, 0 skipped.
 ```
 
 A more detailed description of the test results is written out on the standard output. In this example,
-this is written in the [Test Anything Protocol] (TAP) format to `output.txt`.
+this is written to `output.txt` in the [Test Anything Protocol] (TAP) format.
 
 ```console
 1..1
