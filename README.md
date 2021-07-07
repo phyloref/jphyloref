@@ -29,7 +29,7 @@ format. When used to find clade ancestor nodes implied by logical clade definiti
 JPhyloRef uses the [OWL API] reference library for reading Web Ontology Language (OWL) ontologies, and for the actual ontology reasoning step it uses an external and configurable OWL reasoner.
 
 JPhyloRef wraps the [ELK reasoner] and provides three ways in which they
-can be used to resolve [phyloreferences](http://phyloref.org):
+can be used to resolve phyloreferences:
 
 - `java -jar jphyloref.jar resolve input.owl`: Resolves phyloreferences in `input.owl`
   and returns the nodes they resolve to in a JSON document.
@@ -93,12 +93,6 @@ Many command line options can be used for all included commands:
   are supported:
   - [Elk 0.4.3](https://github.com/liveontologies/elk-reasoner) (`elk`) is an OWL 2 EL
     reasoner. Phyloreferences should currently be resolved using this reasoner.
-  - [FaCT++ 1.5.2](https://code.google.com/archive/p/factplusplus/) (`fact++`) is
-    an OWL 2 DL reasoner. It requires version 1.5.2 of the Java Native Library for
-    your operating system, which needs to be
-    [downloaded from Google Code](https://code.google.com/archive/p/factplusplus/downloads?page=2).
-  - [JFact 4.0.4](http://jfact.sourceforge.net/) (`jfact`) is an OWL 2 DL reasoner.
-    Since it is written in pure Java, it is the slowest reasoner currently supported.
 
 # Hosting a server with Webhook
 
