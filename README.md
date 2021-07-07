@@ -52,6 +52,7 @@ can be used to resolve phyloreferences:
   in the file.
 
 Documentation of the API is included in the source code as [Javadoc] comments. It is also available online [at javadoc.io].
+Detailed usage instructions are included in the [JPhyloRef Usage document].
 
 Many command line options can be used for all included commands:
 - `--jsonld` or `-j` can be used to interpret the input file as a JSON-LD file
@@ -131,6 +132,7 @@ published to the OSSRH Snapshots repository.
   [Coursier]: https://get-coursier.io/
   [Javadoc]: https://en.wikipedia.org/wiki/Javadoc
   [at javadoc.io]: https://javadoc.io/doc/org.phyloref/jphyloref
+  [JPhyloRef Usage document]: ./Usage.md
   [our Github repository]: https://github.com/phyloref/jphyloref
   [an issue tracker]: https://github.com/phyloref/jphyloref/issues
   [continuous testing workflow]: https://github.com/phyloref/jphyloref/actions?query=workflow%3A%22Build+with+Maven%22
