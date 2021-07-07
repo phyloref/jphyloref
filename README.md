@@ -5,18 +5,18 @@
 [![javadoc](https://javadoc.io/badge2/org.phyloref/jphyloref/javadoc.svg)](https://javadoc.io/doc/org.phyloref/jphyloref)
 [![DOI](https://zenodo.org/badge/104808310.svg)](https://zenodo.org/badge/latestdoi/104808310)
 
-In evolutionary biology, groups of organisms consisting of an ancestor and all of its descendants ("clades") are a
+In evolutionary biology, groups of organisms consisting of an ancestor and all of its descendants ("[clades]") are a
 fundamental unit for understanding evolution and describing biodiversity (see [de Queiroz, 2007]). Phylogenetic clade
 definitions define clades based on shared ancestry, providing the theoretical foundation for the semantics of taxon
 concepts to be defined and reproducibly resolved within a hypothesis of evolutionary relationships, i.e., a phylogeny.
 We have proposed a mechanism, called [Phyloreferencing], for representing phylogenetic clade definitions as structured
-data with fully machine-processable semantics, using the [Web Ontology Language] (OWL). We refer to such
-machine-interpretable clade definitions as "phyloreferences" (see [Cellinese et al., preprint]). For more information
-on how phyloreferences are implemented, see [the JOSS manuscript] included in this repository.
+data with fully machine-processable semantics in [ontologies], using the [Web Ontology Language] (OWL). We refer to such
+machine-interpretable clade definitions as "phyloreferences" (see [Cellinese et al., preprint]). For more information on
+how phyloreferences are implemented, see [the JOSS manuscript] included in this repository or [phyx.js], a JavaScript
+library for creating phyloreferences in OWL ontologies.
 
-JPhyloRef is a [Java]-based command line tool as well as a web service for reasoning with [ontologies] in OWL that
-contain phyloreferences and their accompanying reference phylogenetic
-trees. It has two main goals:
+JPhyloRef is a [Java]-based command line tool as well as a web service for reasoning with OWL ontologies containing
+phyloreferences and their accompanying reference phylogenetic trees. JPhyloRef has two main goals:
 
 1. The primary one is to facilitate automated testing that the semantics
 of the logical definitions imply ("resolve to") the correct nodes in the reference tree as clade ancestors. This is key in
@@ -25,7 +25,7 @@ machine-interpretable representation. It also verifies that one of the theoretic
 computational reproducibility, holds in practice.
 2. The secondary goal is to enable integration with external tools that need
 to obtain the clade ancestor node(s) resulting from a given ontology of phyloreferences and reference tree(s). When run as
-part of an automated testing workflow, JPhyloRef reports test results in the cross-platform [Test Anything Protocol] (TAP)
+part of an automated testing workflow, JPhyloRef reports test results in the cross-platform [Test Anything Protocol]
 format. When used to find clade ancestor nodes implied by logical clade definitions, results are returned as a [JSON] object.
 JPhyloRef uses the [OWL API] reference library for reading Web Ontology Language (OWL) ontologies, and for the actual ontology reasoning step it uses an external and configurable OWL reasoner.
 
@@ -51,8 +51,10 @@ can be used to resolve phyloreferences:
   `input.owl` by comparing their resolution with the expected resolution recorded
   in the file.
 
-Documentation of the API is included in the source code as [Javadoc] comments. It is also available online [at javadoc.io].
-Detailed usage instructions are included in the [JPhyloRef Usage document].
+Detailed usage instructions are included in the [JPhyloRef Usage document]. Documentation of the source code is included
+as [Javadoc] comments, which are also available online [at javadoc.io].
+
+## Command line options
 
 Many command line options can be used for all included commands:
 - `--jsonld` or `-j` can be used to interpret the input file as a JSON-LD file
@@ -112,6 +114,7 @@ Once you're set up, you can run `mvn clean deploy` to publish the package
 to the OSSRH. If your version number ends in `-SNAPSHOT`, this will be
 published to the OSSRH Snapshots repository.
 
+  [clades]: https://en.wikipedia.org/wiki/Clade
   [de Queiroz, 2007]: https://doi.org/10.1080/10635150701656378
   [Phyloreferencing]: https://www.phyloref.org/
   [Cellinese et al., preprint]: https://doi.org/10.32942/osf.io/57yjs
@@ -121,6 +124,7 @@ published to the OSSRH Snapshots repository.
   [JSON]: https://www.json.org/
   [OWL API]: https://github.com/owlcs/owlapi
   [the JOSS manuscript]: ./paper/paper.md
+  [phyx.js]: https://github.com/phyloref/phyx.js
   [Elk reasoner]: http://liveontologies.github.io/elk-reasoner/
   [Java]: https://www.java.com/en/
   [Apache Maven]: https://maven.apache.org/
