@@ -11,7 +11,8 @@ definitions define clades based on shared ancestry, providing the theoretical fo
 concepts to be defined and reproducibly resolved within a hypothesis of evolutionary relationships, i.e., a phylogeny.
 We have proposed a mechanism, called [Phyloreferencing], for representing phylogenetic clade definitions as structured
 data with fully machine-processable semantics, using the [Web Ontology Language] (OWL). We refer to such
-machine-interpretable clade definitions as "phyloreferences" (see [Cellinese et al., preprint]).
+machine-interpretable clade definitions as "phyloreferences" (see [Cellinese et al., preprint]). For more information
+on how phyloreferences are implemented, see [the JOSS manuscript] included in this repository.
 
 JPhyloRef is a [Java]-based command line tool as well as a web service for reasoning with [ontologies] in OWL that contain logical
 definitions of phylogenetic clade definitions, called [phyloreferences], and their accompanying reference phylogenetic
@@ -21,7 +22,7 @@ trees. It has two main goals:
 of the logical definitions imply ("resolve to") the correct nodes in the reference tree as clade ancestors. This is key in
 supporting quality control for the digitization of phylogenetic clade definitions from natural language text to a structured
 machine-interpretable representation. It also verifies that one of the theoretical foundational premises of phyloreferences,
-computational reproducibility, holds in practice. 
+computational reproducibility, holds in practice.
 2. The secondary goal is to enable integration with external tools that need
 to obtain the clade ancestor node(s) resulting from a given ontology of phyloreferences and reference tree(s). When run as
 part of an automated testing workflow, JPhyloRef reports test results in the cross-platform [Test Anything Protocol] (TAP)
@@ -118,6 +119,7 @@ published to the OSSRH Snapshots repository.
   [Test Anything Protocol]: http://testanything.org/
   [JSON]: https://www.json.org/
   [OWL API]: https://github.com/owlcs/owlapi
+  [the JOSS manuscript]: ./paper/paper.md
   [Elk reasoner]: http://liveontologies.github.io/elk-reasoner/
   [Java]: https://www.java.com/en/
   [Apache Maven]: https://maven.apache.org/
