@@ -5,7 +5,30 @@
 [![javadoc](https://javadoc.io/badge2/org.phyloref/jphyloref/javadoc.svg)](https://javadoc.io/doc/org.phyloref/jphyloref)
 [![DOI](https://zenodo.org/badge/104808310.svg)](https://zenodo.org/badge/latestdoi/104808310)
 
-JPhyloRef wraps multiple OWL 2 reasoners and provides three ways in which they
+In evolutionary biology, groups of organisms consisting of an ancestor and all of its descendants ("clades") are a
+fundamental unit for understanding evolution and describing biodiversity (see [de Queiroz, 2007]). Phylogenetic clade
+definitions define clades based on shared ancestry, providing the theoretical foundation for the semantics of taxon
+concepts to be defined and reproducibly resolved within a hypothesis of evolutionary relationships, i.e., a phylogeny.
+We have proposed a mechanism, called [Phyloreferencing], for representing phylogenetic clade definitions as structured
+data with fully machine-processable semantics, using the [Web Ontology Language] (OWL). We refer to such
+machine-interpretable clade definitions as "phyloreferences" (see [Cellinese et al., preprint]).
+
+JPhyloRef is a [Java]-based command line tool as well as a web service for reasoning with [ontologies] in OWL that contain logical
+definitions of phylogenetic clade definitions, called [phyloreferences], and their accompanying reference phylogenetic
+trees. It has two main goals:
+
+1. The primary one is to facilitate automated testing that the semantics
+of the logical definitions imply ("resolve to") the correct nodes in the reference tree as clade ancestors. This is key in
+supporting quality control for the digitization of phylogenetic clade definitions from natural language text to a structured
+machine-interpretable representation. It also verifies that one of the theoretical foundational premises of phyloreferences,
+computational reproducibility, holds in practice. 
+2. The secondary goal is to enable integration with external tools that need
+to obtain the clade ancestor node(s) resulting from a given ontology of phyloreferences and reference tree(s). When run as
+part of an automated testing workflow, JPhyloRef reports test results in the cross-platform [Test Anything Protocol] (TAP)
+format. When used to find clade ancestor nodes implied by logical clade definitions, results are returned as a [JSON] object.
+JPhyloRef uses the [OWL API] reference library for reading Web Ontology Language (OWL) ontologies, and for the actual ontology reasoning step it uses an external and configurable OWL reasoner.
+
+JPhyloRef wraps the [ELK reasoner] and provides three ways in which they
 can be used to resolve [phyloreferences](http://phyloref.org):
 
 - `java -jar jphyloref.jar resolve input.owl`: Resolves phyloreferences in `input.owl`
@@ -93,6 +116,15 @@ Once you're set up, you can run `mvn clean deploy` to publish the package
 to the OSSRH. If your version number ends in `-SNAPSHOT`, this will be
 published to the OSSRH Snapshots repository.
 
+  [de Queiroz, 2007]: https://doi.org/10.1080/10635150701656378
+  [Phyloreferencing]: https://www.phyloref.org/
+  [Cellinese et al., preprint]: https://doi.org/10.32942/osf.io/57yjs
+  [ontologies]: https://en.wikipedia.org/wiki/Ontology
+  [Web Ontology Language]: https://www.w3.org/OWL/
+  [Test Anything Protocol]: http://testanything.org/
+  [JSON]: https://www.json.org/
+  [OWL API]: https://github.com/owlcs/owlapi
+  [Elk reasoner]: http://liveontologies.github.io/elk-reasoner/
   [Java]: https://www.java.com/en/
   [Apache Maven]: https://maven.apache.org/
   [Homebrew]: https://brew.sh/
