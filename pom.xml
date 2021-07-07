@@ -97,13 +97,6 @@
             <version>2.3.2</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.github.jsonld-java/jsonld-java -->
-        <dependency>
-            <groupId>com.github.jsonld-java</groupId>
-            <artifactId>jsonld-java</artifactId>
-            <version>0.12.0</version>
-        </dependency>
-
         <!-- REASONERS -->
 
         <!-- Elk is an OWL 2 EL reasoner -->
@@ -115,10 +108,10 @@
         </dependency>
 
         <!-- To access OWL-API -->
-        <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/owlapi-distribution -->
+        <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/owlapi-apibinding -->
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
-            <artifactId>owlapi-distribution</artifactId>
+            <artifactId>owlapi-apibinding</artifactId>
             <version>4.5.19</version>
         </dependency>
 
@@ -248,6 +241,16 @@
                 <showDeprecation>true</showDeprecation>
               </configuration>
             </plugin>
+
+            <!-- Recreate JAR file on every run -->
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-jar-plugin</artifactId>
+	      <version>3.2.0</version>
+	      <configuration>
+                <forceCreation>true</forceCreation>
+	      </configuration>
+	    </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
