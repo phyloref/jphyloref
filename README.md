@@ -14,8 +14,8 @@ data with fully machine-processable semantics, using the [Web Ontology Language]
 machine-interpretable clade definitions as "phyloreferences" (see [Cellinese et al., preprint]). For more information
 on how phyloreferences are implemented, see [the JOSS manuscript] included in this repository.
 
-JPhyloRef is a [Java]-based command line tool as well as a web service for reasoning with [ontologies] in OWL that contain logical
-definitions of phylogenetic clade definitions, called [phyloreferences], and their accompanying reference phylogenetic
+JPhyloRef is a [Java]-based command line tool as well as a web service for reasoning with [ontologies] in OWL that
+contain phyloreferences and their accompanying reference phylogenetic
 trees. It has two main goals:
 
 1. The primary one is to facilitate automated testing that the semantics
