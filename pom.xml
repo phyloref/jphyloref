@@ -166,6 +166,28 @@
                   </googleJavaFormat>
                   <removeUnusedImports/>
                 </java>
+
+                <formats>
+                  <!-- Clean up indentation in XML, Markdown and JSON files in this project. -->
+                  <format>
+                    <includes>
+                      <include>**/*.xml</include>
+                      <include>**/*.md</include>
+                      <include>**/*.json</include>
+                    </includes>
+                    <excludes>
+                      <exclude>target/**</exclude>
+                      <exclude>dependency-reduced-pom.xml</exclude>
+                    </excludes>
+
+                    <trimTrailingWhitespace/>
+                    <endWithNewline/>
+                    <indent>
+                      <spaces>true</spaces>
+                      <spacesPerTab>2</spacesPerTab>
+                    </indent>
+                  </format>
+                </formats>
               </configuration>
               <executions>
                 <execution>
@@ -245,12 +267,12 @@
             <!-- Recreate JAR file on every run -->
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
-	      <artifactId>maven-jar-plugin</artifactId>
-	      <version>3.2.0</version>
-	      <configuration>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.2.0</version>
+        <configuration>
                 <forceCreation>true</forceCreation>
-	      </configuration>
-	    </plugin>
+        </configuration>
+      </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
