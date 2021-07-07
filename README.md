@@ -29,7 +29,9 @@ part of an automated testing workflow, JPhyloRef reports test results in the cro
 format. When used to find clade ancestor nodes implied by logical clade definitions, results are returned as a [JSON] object.
 JPhyloRef uses the [OWL API] reference library for reading Web Ontology Language (OWL) ontologies, and for the actual ontology reasoning step it uses an external and configurable OWL reasoner.
 
-JPhyloRef wraps the [ELK reasoner] and provides three ways in which they
+# Usage
+
+JPhyloRef wraps the [ELK reasoner] and provides three ways in which it
 can be used to resolve phyloreferences:
 
 - `java -jar jphyloref.jar resolve input.owl`: Resolves phyloreferences in `input.owl`
