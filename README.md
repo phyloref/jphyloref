@@ -5,18 +5,22 @@
 [![javadoc](https://javadoc.io/badge2/org.phyloref/jphyloref/javadoc.svg)](https://javadoc.io/doc/org.phyloref/jphyloref)
 [![DOI](https://zenodo.org/badge/104808310.svg)](https://zenodo.org/badge/latestdoi/104808310)
 
-In evolutionary biology, groups of organisms consisting of an ancestor and all of its descendants ("[clades]") are a
-fundamental unit for understanding evolution and describing biodiversity (see [de Queiroz, 2007]). Phylogenetic clade
-definitions define clades based on shared ancestry, providing the theoretical foundation for the semantics of taxon
-concepts to be defined and reproducibly resolved within a hypothesis of evolutionary relationships, i.e., a phylogeny.
-We have proposed a mechanism, called [Phyloreferencing], for representing phylogenetic clade definitions as structured
-data with fully machine-processable semantics in [ontologies], using the [Web Ontology Language] (OWL). We refer to such
-machine-interpretable clade definitions as "phyloreferences" (see [Cellinese et al., preprint]). For more information on
-how phyloreferences are implemented, see [the JOSS manuscript] included in this repository or [phyx.js], a JavaScript
-library for creating phyloreferences in OWL ontologies.
-
 JPhyloRef is a [Java]-based command line tool as well as a web service for reasoning with OWL ontologies containing
-phyloreferences and their accompanying reference phylogenetic trees. JPhyloRef has two main goals:
+phyloreferences and their accompanying reference phylogenetic trees.
+
+Phyloreferences are phylogenetic clade definitions in the form of well-structured machine-readable data with
+machine-interpretable semantics. Phylogenetic clade definitions define groups of organisms consisting of an ancestor and
+all of its descendants ("[clades]") based on shared ancestry. In evolutionary biology, clades are a fundamental unit for
+understanding evolution and describing biodiversity (see [de Queiroz, 2007]). Phylogenetic clade definitions therefore provide
+the theoretical foundation for the semantics of taxon concepts to be defined and reproducibly resolved within a hypothesis
+of evolutionary relationships, i.e., a phylogeny. The aim of [Phyloreferencing] is to structure and represent the semantics
+of a phylogenetic clade definition and phylogenetic hypotheses using [ontologies] and formal logic expressions (in the
+[Web Ontology Language] (OWL)) such that machines can unambigiuously and reproducibly retrieve the nodes in a tree that
+match the semantics of the clade definition (if any). For more information on the motivation for phyloreferencing see
+[Cellinese et al., preprint], and for more information on how phyloreferences are implemented, see [the JOSS manuscript]
+included in this repository, or [phyx.js], a JavaScript library for creating phyloreferences using OWL ontologies.
+
+JPhyloRef has two main goals:
 
 1. The primary one is to facilitate automated testing that the semantics
 of the logical definitions imply ("resolve to") the correct nodes in the reference tree as clade ancestors. This is key in
