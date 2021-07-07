@@ -53,6 +53,18 @@ can be used to resolve phyloreferences:
 
 Documentation of the API is included in the source code as [Javadoc] comments. It is also available online [at javadoc.io].
 
+Many command line options can be used for all included commands:
+- `--jsonld` or `-j` can be used to interpret the input file as a JSON-LD file
+  rather than an RDF/XML file (resolve or test only).
+- `--host [hostname]` or `-h` can be used to set the hostname that the webserver
+  should listen on (webserver only).
+- `--port [port number]` or `-p` can be used to set the port that the webserver
+  should listen on (webserver only).
+- `--reasoner [name]` can be used to set the reasoner to use. The following reasoners
+  are supported:
+  - [Elk 0.4.3](https://github.com/liveontologies/elk-reasoner) (`elk`) is an OWL 2 EL
+    reasoner. Phyloreferences should currently be resolved using this reasoner.
+
 # Community guidelines
 
 Development of JPhyloRef takes place in [our GitHub repository]. This includes [an issue tracker] for reporting any bugs you find or requesting any features you need. We welcome any pull requests to add additional features, tests or documentation. All new pull requests are tested with a [continuous testing workflow].
@@ -82,20 +94,6 @@ by running:
 ```
 $ coursier launch org.phyloref:jphyloref:1.0.0 -- test input.owl
 ```
-
-# Command line options
-
-Many command line options can be used for all included commands:
-- `--jsonld` or `-j` can be used to interpret the input file as a JSON-LD file
-  rather than an RDF/XML file (resolve or test only).
-- `--host [hostname]` or `-h` can be used to set the hostname that the webserver
-  should listen on (webserver only).
-- `--port [port number]` or `-p` can be used to set the port that the webserver
-  should listen on (webserver only).
-- `--reasoner [name]` can be used to set the reasoner to use. The following reasoners
-  are supported:
-  - [Elk 0.4.3](https://github.com/liveontologies/elk-reasoner) (`elk`) is an OWL 2 EL
-    reasoner. Phyloreferences should currently be resolved using this reasoner.
 
 # Hosting a server with Webhook
 
