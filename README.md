@@ -5,8 +5,38 @@
 [![javadoc](https://javadoc.io/badge2/org.phyloref/jphyloref/javadoc.svg)](https://javadoc.io/doc/org.phyloref/jphyloref)
 [![DOI](https://zenodo.org/badge/104808310.svg)](https://zenodo.org/badge/latestdoi/104808310)
 
-JPhyloRef wraps multiple OWL 2 reasoners and provides three ways in which they
-can be used to resolve [phyloreferences](http://phyloref.org):
+JPhyloRef is a [Java]-based command line tool as well as a web service for reasoning with OWL ontologies containing
+phyloreferences and their accompanying reference phylogenetic trees.
+
+Phyloreferences are phylogenetic clade definitions in the form of well-structured machine-readable data with
+machine-interpretable semantics. Phylogenetic clade definitions define groups of organisms consisting of an ancestor and
+all of its descendants ("[clades]") based on shared ancestry. In evolutionary biology, clades are a fundamental unit for
+understanding evolution and describing biodiversity (see [de Queiroz, 2007]). Phylogenetic clade definitions therefore provide
+the theoretical foundation for the semantics of taxon concepts to be defined and reproducibly resolved within a hypothesis
+of evolutionary relationships, i.e., a phylogeny. The aim of [Phyloreferencing] is to structure and represent the semantics
+of a phylogenetic clade definition and phylogenetic hypotheses using [ontologies] and formal logic expressions (in the
+[Web Ontology Language] (OWL)) such that machines can unambigiuously and reproducibly retrieve the nodes in a tree that
+match the semantics of the clade definition (if any). For more information on the motivation for phyloreferencing see
+[Cellinese et al., preprint], and for more information on how phyloreferences are implemented, see [the JOSS manuscript]
+included in this repository, or [phyx.js], a JavaScript library for creating phyloreferences using OWL ontologies.
+
+JPhyloRef has two main goals:
+
+1. The primary one is to facilitate automated testing that the semantics
+of the logical definitions imply ("resolve to") the correct nodes in the reference tree as clade ancestors. This is key in
+supporting quality control for the digitization of phylogenetic clade definitions from natural language text to a structured
+machine-interpretable representation. It also verifies that one of the theoretical foundational premises of phyloreferences,
+computational reproducibility, holds in practice.
+2. The secondary goal is to enable integration with external tools that need
+to obtain the clade ancestor node(s) resulting from a given ontology of phyloreferences and reference tree(s). When run as
+part of an automated testing workflow, JPhyloRef reports test results in the cross-platform [Test Anything Protocol]
+format. When used to find clade ancestor nodes implied by logical clade definitions, results are returned as a [JSON] object.
+JPhyloRef uses the [OWL API] reference library for reading Web Ontology Language (OWL) ontologies, and for the actual ontology reasoning step it uses an external and configurable OWL reasoner.
+
+# Usage
+
+JPhyloRef wraps the [ELK reasoner] and provides three ways in which it
+can be used to resolve phyloreferences:
 
 - `java -jar jphyloref.jar resolve input.owl`: Resolves phyloreferences in `input.owl`
   and returns the nodes they resolve to in a JSON document.
@@ -25,7 +55,22 @@ can be used to resolve [phyloreferences](http://phyloref.org):
   `input.owl` by comparing their resolution with the expected resolution recorded
   in the file.
 
-Documentation of the API is included in the source code as [Javadoc] comments. It is also available online [at javadoc.io].
+Detailed usage instructions are included in the [JPhyloRef Usage document]. Documentation of the source code is included
+as [Javadoc] comments, which are also available online [at javadoc.io].
+
+## Command line options
+
+Many command line options can be used for all included commands:
+- `--jsonld` or `-j` can be used to interpret the input file as a JSON-LD file
+  rather than an RDF/XML file (resolve or test only).
+- `--host [hostname]` or `-h` can be used to set the hostname that the webserver
+  should listen on (webserver only).
+- `--port [port number]` or `-p` can be used to set the port that the webserver
+  should listen on (webserver only).
+- `--reasoner [name]` can be used to set the reasoner to use. The following reasoners
+  are supported:
+  - [Elk 0.4.3](https://github.com/liveontologies/elk-reasoner) (`elk`) is an OWL 2 EL
+    reasoner. Other reasoners for the OWL-EL profile may work but have not been tested. OWL-DL reasoners have been found to have insufficient performance.
 
 # Community guidelines
 
@@ -57,26 +102,6 @@ by running:
 $ coursier launch org.phyloref:jphyloref:1.0.0 -- test input.owl
 ```
 
-# Command line options
-
-Many command line options can be used for all included commands:
-- `--jsonld` or `-j` can be used to interpret the input file as a JSON-LD file
-  rather than an RDF/XML file (resolve or test only).
-- `--host [hostname]` or `-h` can be used to set the hostname that the webserver
-  should listen on (webserver only).
-- `--port [port number]` or `-p` can be used to set the port that the webserver
-  should listen on (webserver only).
-- `--reasoner [name]` can be used to set the reasoner to use. The following reasoners
-  are supported:
-  - [Elk 0.4.3](https://github.com/liveontologies/elk-reasoner) (`elk`) is an OWL 2 EL
-    reasoner. Phyloreferences should currently be resolved using this reasoner.
-  - [FaCT++ 1.5.2](https://code.google.com/archive/p/factplusplus/) (`fact++`) is
-    an OWL 2 DL reasoner. It requires version 1.5.2 of the Java Native Library for
-    your operating system, which needs to be
-    [downloaded from Google Code](https://code.google.com/archive/p/factplusplus/downloads?page=2).
-  - [JFact 4.0.4](http://jfact.sourceforge.net/) (`jfact`) is an OWL 2 DL reasoner.
-    Since it is written in pure Java, it is the slowest reasoner currently supported.
-
 # Hosting a server with Webhook
 
 JPhyloRef can be [set up on a SLURM cluster using Webhook](webhook/README.md),
@@ -93,6 +118,18 @@ Once you're set up, you can run `mvn clean deploy` to publish the package
 to the OSSRH. If your version number ends in `-SNAPSHOT`, this will be
 published to the OSSRH Snapshots repository.
 
+  [clades]: https://en.wikipedia.org/wiki/Clade
+  [de Queiroz, 2007]: https://doi.org/10.1080/10635150701656378
+  [Phyloreferencing]: https://www.phyloref.org/
+  [Cellinese et al., preprint]: https://doi.org/10.32942/osf.io/57yjs
+  [ontologies]: https://en.wikipedia.org/wiki/Ontology
+  [Web Ontology Language]: https://www.w3.org/OWL/
+  [Test Anything Protocol]: http://testanything.org/
+  [JSON]: https://www.json.org/
+  [OWL API]: https://github.com/owlcs/owlapi
+  [the JOSS manuscript]: ./paper/paper.md
+  [phyx.js]: https://github.com/phyloref/phyx.js
+  [Elk reasoner]: http://liveontologies.github.io/elk-reasoner/
   [Java]: https://www.java.com/en/
   [Apache Maven]: https://maven.apache.org/
   [Homebrew]: https://brew.sh/
@@ -103,6 +140,7 @@ published to the OSSRH Snapshots repository.
   [Coursier]: https://get-coursier.io/
   [Javadoc]: https://en.wikipedia.org/wiki/Javadoc
   [at javadoc.io]: https://javadoc.io/doc/org.phyloref/jphyloref
+  [JPhyloRef Usage document]: ./Usage.md
   [our Github repository]: https://github.com/phyloref/jphyloref
   [an issue tracker]: https://github.com/phyloref/jphyloref/issues
   [continuous testing workflow]: https://github.com/phyloref/jphyloref/actions?query=workflow%3A%22Build+with+Maven%22
