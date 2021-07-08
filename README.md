@@ -70,7 +70,7 @@ Many command line options can be used for all included commands:
 - `--reasoner [name]` can be used to set the reasoner to use. The following reasoners
   are supported:
   - [Elk 0.4.3](https://github.com/liveontologies/elk-reasoner) (`elk`) is an OWL 2 EL
-    reasoner. Phyloreferences should currently be resolved using this reasoner.
+    reasoner. Other reasoners for the OWL-EL profile may work but have not been tested. OWL-DL reasoners have been found to have insufficient performance.
 
 # Community guidelines
 
