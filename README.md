@@ -8,13 +8,13 @@
 JPhyloRef is a [Java]-based command line tool as well as a web service for reasoning with OWL ontologies containing
 phyloreferences and their accompanying reference phylogenetic trees.
 
-Phyloreferences are phylogenetic clade definitions in the form of well-structured machine-readable data with
-machine-interpretable semantics. Phylogenetic clade definitions define groups of organisms consisting of an ancestor and
+Phyloreferences are clade definitions in the form of well-structured machine-readable data with
+machine-interpretable semantics. Clade definitions define groups of organisms consisting of an ancestor and
 all of its descendants ("[clades]") based on shared ancestry. In evolutionary biology, clades are a fundamental unit for
-understanding evolution and describing biodiversity (see [de Queiroz, 2007]). Phylogenetic clade definitions therefore provide
+understanding evolution and describing biodiversity (see [de Queiroz, 2007]). Clade definitions therefore provide
 the theoretical foundation for the semantics of taxon concepts to be defined and reproducibly resolved within a hypothesis
 of evolutionary relationships, i.e., a phylogeny. The aim of [Phyloreferencing] is to structure and represent the semantics
-of a phylogenetic clade definition and phylogenetic hypotheses using [ontologies] and formal logic expressions (in the
+of a clade definition and phylogenetic hypotheses using [ontologies] and formal logic expressions (in the
 [Web Ontology Language] (OWL)) such that machines can unambigiuously and reproducibly retrieve the nodes in a tree that
 match the semantics of the clade definition (if any). For more information on the motivation for phyloreferencing see
 [Cellinese et al., preprint], and for more information on how phyloreferences are implemented, see [the JOSS manuscript]
@@ -24,7 +24,7 @@ JPhyloRef has two main goals:
 
 1. The primary one is to facilitate automated testing that the semantics
 of the logical definitions imply ("resolve to") the correct nodes in the reference tree as clade ancestors. This is key in
-supporting quality control for the digitization of phylogenetic clade definitions from natural language text to a structured
+supporting quality control for the digitization of clade definitions from natural language text to a structured
 machine-interpretable representation. It also verifies that one of the theoretical foundational premises of phyloreferences,
 computational reproducibility, holds in practice.
 2. The secondary goal is to enable integration with external tools that need
