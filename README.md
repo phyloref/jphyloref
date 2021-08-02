@@ -89,8 +89,10 @@ JPhyloRef can be built from source by running `mvn package` from the root direct
 for example:
 
 ```
-$ java -jar target/jphyloref-1.0.0.jar test src/test/resources/phylorefs/dummy1.owl
+$ java -jar target/jphyloref-1.1.0-SNAPSHOT.jar test src/test/resources/phylorefs/dummy1.owl
 ```
+
+(Note that `1.1.0` should be replaced by the correct version number -- look for the `Building JPhyloRef 1.1.0-SNAPSHOT` line in the output from `mvn package`)
 
 You can also download any published version of this software directly from Maven
 at https://search.maven.org/artifact/org.phyloref/jphyloref.
