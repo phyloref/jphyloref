@@ -92,7 +92,7 @@ for example:
 $ java -jar target/jphyloref-1.1.0-SNAPSHOT.jar test src/test/resources/phylorefs/dummy1.owl
 ```
 
-(Note that `1.1.0` should be replaced by the correct version number -- look for the `Building JPhyloRef 1.1.0-SNAPSHOT` line in the output from `mvn package`)
+(Note that `1.1.0` should be replaced by the correct version number -- look for the `Building JPhyloRef N.M.K-SNAPSHOT` line in the output from `mvn package`, where N.M.K is the version, such as 1.1.0)
 
 You can also download any published version of this software directly from Maven
 at https://search.maven.org/artifact/org.phyloref/jphyloref.
