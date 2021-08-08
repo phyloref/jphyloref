@@ -2,6 +2,8 @@
 
 Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
+## [Unreleased]
+
 ## [1.1.0] - 2021-08-07
 - Prepared manuscript for submission to the Journal of Open Source Software (JOSS).
 - Improved documentation based on JOSS reviewer feedback.
