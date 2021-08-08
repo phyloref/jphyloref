@@ -8,7 +8,8 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 - Prepared manuscript for submission to the Journal of Open Source Software (JOSS).
 - Improved documentation based on JOSS reviewer feedback.
 - Improved pom.xml based on JOSS reviewer feedback.
-- Removed JFact reasoner as it no longer works with Java 16.
+- Removed JFact reasoner as it only works on Java 15 and earlier versions of Java.
+  This allows us to support Java 16.
 
 ## [1.0.0] - 2021-04-15
 - Improved README by adding badges and build and execution instructions.
