@@ -2,7 +2,10 @@
 
 Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
-## [Unreleased]
+## [1.1.0] - 2021-08-07
+- Prepared manuscript for submission to the Journal of Open Source Software (JOSS).
+- Improved documentation based on JOSS reviewer feedback.
+- Improved pom.xml based on JOSS reviewer feedback.
 - Removed JFact reasoner as it no longer works with Java 16.
 
 ## [1.0.0] - 2021-04-15
@@ -57,7 +60,8 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 - Initial release, with support for testing phyloreferences expressed in OWL
   and stored in RDF/XML.
 
-[Unreleased]: https://github.com/phyloref/jphyloref/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/phyloref/jphyloref/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/phyloref/jphyloref/releases/tag/v1.1.0
 [1.0.0]: https://github.com/phyloref/jphyloref/releases/tag/v1.0.0
 [0.4.0]: https://github.com/phyloref/jphyloref/releases/tag/v0.4.0
 [0.3.1]: https://github.com/phyloref/jphyloref/releases/tag/v0.3.1
