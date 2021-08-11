@@ -101,7 +101,7 @@ If you have [Coursier] installed, you can download and run JPhyloRef in one step
 by running:
 
 ```
-$ coursier launch org.phyloref:jphyloref:1.1.0 -- test input.owl
+$ coursier launch org.phyloref:jphyloref:1.1.1 -- test input.owl
 ```
 
 # Hosting a server with Webhook
