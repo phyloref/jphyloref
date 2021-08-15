@@ -33,5 +33,6 @@ preferred-citation:
       given-names: Hilmar
       orcid: https://orcid.org/0000-0001-9107-0714
   title: "JPhyloRef: a tool for testing and resolving phyloreferences"
+  type: article
   doi: 10.21105/joss.03374
   date-released: 2021-08-14
