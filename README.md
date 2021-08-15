@@ -3,10 +3,11 @@
 [![Build Status](https://github.com/phyloref/jphyloref/workflows/Build%20with%20Maven/badge.svg)](https://github.com/phyloref/jphyloref/actions?query=workflow%3A%22Build+with+Maven%22)
 [![Maven Central](https://img.shields.io/maven-central/v/org.phyloref/jphyloref.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.phyloref%22%20AND%20a:%22jphyloref%22)
 [![javadoc](https://javadoc.io/badge2/org.phyloref/jphyloref/javadoc.svg)](https://javadoc.io/doc/org.phyloref/jphyloref)
-[![DOI](https://zenodo.org/badge/104808310.svg)](https://zenodo.org/badge/latestdoi/104808310)
+[![JOSS](https://joss.theoj.org/papers/10.21105/joss.03374/status.svg)](https://doi.org/10.21105/joss.03374)
+[![Zenodo](https://zenodo.org/badge/104808310.svg)](https://zenodo.org/badge/latestdoi/104808310)
 
 JPhyloRef is a [Java]-based command line tool as well as a web service for reasoning with OWL ontologies containing
-phyloreferences and their accompanying reference phylogenetic trees.
+phyloreferences and their accompanying reference phylogenetic trees. 
 
 Phyloreferences are clade definitions in the form of well-structured machine-readable data with
 machine-interpretable semantics. Clade definitions define groups of organisms consisting of an ancestor and
