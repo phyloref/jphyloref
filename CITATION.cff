@@ -1,5 +1,4 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite the JOSS paper as well as the specific version of JPhyloRef that you used from Zenodo."
 authors:
   - family-names: Vaidya
     given-names: Gaurav
