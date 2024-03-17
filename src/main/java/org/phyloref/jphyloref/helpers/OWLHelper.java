@@ -110,6 +110,7 @@ public final class OWLHelper {
 
     // Go through all known annotations, looking for OWLLiterals.
     EntitySearcher.getAnnotations(entity, ontology, annotationProperty)
+        .stream()
         .filter(annotation -> annotation.getValue() instanceof OWLLiteral)
         .forEach(
             annotation -> {

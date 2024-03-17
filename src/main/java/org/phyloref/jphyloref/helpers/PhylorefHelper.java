@@ -313,8 +313,7 @@ public class PhylorefHelper {
 
     // Retrieve holdsStatusInTime to determine the active status of this phyloreference.
     List<OWLAnnotation> holdsStatusInTime =
-        EntitySearcher.getAnnotations(phyloref, ontology, pso_holdsStatusInTime)
-            .collect(Collectors.toList());
+        new ArrayList<>(EntitySearcher.getAnnotations(phyloref, ontology, pso_holdsStatusInTime));
 
     // Read through the list of OWLAnnotations to create corresponding PhylorefStatus objects.
     for (OWLAnnotation statusInTime : holdsStatusInTime) {
