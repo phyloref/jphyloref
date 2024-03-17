@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -315,7 +314,7 @@ public class PhylorefHelper {
     // Retrieve holdsStatusInTime to determine the active status of this phyloreference.
     List<OWLAnnotation> holdsStatusInTime =
         EntitySearcher.getAnnotations(phyloref, ontology, pso_holdsStatusInTime)
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
 
     // Read through the list of OWLAnnotations to create corresponding PhylorefStatus objects.
     for (OWLAnnotation statusInTime : holdsStatusInTime) {
