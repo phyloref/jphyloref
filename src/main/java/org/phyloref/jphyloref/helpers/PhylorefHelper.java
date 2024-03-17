@@ -313,8 +313,9 @@ public class PhylorefHelper {
         dataFactory.getOWLAnnotationProperty(PhylorefHelper.IRI_TIMEINT_HAS_INTERVAL_END_DATE);
 
     // Retrieve holdsStatusInTime to determine the active status of this phyloreference.
-    Collection<OWLAnnotation> holdsStatusInTime =
-        EntitySearcher.getAnnotations(phyloref, ontology, pso_holdsStatusInTime);
+    List<OWLAnnotation> holdsStatusInTime =
+        EntitySearcher.getAnnotations(phyloref, ontology, pso_holdsStatusInTime)
+                .collect(Collectors.toList());
 
     // Read through the list of OWLAnnotations to create corresponding PhylorefStatus objects.
     for (OWLAnnotation statusInTime : holdsStatusInTime) {
