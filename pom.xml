@@ -36,6 +36,7 @@
     <properties>
         <mainClass>org.phyloref.jphyloref.JPhyloRef</mainClass>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Java 1.8 is what HiPerGator currently gives us -->
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
