@@ -1,14 +1,20 @@
 package org.phyloref.jphyloref.helpers;
 
+import com.github.jsonldjava.core.DocumentLoader;
+import com.github.jsonldjava.core.JsonLdError;
+import com.github.jsonldjava.core.RemoteDocument;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFParser;
 import org.eclipse.rdf4j.rio.Rio;
+import org.eclipse.rdf4j.rio.helpers.JSONLDSettings;
 import org.semanticweb.owlapi.formats.RDFJsonLDDocumentFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyLoaderConfiguration;
 import org.semanticweb.owlapi.rio.RioOWLRDFConsumerAdapter;
 import org.semanticweb.owlapi.util.AnonymousNodeChecker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * JSONLDHelper provides methods to help read and process JSON-LD files.
@@ -16,6 +22,8 @@ import org.semanticweb.owlapi.util.AnonymousNodeChecker;
  * @author Gaurav Vaidya
  */
 public class JSONLDHelper {
+  private static final Logger logger = LoggerFactory.getLogger(JSONLDHelper.class);
+
   /**
    * Create an RDFParser for JSON-LD files. When the parser's <code>parse()</code> method is called,
    * its contents will be added to the OWLOntology passed to this method.
@@ -59,6 +67,23 @@ public class JSONLDHelper {
     // Set up an RDF parser to read the JSON-LD file.
     RDFParser parser = Rio.createParser(RDFFormat.JSONLD);
     parser.setRDFHandler(rdfHandler);
+
+    // We get some indistinct errors if any of the context URLs in the JSON-LD file are
+    // incorrect or inaccessible. However, we can set up our own document loader so we
+    // can detect when this occurs.
+    parser.set(
+        JSONLDSettings.DOCUMENT_LOADER,
+        new DocumentLoader() {
+          @Override
+          public RemoteDocument loadDocument(String url) throws JsonLdError {
+            try {
+              return super.loadDocument(url);
+            } catch (JsonLdError err) {
+              logger.error("Error occurred while loading document " + url + ": " + err);
+              throw err;
+            }
+          }
+        });
 
     return parser;
   }
