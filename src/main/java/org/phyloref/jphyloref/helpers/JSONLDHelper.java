@@ -3,6 +3,8 @@ package org.phyloref.jphyloref.helpers;
 import com.github.jsonldjava.core.DocumentLoader;
 import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.core.RemoteDocument;
+import com.github.jsonldjava.utils.JsonUtils;
+import java.net.URL;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFParser;
 import org.eclipse.rdf4j.rio.Rio;
@@ -70,17 +72,18 @@ public class JSONLDHelper {
 
     // We get some indistinct errors if any of the context URLs in the JSON-LD file are
     // incorrect or inaccessible. However, we can set up our own document loader so we
-    // can detect when this occurs.
+    // can detect when this occurs.)
     parser.set(
         JSONLDSettings.DOCUMENT_LOADER,
         new DocumentLoader() {
           @Override
           public RemoteDocument loadDocument(String url) throws JsonLdError {
             try {
-              return super.loadDocument(url);
-            } catch (JsonLdError err) {
+              return new RemoteDocument(
+                  url, JsonUtils.fromURL(new URL(url), JsonUtils.createDefaultHttpClient()));
+            } catch (Exception err) {
               logger.error("Error occurred while loading document " + url + ": " + err);
-              throw err;
+              throw new JsonLdError(JsonLdError.Error.LOADING_REMOTE_CONTEXT_FAILED, url, err);
             }
           }
         });
