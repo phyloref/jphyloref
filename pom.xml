@@ -86,7 +86,7 @@
         <dependency>
             <groupId>org.eclipse.rdf4j</groupId>
             <artifactId>rdf4j-rio-jsonld</artifactId>
-            <version>2.3.2</version>
+            <version>3.7.7</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -94,7 +94,7 @@
         <dependency>
             <groupId>org.eclipse.rdf4j</groupId>
             <artifactId>rdf4j-rio-api</artifactId>
-            <version>2.3.2</version>
+            <version>3.7.7</version>
         </dependency>
 
         <!-- REASONERS -->
