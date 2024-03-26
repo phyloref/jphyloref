@@ -83,7 +83,7 @@ public class JSONLDHelper {
             // Load built-in context files as injected documents.
             try {
               this.addInjectedDoc(
-                  "https://ww.phyloref.org/phyx.js/context/v1.0.0/phyx.json",
+                  "https://www.phyloref.org/phyx.js/context/v1.0.0/phyx.json",
                   loadResourceFileAsString("context/phyx-context-v1.0.0.json"));
             } catch (IOException e) {
               logger.error("Could not load Phyx context v1.0.0: " + e);
