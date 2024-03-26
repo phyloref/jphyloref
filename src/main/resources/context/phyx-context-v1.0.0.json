@@ -1,0 +1,143 @@
+{
+  "@context": {
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "obo": "http://purl.obolibrary.org/obo/",
+    "dwc": "http://rs.tdwg.org/dwc/terms/",
+    "dct": "http://purl.org/dc/terms/",
+    "tc": "http://rs.tdwg.org/ontology/voc/TaxonConcept#",
+    "tn": "http://rs.tdwg.org/ontology/voc/TaxonName#",
+    "testcase": "http://vocab.phyloref.org/phyloref/testcase.owl#",
+    "pso": "http://purl.org/spar/pso/",
+    "tvc": "http://www.essepuntato.it/2012/04/tvc/",
+    "timeinterval": "http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#",
+    "phyloref": "http://ontology.phyloref.org/phyloref.owl#",
+    "opentree": "http://purl.org/opentree/nexson#",
+    "subClasses": {
+      "@reverse": "rdfs:subClassOf"
+    },
+    "label": {
+      "@id": "rdfs:label",
+      "@type": "xsd:string"
+    },
+    "labels": {
+      "@id": "rdfs:label",
+      "@type": "xsd:string",
+      "@container": "@set"
+    },
+    "namePublishedIn": "dwc:namePublishedIn",
+    "definitionSource": "obo:IAO_0000119",
+    "definition": {
+      "@id": "obo:IAO_0000115",
+      "@type": "xsd:string"
+    },
+    "hasName": {
+      "@id": "tc:hasName",
+      "@type": "tn:TaxonName"
+    },
+    "nameComplete": {
+      "@id": "tn:nameComplete",
+      "@type": "xsd:string"
+    },
+    "nomenclaturalCode": {
+      "@id": "tn:nomenclaturalCode",
+      "@type": "@id"
+    },
+    "scientificName": {
+      "@id": "dwc:scientificName",
+      "@type": "xsd:string"
+    },
+    "genusPart": {
+      "@id": "tn:genusPart",
+      "@type": "xsd:string"
+    },
+    "specificEpithet": {
+      "@id": "tn:specificEpithet",
+      "@type": "xsd:string"
+    },
+    "basisOfRecord": "dwc:basisOfRecord",
+    "occurrenceID": "dwc:occurrenceID",
+    "catalogNumber": "dwc:catalogNumber",
+    "collectionCode": "dwc:collectionCode",
+    "institutionCode": "dwc:institutionCode",
+    "subClassOf": {
+      "@id": "rdfs:subClassOf",
+      "@type": "@id"
+    },
+    "parent": {
+      "@id": "obo:CDAO_0000179",
+      "@type": "@id"
+    },
+    "children": {
+      "@id": "obo:CDAO_0000149",
+      "@type": "@id"
+    },
+    "siblings": {
+      "@id": "phyloref:has_Sibling",
+      "@type": "@id"
+    },
+    "owl:imports": {
+      "@id": "owl:imports",
+      "@type": "@id"
+    },
+    "equivalentClass": "owl:equivalentClass",
+    "intersectionOf": {
+      "@id": "owl:intersectionOf",
+      "@container": "@list"
+    },
+    "onProperty": {
+      "@id": "owl:onProperty",
+      "@type": "@id"
+    },
+    "someValuesFrom": {
+      "@id": "owl:someValuesFrom",
+      "@container": "@set"
+    },
+    "unionOf": {
+      "@id": "owl:unionOf",
+      "@container": "@list"
+    },
+    "hasValue": {
+      "@id": "owl:hasValue",
+      "@type": "xsd:string"
+    },
+    "nodes": {
+      "@reverse": "obo:CDAO_0000200",
+      "@container": "@set"
+    },
+    "hasRootNode": {
+      "@id": "obo:CDAO_0000148",
+      "@type": "@id"
+    },
+    "newick": {
+      "@id": "phyloref:newick_expression",
+      "@type": "xsd:string"
+    },
+    "curator": {
+      "@id": "opentree:curatorName",
+      "@type": "xsd:string"
+    },
+    "scientificNameAuthorship": {
+      "@id": "dwc:scientificNameAuthorship",
+      "@type": "xsd:string"
+    },
+    "nameAccordingTo": "tc:accordingTo",
+    "phylogenies": {
+      "@reverse": "rdfs:isDefinedBy",
+      "@container": "@set"
+    },
+    "phylorefs": {
+      "@reverse": "rdfs:isDefinedBy",
+      "@container": "@set"
+    },
+    "title": "dct:title",
+    "source": "dct:source",
+    "bibliographicCitation": "dct:bibliographicCitation",
+    "doi": "http://prismstandard.org/namespaces/basic/2.0/doi",
+    "representsTaxonomicUnits": "obo:CDAO_0000187",
+    "apomorphy": "phyloref:apomorphy"
+  }
+}
