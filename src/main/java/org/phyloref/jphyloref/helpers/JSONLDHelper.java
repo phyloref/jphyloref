@@ -3,6 +3,11 @@ package org.phyloref.jphyloref.helpers;
 import com.github.jsonldjava.core.DocumentLoader;
 import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.core.RemoteDocument;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFParser;
 import org.eclipse.rdf4j.rio.Rio;
@@ -74,6 +79,42 @@ public class JSONLDHelper {
     parser.set(
         JSONLDSettings.DOCUMENT_LOADER,
         new DocumentLoader() {
+          {
+            // Load built-in context files as injected documents.
+            try {
+              this.addInjectedDoc(
+                  "https://ww.phyloref.org/phyx.js/context/v1.0.0/phyx.json",
+                  loadResourceFileAsString("context/phyx-context-v1.0.0.json"));
+            } catch (IOException e) {
+              logger.error("Could not load Phyx context v1.0.0: " + e);
+            }
+
+            try {
+              this.addInjectedDoc(
+                  "https://www.phyloref.org/phyx.js/context/v1.1.0/phyx.json",
+                  loadResourceFileAsString("context/phyx-context-v1.1.0.json"));
+            } catch (IOException e) {
+              logger.error("Could not load Phyx context v1.1.0: " + e);
+            }
+          }
+
+          /**
+           * Load a text Resource as a String. Based on the code at
+           * https://stackoverflow.com/a/46613809/27310
+           *
+           * @return A String representation of the Resource specified.
+           */
+          private String loadResourceFileAsString(String fileName) throws IOException {
+            ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+            try (InputStream is = classLoader.getResourceAsStream(fileName)) {
+              if (is == null) throw new IOException("Could not find resource: " + fileName);
+              try (InputStreamReader isr = new InputStreamReader(is);
+                  BufferedReader reader = new BufferedReader(isr)) {
+                return reader.lines().collect(Collectors.joining(System.lineSeparator()));
+              }
+            }
+          }
+
           @Override
           public RemoteDocument loadDocument(String url) throws JsonLdError {
             try {
