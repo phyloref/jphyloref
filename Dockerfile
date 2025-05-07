@@ -9,7 +9,7 @@ COPY pom.xml .
 COPY src ./src
 
 # Build the application using Maven
-RUN mvn clean package -DskipTests -Djar.finalName=jphyloref
+RUN mvn clean package -DskipTests 
 
 # Step 2. Set up an image to run the built file in webserver mode.
 FROM eclipse-temurin:21
