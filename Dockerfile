@@ -17,10 +17,14 @@ FROM eclipse-temurin:21
 # Configuration for runner.
 ARG APPDIR=/app
 ARG PORT=8080
+ARG MEM=16G
+
+ENV PORT=$PORT
+ENV MEM=$MEM
 
 WORKDIR ${APPDIR}
 
 COPY --from=build /build/target/JPhyloRef.jar .
 
 EXPOSE ${PORT}/tcp
-CMD ["java", "-jar", "JPhyloRef.jar", "webserver", "--port", "${PORT}"]
+CMD ["sh -c", "java -Xmx${MEM} -jar JPhyloRef.jar webserver --hostname 0.0.0.0 --port ${PORT}"]
