@@ -23,4 +23,4 @@ WORKDIR ${APPDIR}
 COPY --from=build /build/target/JPhyloRef.jar .
 
 EXPOSE ${PORT}/tcp
-CMD ["java", "-jar", "jphyloref.jar", "webserver", "--host", "localhost", "--port", "${PORT}"]
+CMD ["java", "-jar", "JPhyloRef.jar", "webserver", "--port", "${PORT}"]
