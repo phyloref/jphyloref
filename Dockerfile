@@ -2,22 +2,25 @@
 # It is based on https://medium.com/@ramanamuttana/build-a-docker-image-using-maven-and-spring-boot-418e24c00776, which
 # suggests a two step process:
 
-# Configuration.
-ARG APPDIR=/app
-
 # Step 1. Set up an image to build the JAR files.
-FROM maven:eclipse-temurin-21 AS build
-WORKDIR ${APPDIR}
+FROM maven:3-eclipse-temurin-21 AS build
+WORKDIR /build
 COPY pom.xml .
 COPY src ./src
 
 # Build the application using Maven
-RUN mvn clean package -DskipTests
+RUN mvn clean package -DskipTests -Djar.finalName=jphyloref
 
-# Step 2. Set up an image to store the built file.
+# Step 2. Set up an image to run the built file in webserver mode.
 FROM eclipse-temurin:21
+
+# Configuration for runner.
+ARG APPDIR=/app
+ARG PORT=8080
 
 WORKDIR ${APPDIR}
 
-COPY --from=build ${APPDIR}/target/jphyloref.jar .
-CMD ["java", "-jar", "jphyloref.jar"]
+COPY --from=build /build/target/JPhyloRef.jar .
+
+EXPOSE ${PORT}/tcp
+CMD ["java", "-jar", "jphyloref.jar", "webserver", "--host", "localhost", "--port", "${PORT}"]
