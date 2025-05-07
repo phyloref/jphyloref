@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         # When debugging/bugfixing Babel, it's helpful to have the entire Git history
         # with you (fetch-depth: 0). But for publishing the Docker image, just the
         # latest history should be fine.
