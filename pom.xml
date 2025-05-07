@@ -143,6 +143,7 @@
     </dependencies>
 
     <build>
+        <finalName>JPhyloRef</finalName>
         <plugins>
             <!-- We use Surefire to run testing using JUnit Jupiter Engine -->
             <plugin>
