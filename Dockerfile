@@ -14,13 +14,14 @@ RUN mvn clean package -DskipTests
 # Step 2. Set up an image to run the built file in webserver mode.
 FROM eclipse-temurin:21
 
-# Set up a volume for storing temporary files.
-VOLUME /data
-
 # Configuration for runner.
 ARG APPDIR=/app
+ARG DATADIR=/data
 ARG PORT=8080
 ARG MEMORY=16G
+
+# Set up a volume for storing temporary files.
+VOLUME ${DATADIR}
 
 # These environmental variables will be used by start.sh.
 ENV PORT=$PORT
@@ -35,6 +36,12 @@ WORKDIR ${APPDIR}
 
 # Create a user account and switch to it.
 RUN useradd --home ${APPDIR} nru
+
+# Create the data directory with the right permissions (so we can mount an external volume here).
+RUN mkdir ${DATADIR}
+RUN chown nru ${DATADIR}
+
+# Change to the nru user.
 USER nru
 
 # Copy the necessary files into the image.
