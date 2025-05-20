@@ -3,7 +3,7 @@
 # Webhook should set: $JSONLD_FILENAME (JSON-LD input as file)
 
 # Configuration
-JARFILE=JPhyloRef.jar
+JARFILE=/app/JPhyloRef.jar
 
 # Set up proxy
 #HTTP_PROXY_HOST= # TODO enter proxy server hostname here
@@ -12,8 +12,8 @@ JARFILE=JPhyloRef.jar
 #HTTPS_PROXY_PORT=$HTTP_PROXY_PORT
 
 # We first need to uncompress the input file.
-mv "$JSONLD_FILENAME" "$JSONLD_FILENAME.gz" # 2> /dev/null
-gunzip "$JSONLD_FILENAME" # 2> /dev/null
+mv "$JSONLD_FILENAME" "$JSONLD_FILENAME.gz" 2> /dev/null
+gunzip "$JSONLD_FILENAME" 2> /dev/null
 
 # Run it!
 java -Xmx"${MEM:=16G}" -jar $JARFILE resolve "$JSONLD_FILENAME" -j --errors-as-json # 2> /dev/null
