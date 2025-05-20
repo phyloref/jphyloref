@@ -9,22 +9,39 @@ COPY pom.xml .
 COPY src ./src
 
 # Build the application using Maven
-RUN mvn clean package -DskipTests 
+RUN mvn clean package -DskipTests
 
 # Step 2. Set up an image to run the built file in webserver mode.
 FROM eclipse-temurin:21
 
+# Set up a volume for storing temporary files.
+VOLUME /data
+
 # Configuration for runner.
 ARG APPDIR=/app
 ARG PORT=8080
-ARG MEM=16G
+ARG MEMORY=16G
 
+# These environmental variables will be used by start.sh.
 ENV PORT=$PORT
-ENV MEM=$MEM
+ENV MEMORY=$MEMORY
 
+# Install webhook.
+RUN apt update
+RUN apt install webhook
+
+# Set the workdir.
 WORKDIR ${APPDIR}
 
+# Create a user account and switch to it.
+RUN useradd --home ${APPDIR} nru
+USER nru
+
+# Copy the necessary files into the image.
 COPY --from=build /build/target/JPhyloRef.jar .
+COPY ./webhook/hooks.json ./hooks.json
+COPY ./webhook/start.sh ./webhook-start.sh
+COPY ./webhook/exec_jphyloref.sh ./exec_jphyloref.sh
 
 EXPOSE ${PORT}/tcp
-CMD ["sh -c", "java -Xmx${MEM} -jar JPhyloRef.jar webserver --hostname 0.0.0.0 --port ${PORT}"]
+CMD ["/usr/bin/bash", "webhook-start.sh"]
