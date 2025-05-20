@@ -37,3 +37,6 @@ phyloreferences to standard output. It calls JPhyloRef with particular settings 
   * Some settings (maximum memory, HTTP proxy settings) are sent to Java to set up
     the environment in which JPhyloRef can run.
   * Some settings (the name of the input file) are sent to JPhyloRef for processing.
+* [klados-backend.container](klados-backend.container) is a Quadlet description for adding to
+  systemd to run the Klados Backend using webhook. The Image is the one built from the
+  Dockerfile at the root of this repository.

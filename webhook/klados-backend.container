@@ -1,0 +1,14 @@
+[Unit]
+Description=Klados Backend
+After=network.target
+
+[Container]
+Image=ghcr.io/phyloref/jphyloref:add-docker
+ContainerName=klados-backend
+PublishPort=19703:8080
+Tmpfs=/data:rw,U,size=20G
+AutoUpdate=registry
+
+[Install]
+# Start by default on boot
+WantedBy=default.target
