@@ -20,9 +20,6 @@ ARG DATADIR=/data
 ARG PORT=8080
 ARG MEMORY=16G
 
-# Set up a volume for storing temporary files.
-VOLUME ${DATADIR}
-
 # These environmental variables will be used by start.sh.
 ENV PORT=$PORT
 ENV MEMORY=$MEMORY
@@ -40,6 +37,7 @@ RUN useradd --home ${APPDIR} nru
 # Create the data directory with the right permissions (so we can mount an external volume here).
 RUN mkdir ${DATADIR}
 RUN chown nru ${DATADIR}
+VOLUME ${DATADIR}
 
 # Change to the nru user.
 USER nru
