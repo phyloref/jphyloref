@@ -1,8 +1,8 @@
 [
   {
     "id": "reason",
-    "execute-command": "./exec_jphyloref_webhook.sh",
-    "command-working-directory": ".",
+    "execute-command": "./exec_jphyloref.sh",
+    "command-working-directory": "data",
     "pass-file-to-command": [
       {
         "source": "payload",
