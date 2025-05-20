@@ -25,9 +25,13 @@ HTTP headers to ensure that requests from other websites via
 [X-Hub-Signature](https://www.npmjs.com/package/x-hub-signature) to ensure that
 the browser knows a secret (which should be set as `$SECRET`) shared with the
 reasoner.
-* [exec_jphyloref_webhook.sh](./exec_jphyloref_webhook.sh) is a helper script that
-executes JPhyloRef and prints the JSON document containing resolved phyloreferences
-to standard output. It calls JPhyloRef with particular settings at three levels:
+* [exec_jphyloref.sh](exec_jphyloref.sh) is a helper script that executes JPhyloRef,
+which will return a JSON document: either the resolution results or an error message.
+Webhook will then send this back to the browser. As is usual for webhook, the filepath
+of the input file is expected to be passed as the `$JSONLD_FILENAME` environmental variable.
+* [exec_jphyloref_srun.sh](exec_jphyloref_srun.sh) is a helper script that
+executes JPhyloRef using srun and prints the JSON document containing resolved
+phyloreferences to standard output. It calls JPhyloRef with particular settings at three levels:
   * Some settings (number of tasks, number of CPUs per task, timeout) are sent to
     [`srun`](https://slurm.schedmd.com/srun.html), which starts JPhyloRef on a cluster.
   * Some settings (maximum memory, HTTP proxy settings) are sent to Java to set up
