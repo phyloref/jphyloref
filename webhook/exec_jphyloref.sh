@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 # Webhook should set: $JSONLD_FILENAME (JSON-LD input as file)
 
