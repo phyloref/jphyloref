@@ -16,4 +16,4 @@ mv "$JSONLD_FILENAME" "$JSONLD_FILENAME.gz" 2> /dev/null
 gunzip "$JSONLD_FILENAME" 2> /dev/null
 
 # Run it!
-java -Xmx"${MEM:=16G}" -jar $JARFILE resolve "$JSONLD_FILENAME" -j --errors-as-json # 2> /dev/null
+java -Xmx"${MEM:=16G}" -jar $JARFILE resolve "$JSONLD_FILENAME" -j --errors-as-json 2> /dev/null
