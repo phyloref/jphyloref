@@ -38,10 +38,10 @@ RUN useradd --home ${APPDIR} nru
 USER nru
 
 # Copy the necessary files into the image.
-COPY --from=build /build/target/JPhyloRef.jar .
-COPY ./webhook/hooks.json ./hooks.json
-COPY ./webhook/start.sh ./webhook-start.sh
-COPY ./webhook/exec_jphyloref.sh ./exec_jphyloref.sh
+COPY --from=build /build/target/JPhyloRef.jar ${APPDIR}/JPhyloRef.jar
+COPY ./webhook/hooks.json ${APPDIR}/hooks.json
+COPY ./webhook/start.sh ${APPDIR}/webhook-start.sh
+COPY --chmod=755 ./webhook/exec_jphyloref.sh ${APPDIR}/exec_jphyloref.sh
 
 EXPOSE ${PORT}/tcp
 CMD ["/usr/bin/bash", "webhook-start.sh"]
