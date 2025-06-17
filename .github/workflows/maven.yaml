@@ -4,7 +4,7 @@
 name: Build with Maven
 
 # Execute on every pull request and if activated manually.
-on: [push, pull_request, workflow_dispatch]
+on: [pull_request, workflow_dispatch]
 
 jobs:
   build:
