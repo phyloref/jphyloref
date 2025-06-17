@@ -25,7 +25,7 @@ ENV PORT=$PORT
 ENV MEMORY=$MEMORY
 
 # Install webhook.
-RUN apt update && apt install -y webhook && rm -rf /var/lib/apt/lists/*
+RUN apt update && apt install -y bash webhook && rm -rf /var/lib/apt/lists/*
 
 # Set the workdir.
 WORKDIR ${APPDIR}
