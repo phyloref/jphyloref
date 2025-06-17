@@ -20,7 +20,7 @@ ARG DATADIR=/data
 ARG PORT=8080
 ARG MEMORY=16G
 
-# These environmental variables will be used by start.sh.
+# These environmental variables will be used by start.sh and exec_jphyloref.sh.
 ENV PORT=$PORT
 ENV MEMORY=$MEMORY
 

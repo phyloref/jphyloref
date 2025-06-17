@@ -1,9 +1,9 @@
 #!/usr/bin/bash
 
-# Webhook should set: $JSONLD_FILENAME (JSON-LD input as file)
-
-# Configuration
-JARFILE=/app/JPhyloRef.jar
+# Environmental variables:
+# - JARFILE: The JAR file to load (defaults to /app/JPhyloRef.jar)
+# - MEMORY: The maximum memory to give Java via `-Xmx` (defaults to 16G)
+# Webhook should set environmental variable $JSONLD_FILENAME (JSON-LD input as file)
 
 # Set up proxy
 #HTTP_PROXY_HOST= # TODO enter proxy server hostname here
@@ -16,4 +16,4 @@ mv "$JSONLD_FILENAME" "$JSONLD_FILENAME.gz" 2> /dev/null
 gunzip "$JSONLD_FILENAME" 2> /dev/null
 
 # Run it!
-java -Xmx"${MEM:=16G}" -jar $JARFILE resolve "$JSONLD_FILENAME" -j --errors-as-json 2> /dev/null
+java -Xmx"${MEMORY:=16G}" -jar "${JARFILE:=/app/JPhyloRef.jar}" resolve "$JSONLD_FILENAME" -j --errors-as-json 2> /dev/null
