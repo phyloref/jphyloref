@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 # Environmental variables:
 # - JARFILE: The JAR file to load (defaults to /app/JPhyloRef.jar)
