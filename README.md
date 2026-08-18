@@ -87,14 +87,12 @@ variable; if not, you will need to set it to point at the directory containing y
 
 Once you have downloaded the source code to your computer, you can compile and test the code by running `mvn test`.
 
-JPhyloRef can be built from source by running `mvn package` from the root directory of this repository. This will create a JAR file in the `target/` directory, which can be executed by running,
+JPhyloRef can be built from source by running `mvn package` from the root directory of this repository. This will create `target/JPhyloRef.jar`, which can be executed by running,
 for example:
 
 ```
-$ java -jar target/jphyloref-1.2.0-SNAPSHOT.jar test src/test/resources/phylorefs/dummy1.owl
+$ java -jar target/JPhyloRef.jar test src/test/resources/phylorefs/dummy1.owl
 ```
-
-(Note that `1.2.0` should be replaced by the correct version number -- look for the `Building JPhyloRef N.M.K-SNAPSHOT` line in the output from `mvn package`, where N.M.K is the version, such as 1.2.0)
 
 You can also download any published version of this software directly from Maven
 at https://search.maven.org/artifact/org.phyloref/jphyloref.
