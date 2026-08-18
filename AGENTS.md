@@ -50,7 +50,7 @@ JPhyloRef reads an OWL ontology containing phyloreferences (clade definitions as
 - Tests in `TestCommandTest`/`ResolveCommandTest` assert against **exact stdout strings**, including the reasoner version line (`# Using reasoner: ELK/2016-01-11T13:41:15Z`). Any change to TAP output, log wording, or the ELK dependency version breaks them.
 - `ReasonerHelper.getReasonerNameAndVersion()` parses ELK's version out of a `NumberFormatException` message — ELK throws when asked for its own version. Not a bug to "fix".
 - Test fixtures live in `src/test/resources/phylorefs/`; `dummy1.*` resolve correctly, `failing1.*` exercise failure/skip paths.
-- **Every JSON-LD test needs network access.** The fixtures reference `http://www.phyloref.org/phyx.js/context/v0.2.0/phyx.json` and jsonld-java fetches it at parse time; offline or behind a firewall those tests die with `JsonLdError: loading remote context failed`. The `.owl` fixtures are unaffected.
+- **Every JSON-LD test needs network access.** The fixtures reference `http://www.phyloref.org/phyx.js/context/v0.2.0/phyx.json` and jsonld-java fetches it at parse time; offline, behind a firewall, or if that URL stops resolving, those tests die with `JsonLdError: loading remote context failed`. The `.owl` fixtures are unaffected. This has taken the build red before, and it hits users too — `resolve`/`test` on any `.jsonld` file and the webserver's `/reason` endpoint fetch the same context. The unmerged `quick-fix-context-download` branch sketches the fix: bundle the contexts under `src/main/resources/context/` and register them with a `DocumentLoader`'s `addInjectedDoc()`.
 
 ## Deployment
 
