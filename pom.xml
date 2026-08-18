@@ -78,7 +78,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20180130</version>
+            <version>20250517</version>
         </dependency>
 
         <!-- For reading and writing JSON-LD -->
@@ -158,7 +158,7 @@
             <plugin>
               <groupId>com.diffplug.spotless</groupId>
               <artifactId>spotless-maven-plugin</artifactId>
-              <version>1.15.0</version>
+              <version>1.20.0</version>
               <configuration>
                 <java>
                   <googleJavaFormat>
