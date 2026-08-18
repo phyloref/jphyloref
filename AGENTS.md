@@ -12,11 +12,10 @@ mvn test -Dtest='TestCommandTest*'   # single test class — the trailing * is r
 ```
 
 - **The trailing `*` in `-Dtest` is not optional.** Every test method lives inside a JUnit 5 `@Nested` inner class, so `-Dtest=TestCommandTest` matches nothing and Surefire 2.22.1 fails with "No tests were executed!".
-- **JaCoCo 0.8.6 cannot instrument class files newer than Java 15**, so `mvn test` fails on a modern JDK with `Unsupported class file major version NN` before any test runs. Either build under a JDK ≤ 15 (CI uses 8) or add `-Djacoco.skip=true` locally.
 - Spotless runs in the `test` phase and **fails the build** on unformatted Java, XML, Markdown, or JSON. Run `mvn spotless:apply` before committing. The tree is currently Spotless-clean, so a run that reports no changes is the expected result. Note that `spotless:apply` rewrites file mtimes even when content is unchanged, which makes `git status` list files as modified while `git diff` shows nothing — trust `git diff`.
 - JaCoCo's coverage `check` has `haltOnFailure=false`, so coverage shortfalls only show up in the log.
-- Source/target is Java 8 (CI builds on JDK 8); the Dockerfile builds and runs on Temurin 21.
-- The shaded JAR is always `target/JPhyloRef.jar` (`<finalName>`), not a versioned filename — README.md and Usage.md still show older versioned names.
+- Source/target is Java 8. CI builds on a matrix of JDK 8, 11, 17 and 21 — keep it that way, since the build tooling (not the code) is what tends to break on newer JDKs. The Dockerfile builds and runs on Temurin 21.
+- The shaded JAR is always `target/JPhyloRef.jar` (`<finalName>`), not a versioned filename.
 
 Run the built JAR:
 
@@ -46,7 +45,7 @@ JPhyloRef reads an OWL ontology containing phyloreferences (clade definitions as
 
 ## Gotchas
 
-- `JPhyloRef.VERSION` is a hardcoded string (currently `"1.0.0"`) independent of the `<version>` in pom.xml. Both need updating on release, along with CHANGELOG.md.
+- `JPhyloRef.VERSION` is read at class-load time from `src/main/resources/jphyloref.properties`, which Maven filters with `${project.version}`. Bump the version in pom.xml only; the properties file needs no edit. It falls back to `"(unknown)"` if the resource is missing. CHANGELOG.md still needs updating by hand on release.
 - Tests in `TestCommandTest`/`ResolveCommandTest` assert against **exact stdout strings**, including the reasoner version line (`# Using reasoner: ELK/2016-01-11T13:41:15Z`). Any change to TAP output, log wording, or the ELK dependency version breaks them.
 - `ReasonerHelper.getReasonerNameAndVersion()` parses ELK's version out of a `NumberFormatException` message — ELK throws when asked for its own version. Not a bug to "fix".
 - Test fixtures live in `src/test/resources/phylorefs/`; `dummy1.*` resolve correctly, `failing1.*` exercise failure/skip paths.

@@ -3,6 +3,14 @@
 Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
 ## [Unreleased]
+- Upgraded JaCoCo to 0.8.13 so that `mvn test` works on JDKs newer than 15.
+- `JPhyloRef.VERSION` is now read from a Maven-filtered properties file instead of
+  being hardcoded, so `help` and the webserver's `/version` endpoint report the
+  version declared in pom.xml.
+- Upgraded org.json to 20250517 and the Spotless plugin to 1.20.0 to resolve three
+  high-severity Dependabot advisories.
+- The Maven CI workflow now builds on JDK 8, 11, 17 and 21 rather than JDK 8 alone.
+- Corrected the JAR filename in README.md and Usage.md, which is `target/JPhyloRef.jar`.
 
 ## [1.1.1] - 2021-08-10
 - Fixed manuscript for submission to the Journal of Open Source Software (JOSS).
