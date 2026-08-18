@@ -31,12 +31,21 @@ class AppTest {
     error.reset();
   }
 
-  /** Test whether JPhyloRef has a version number. */
+  /**
+   * Test whether JPhyloRef reports a version number read from the filtered jphyloref.properties
+   * resource, rather than the fallback it uses when that resource is missing from the classpath.
+   */
   @Test
-  @DisplayName("includes a version number")
+  @DisplayName("includes a version number read from jphyloref.properties")
   void phylorefVersion() {
-    JPhyloRef jphyloref = new JPhyloRef();
-    assertNotEquals(jphyloref.VERSION, "");
+    assertNotEquals("", JPhyloRef.VERSION);
+    assertNotEquals(
+        "(unknown)",
+        JPhyloRef.VERSION,
+        "VERSION fell back to its default, so jphyloref.properties was missing or unfiltered");
+    assertTrue(
+        JPhyloRef.VERSION.matches("\\d+\\.\\d+\\.\\d+(-SNAPSHOT)?"),
+        "VERSION should look like a Maven version, but was: " + JPhyloRef.VERSION);
   }
 
   /** Test whether we get the "help" output if we run JPhyloRef without any command line. */
