@@ -6,6 +6,14 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 - Fixed `--reasoner null` crashing the `resolve` command and the webserver; it now skips
   reasoning and reports the resolutions asserted in the ontology. The `test` command, which
   needs a reasoner to determine expected nodes, now rejects it with an error message.
+- Without a reasoner, a node now counts as resolved only if it is asserted to be a member of
+  the phyloreference itself. Previously any class assertion mentioning the phyloreference
+  counted, including the assertion of which node it is *expected* to resolve to. Anonymous
+  subclasses of phyloref:Phyloreference and the Phyloref ontology's own metaclasses are no
+  longer reported as phyloreferences.
+- The webserver's `/reason` endpoint now answers every error with JSON (400 for an ontology
+  without phyloreferences) instead of letting some exceptions escape, and always disposes of
+  its reasoner, which previously leaked after a failed request.
 - `JPhyloRef.VERSION` is now read from a Maven-filtered properties file instead of
   being hardcoded, so `help` and the webserver's `/version` endpoint report the
   version declared in pom.xml.

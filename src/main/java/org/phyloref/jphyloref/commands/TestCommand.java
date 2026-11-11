@@ -184,9 +184,29 @@ public class TestCommand implements Command {
     // Ontology loaded.
     logger.info("Loaded ontology: {}", ontology);
 
-    // Set up an OWLReasoner to reason over the loaded ontology.
-    OWLReasoner reasoner = reasonerFactory.createReasoner(ontology);
+    // Set up an OWLReasoner to reason over the loaded ontology. It is not null: `--reasoner null`
+    // was rejected above.
+    OWLReasoner reasoner = ReasonerHelper.createReasonerFromCmdLine(cmdLine, ontology);
+    try {
+      return testPhyloreferences(
+          ontology, reasoner, reasonerFactory, inputFilename, defaultURIPrefix);
+    } finally {
+      reasoner.dispose();
+    }
+  }
 
+  /**
+   * Test every phyloreference in an ontology against its expected nodes, writing the results to
+   * stdout as TAP and a summary to stderr.
+   *
+   * @return The exit code: -1 if no phyloreference succeeded, otherwise the number of failures.
+   */
+  private int testPhyloreferences(
+      OWLOntology ontology,
+      OWLReasoner reasoner,
+      OWLReasonerFactory reasonerFactory,
+      String inputFilename,
+      String defaultURIPrefix) {
     // Get a list of all phyloreferences.
     Set<OWLClass> phylorefs = PhylorefHelper.getPhyloreferences(ontology, reasoner);
     logger.info("Phyloreferences identified: {}", phylorefs);
@@ -203,7 +223,7 @@ public class TestCommand implements Command {
             "Using reasoner: " + ReasonerHelper.getReasonerNameAndVersion(reasonerFactory)));
 
     // Preload some terms we need to use in the following code.
-    OWLDataFactory dataFactory = manager.getOWLDataFactory();
+    OWLDataFactory dataFactory = ontology.getOWLOntologyManager().getOWLDataFactory();
 
     // Some classes we will use.
     OWLClass classCDAONode = dataFactory.getOWLClass(PhylorefHelper.IRI_CDAO_NODE);
@@ -397,9 +417,6 @@ public class TestCommand implements Command {
             + " failures marked TODO, "
             + countSkipped
             + " skipped.");
-
-    // Dispose of the reasoner.
-    reasoner.dispose();
 
     // Exit with error unless we have zero failures.
     if (countSuccess == 0) return -1;
