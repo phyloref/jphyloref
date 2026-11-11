@@ -17,14 +17,14 @@ jobs:
         # 8 is the version this project targets; the others guard against build
         # tooling that breaks on newer JDKs, which has bitten us before (JaCoCo
         # could not instrument class files newer than Java 15).
-        java-version: ['8', '11', '17', '21']
+        java-version: ['8', '11', '17', '21', '25']
 
     name: Build with JDK ${{ matrix.java-version }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: Set up JDK ${{ matrix.java-version }}
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v6
       with:
         java-version: ${{ matrix.java-version }}
         distribution: temurin
