@@ -8,8 +8,8 @@ You can try these out yourself by setting up [Apache Maven] and running:
 $ mvn clean package
 ```
 
-This will create `target/JPhyloRef.jar`. You can run this using Java. For example, the following command
-will provide a comprehensive list of command line options for JPhyloRef.
+This will create `target/JPhyloRef.jar`. You can run this using Java. For example, the following command will provide
+a comprehensive list of command line options for JPhyloRef.
 
 ```console
 $ java -jar target/JPhyloRef.jar

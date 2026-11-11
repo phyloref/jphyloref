@@ -61,6 +61,21 @@ class ResolveCommandTest {
       assertEquals(0, exitCode);
       assertEquals(EXPECTED_DUMMY1_RESOLUTION, outputStr);
     }
+
+    @Test
+    @DisplayName("resolves phylorefs from asserted class assertions with '--reasoner null'")
+    void resolveOWLFilesWithoutReasoner() throws UnsupportedEncodingException {
+      // dummy1.owl already asserts which node each phyloref resolves to, so skipping the reasoner
+      // should give the same answer.
+      int exitCode =
+          jphyloref.execute(
+              new String[] {
+                "resolve", "src/test/resources/phylorefs/dummy1.owl", "--reasoner", "null"
+              });
+
+      assertEquals(0, exitCode);
+      assertEquals(EXPECTED_DUMMY1_RESOLUTION, output.toString("UTF-8"));
+    }
   }
 
   @Nested
