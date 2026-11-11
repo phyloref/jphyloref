@@ -369,13 +369,38 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.6.2</version>
                 <configuration>
+                    <filters>
+                        <filter>
+                            <!-- Each dependency's module descriptor describes that jar alone;
+                                 the shaded JAR is not a module, and keeping one of them would
+                                 make it look like one. -->
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>module-info.class</exclude>
+                                <exclude>META-INF/versions/*/module-info.class</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
                     <transformers>
+                        <!-- Several dependencies register implementations of the same service:
+                             each rdf4j-rio-* jar adds its RDFParserFactory and RDFWriterFactory,
+                             and owlapi-parsers, owlapi-rio and owlapi-oboformat each add
+                             OWLParserFactory and OWLStorerFactory entries. Without this
+                             transformer only one jar's file survives shading, so parsers go
+                             missing from the shaded JAR while `mvn test`, which runs on the
+                             unshaded classpath, still finds them all. -->
+                        <transformer
+                            implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                         <transformer
                             implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                             <manifestEntries>
                                 <Main-Class>${mainClass}</Main-Class>
+                                <!-- Keep the Java-version-specific classes that multi-release
+                                     dependencies (Jackson, Guava, Caffeine, ...) ship under
+                                     META-INF/versions/; without this the JVM ignores them. -->
+                                <Multi-Release>true</Multi-Release>
                                 <X-Compile-Source-JDK>${maven.compiler.release}</X-Compile-Source-JDK>
                                 <X-Compile-Target-JDK>${maven.compiler.release}</X-Compile-Target-JDK>
                             </manifestEntries>
