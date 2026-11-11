@@ -31,3 +31,20 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+    # The tests run against Maven's classpath, not the shaded JAR, so check that the JAR
+    # users run still works (shading once silently dropped most parser registrations).
+    - name: Smoke-test the shaded JAR
+      run: |
+        java -jar target/JPhyloRef.jar test src/test/resources/phylorefs/dummy1.owl
+        java -jar target/JPhyloRef.jar resolve src/test/resources/phylorefs/dummy1.jsonld -j
+
+  docker:
+    runs-on: ubuntu-latest
+    name: Build and smoke-test the Docker image
+
+    steps:
+    - uses: actions/checkout@v7
+    - name: Build the Docker image
+      run: docker build --pull -t jphyloref:ci .
+    - name: Smoke-test it through webhook
+      run: webhook/smoke-test.sh jphyloref:ci
