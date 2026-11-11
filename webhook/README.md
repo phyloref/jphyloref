@@ -39,4 +39,8 @@ phyloreferences to standard output. It calls JPhyloRef with particular settings 
   * Some settings (the name of the input file) are sent to JPhyloRef for processing.
 * [klados-backend.container](klados-backend.container) is a Quadlet description for adding to
   systemd to run the Klados Backend using webhook. The Image is the one built from the
-  Dockerfile at the root of this repository.
+  Dockerfile at the root of this repository, tagged `latest`: `.github/workflows/docker.yaml`
+  publishes it for every GitHub release, and can be run by hand on a release tag to rebuild
+  that release with current security updates. `AutoUpdate=registry` then pulls the new image.
+  It only does so for the tag named in `Image=`, so a deployment pinned to any other tag
+  (such as the old `add-docker`) stops receiving fixes.

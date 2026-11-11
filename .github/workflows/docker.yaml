@@ -1,5 +1,5 @@
 # This GitHub Action generates and publishes a Docker image of this repository
-# to the GitHub Packages repository. It is triggered when a new package is released.
+# to the GitHub Packages repository. It is triggered when a new release is published.
 #
 # Based on the NameRes release.yaml file at
 # https://github.com/TranslatorSRI/NameResolution/blob/a4f72e3c283dcb40a7280b55650dae63c5625e82/.github/workflows/release.yml
@@ -9,6 +9,11 @@ name: 'Release a new Docker image to Github Packages'
 on:
   release:
     types: [published]
+  # Run this by hand on a release tag (e.g. v1.2.0) to rebuild that release's image
+  # with current base images and security updates, without cutting a new release.
+  # The Docker image only picks up OS and Go security fixes when it is rebuilt, and
+  # vulnerability scans of deployed images will flag it if it isn't.
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
@@ -17,34 +22,42 @@ jobs:
   push_to_registry:
     name: Push Docker image to GitHub Packages tagged with "latest" and version number.
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         # When debugging/bugfixing Babel, it's helpful to have the entire Git history
         # with you (fetch-depth: 0). But for publishing the Docker image, just the
         # latest history should be fine.
         with:
           fetch-depth: 1
-      - name: Get the version
-        id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v6
         with:
           images:
             ghcr.io/${{ github.repository }}
+          # A release tagged v1.2.0 is published as 1.2.0, 1.2 and latest. These only
+          # work on a tag ref, so run workflow_dispatch on a release tag, not a branch.
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
       - name: Login to ghcr
-        uses: docker/login-action@v1
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
       - name: Push to GitHub Packages
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: true
+          # Always pull the base images, so a rebuild picks up their security fixes.
+          pull: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: BRANCH_NAME=${{ github.event.release.target_commitish }}
