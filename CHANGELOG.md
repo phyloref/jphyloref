@@ -9,7 +9,14 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
   version declared in pom.xml.
 - Upgraded org.json to 20260814 and the Spotless plugin to 1.20.0 to resolve four
   Dependabot advisories (three high-severity, one medium).
-- The Maven CI workflow now builds on JDK 8, 11, 17 and 21 rather than JDK 8 alone.
+- Upgraded OWLAPI to 4.5.29, rdf4j to 3.7.7, tap4j to 4.4.2, commons-cli to 1.11.0
+  and slf4j to 2.0.20, replaced log4j 1.2.14 (from ELK) with reload4j 1.2.27, removed
+  the unused Sesame 1.x `openrdf-model` dependency, and pinned newer Jackson,
+  commons-io, Guava and SnakeYAML, so that no library in the JAR has a known advisory.
+- The Docker image now runs on Temurin 25 (Ubuntu 26.04) with security updates applied
+  at build time, and builds webhook from source with a current Go instead of using
+  Ubuntu's package.
+- The Maven CI workflow now builds on JDK 8, 11, 17, 21 and 25 rather than JDK 8 alone.
 - Corrected the JAR filename in README.md and Usage.md, which is `target/JPhyloRef.jar`.
 
 ## [1.1.1] - 2021-08-10
