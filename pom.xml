@@ -38,6 +38,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+
+        <!-- The rdf4j version that owlapi-rio is built against; see the rdf4j dependencies. -->
+        <rdf4j.version>3.7.7</rdf4j.version>
+        <slf4j.version>2.0.20</slf4j.version>
     </properties>
 
     <distributionManagement>
@@ -51,19 +55,68 @@
         </repository>
     </distributionManagement>
 
+    <!--
+      Newer versions of transitive dependencies than our direct dependencies ask for,
+      because the versions they ask for have known vulnerabilities that end up in the
+      shaded JAR (and so in the Docker image's vulnerability scans). Check whether each
+      of these is still needed when the dependency that pulls it in is upgraded.
+    -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- From jsonld-java, via rdf4j-rio-jsonld. -->
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>2.23.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- From jsonld-java, via rdf4j-rio-jsonld. -->
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.22.0</version>
+            </dependency>
+            <!-- From owlapi-api. -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>33.8.0-jre</version>
+            </dependency>
+            <!-- owlapi-api asks for slf4j-api 2.0.x and jsonld-java for jcl-over-slf4j
+                 1.7.x; keep both in step with slf4j-simple. -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <!-- From tap4j, which still asks for 1.17. -->
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>2.7</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <!-- For processing command line arguments -->
         <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
-            <version>1.4</version>
+            <version>1.11.0</version>
         </dependency>
 
         <!-- For producing testing output -->
         <dependency>
             <groupId>org.tap4j</groupId>
             <artifactId>tap4j</artifactId>
-            <version>4.2.1</version>
+            <version>4.4.2</version>
         </dependency>
 
         <!-- For creating a webserver -->
@@ -81,12 +134,14 @@
             <version>20260814</version>
         </dependency>
 
-        <!-- For reading and writing JSON-LD -->
+        <!-- For reading and writing JSON-LD. Keep rdf4j.version in step with the
+             rdf4j version that owlapi-rio (below) is built against, so that only
+             one rdf4j release ends up in the shaded JAR. -->
         <!-- https://mvnrepository.com/artifact/org.eclipse.rdf4j/rdf4j-rio-jsonld -->
         <dependency>
             <groupId>org.eclipse.rdf4j</groupId>
             <artifactId>rdf4j-rio-jsonld</artifactId>
-            <version>2.3.2</version>
+            <version>${rdf4j.version}</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -94,7 +149,7 @@
         <dependency>
             <groupId>org.eclipse.rdf4j</groupId>
             <artifactId>rdf4j-rio-api</artifactId>
-            <version>2.3.2</version>
+            <version>${rdf4j.version}</version>
         </dependency>
 
         <!-- REASONERS -->
@@ -105,6 +160,24 @@
             <groupId>org.semanticweb.elk</groupId>
             <artifactId>elk-owlapi</artifactId>
             <version>0.4.3</version>
+            <exclusions>
+                <!-- ELK 0.4.3 (the latest release) logs through log4j 1.2.14, which
+                     has several critical advisories and will never be patched.
+                     reload4j, below, is a drop-in replacement for it. -->
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Maintained fork of log4j 1.2 with the same org.apache.log4j API, which
+             ELK uses for its logging; configured by src/main/resources/log4j.properties. -->
+        <!-- https://mvnrepository.com/artifact/ch.qos.reload4j/reload4j -->
+        <dependency>
+            <groupId>ch.qos.reload4j</groupId>
+            <artifactId>reload4j</artifactId>
+            <version>1.2.27</version>
         </dependency>
 
         <!-- To access OWL-API -->
@@ -112,24 +185,18 @@
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
             <artifactId>owlapi-apibinding</artifactId>
-            <version>4.5.19</version>
+            <version>4.5.29</version>
         </dependency>
 
-        <!-- To support JSON-LD input -->
-        <!-- https://mvnrepository.com/artifact/org.openrdf/openrdf-model -->
-        <dependency>
-            <groupId>org.openrdf</groupId>
-            <artifactId>openrdf-model</artifactId>
-            <version>1.2.7</version>
-        </dependency>
-
-
-        <!-- Adds a StaticLoggerBinder for logging (as per phyloref/jphyloref#18) -->
+        <!-- Adds an SLF4J provider for logging (as per phyloref/jphyloref#18). Its major
+             version has to match slf4j-api's (pinned above): slf4j-api 2.x ignores 1.7.x
+             bindings and silently discards all log output, which breaks the tests that
+             check our stderr. -->
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.7.25</version>
+            <version>${slf4j.version}</version>
         </dependency>
 
         <!-- We use JUnit Jupiter Engine for testing -->
@@ -230,7 +297,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.13</version>
+        <version>0.8.16</version>
         <configuration>
           <!-- These rules are to ensure that CI output records that we still
           haven't finished testing this code, which is why we don't halt on failure. -->
@@ -355,7 +422,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.12.0</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
