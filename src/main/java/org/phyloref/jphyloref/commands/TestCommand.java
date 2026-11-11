@@ -186,7 +186,7 @@ public class TestCommand implements Command {
 
     // Set up an OWLReasoner to reason over the loaded ontology. It is not null: `--reasoner null`
     // was rejected above.
-    OWLReasoner reasoner = ReasonerHelper.createReasonerFromCmdLine(cmdLine, ontology);
+    OWLReasoner reasoner = reasonerFactory.createReasoner(ontology);
     try {
       return testPhyloreferences(
           ontology, reasoner, reasonerFactory, inputFilename, defaultURIPrefix);
@@ -224,9 +224,6 @@ public class TestCommand implements Command {
 
     // Preload some terms we need to use in the following code.
     OWLDataFactory dataFactory = ontology.getOWLOntologyManager().getOWLDataFactory();
-
-    // Some classes we will use.
-    OWLClass classCDAONode = dataFactory.getOWLClass(PhylorefHelper.IRI_CDAO_NODE);
 
     // Terms associated with phyloreferences
     OWLAnnotationProperty labelAnnotationProperty =

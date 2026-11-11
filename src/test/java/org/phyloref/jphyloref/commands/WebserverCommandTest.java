@@ -2,6 +2,8 @@ package org.phyloref.jphyloref.commands;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,7 +13,11 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
@@ -40,7 +46,14 @@ class WebserverCommandTest {
   private static Response postReason(WebserverCommand.Webserver webserver, String filename)
       throws IOException {
     String jsonld = new String(Files.readAllBytes(Paths.get(filename)), StandardCharsets.UTF_8);
-    byte[] body = ("jsonld=" + URLEncoder.encode(jsonld, "UTF-8")).getBytes(StandardCharsets.UTF_8);
+    return postForm(webserver, "jsonld", jsonld);
+  }
+
+  /** POST a single form field to /reason. */
+  private static Response postForm(WebserverCommand.Webserver webserver, String field, String value)
+      throws IOException {
+    byte[] body =
+        (field + "=" + URLEncoder.encode(value, "UTF-8")).getBytes(StandardCharsets.UTF_8);
 
     URL url = new URL("http://localhost:" + webserver.getListeningPort() + "/reason");
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -108,5 +121,48 @@ class WebserverCommandTest {
         }
       }
     }
+
+    @Test
+    @DisplayName("deletes the temporary file it writes a 'jsonld' field into")
+    void deletesTemporaryFile() throws IOException, ParseException {
+      File tmpdir = new File(System.getProperty("java.io.tmpdir"));
+      FilenameFilter ours = (dir, name) -> name.startsWith("jphyloref");
+      Set<String> before = new HashSet<>(Arrays.asList(tmpdir.list(ours)));
+
+      WebserverCommand.Webserver webserver = startWebserver("elk");
+      try {
+        // One request that succeeds and one that fails; neither may leave a file behind.
+        postReason(webserver, "src/test/resources/phylorefs/prereasoned.jsonld");
+        postReason(webserver, "src/test/resources/phylorefs/no-phyloref-class.jsonld");
+      } finally {
+        webserver.stop();
+      }
+
+      Set<String> after = new HashSet<>(Arrays.asList(tmpdir.list(ours)));
+      after.removeAll(before);
+      assertEquals(Collections.emptySet(), after, "Temporary files left in " + tmpdir);
+    }
+
+    @Test
+    @DisplayName("reports a 'jsonldGzipped' field that is not Base64 as a JSON 400")
+    void reportsInvalidBase64() throws IOException, ParseException {
+      WebserverCommand.Webserver webserver = startWebserver("elk");
+      try {
+        Response response = postForm(webserver, "jsonldGzipped", "not base64!");
+
+        assertEquals(400, response.status, response.body);
+        assertTrue(
+            new JSONObject(response.body).getString("error").contains("not valid Base64"),
+            response.body);
+      } finally {
+        webserver.stop();
+      }
+    }
+  }
+
+  @Test
+  @DisplayName("refuses to start with an unknown reasoner")
+  void refusesUnknownReasoner() {
+    assertThrows(IllegalArgumentException.class, () -> startWebserver("Elk"));
   }
 }
