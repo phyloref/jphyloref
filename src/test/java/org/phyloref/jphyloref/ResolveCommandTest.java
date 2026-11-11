@@ -63,10 +63,11 @@ class ResolveCommandTest {
     }
 
     @Test
-    @DisplayName("resolves phylorefs from asserted class assertions with '--reasoner null'")
+    @DisplayName("does not report expected nodes as resolved with '--reasoner null'")
     void resolveOWLFilesWithoutReasoner() throws UnsupportedEncodingException {
-      // dummy1.owl already asserts which node each phyloref resolves to, so skipping the reasoner
-      // should give the same answer.
+      // dummy1.owl is not pre-reasoned: it only says which node phyloref0 is *expected* to
+      // resolve to, through a class expression that mentions phyloref0. Without a reasoner,
+      // phyloref0 therefore resolves to nothing.
       int exitCode =
           jphyloref.execute(
               new String[] {
@@ -74,7 +75,7 @@ class ResolveCommandTest {
               });
 
       assertEquals(0, exitCode);
-      assertEquals(EXPECTED_DUMMY1_RESOLUTION, output.toString("UTF-8"));
+      assertEquals("{\"phylorefs\":{\"#phyloref0\":[]}}\n", output.toString("UTF-8"));
     }
   }
 
@@ -115,6 +116,30 @@ class ResolveCommandTest {
       assertEquals(0, exitCode);
       assertEquals(EXPECTED_DUMMY1_RESOLUTION, outputStr);
       resetIO();
+    }
+
+    @Test
+    @DisplayName("resolves a pre-reasoned JSON-LD file the same with or without a reasoner")
+    void resolvePrereasonedJSONLDFile() throws UnsupportedEncodingException {
+      // prereasoned.jsonld asserts that node1 is in phyloref0, and that node2 is the node
+      // phyloref0 is expected to resolve to. Only node1 has resolved to phyloref0.
+      for (String reasoner : new String[] {"null", "elk"}) {
+        resetIO();
+        int exitCode =
+            jphyloref.execute(
+                new String[] {
+                  "resolve",
+                  "src/test/resources/phylorefs/prereasoned.jsonld",
+                  "--reasoner",
+                  reasoner
+                });
+
+        assertEquals(0, exitCode, "Exit code with --reasoner " + reasoner);
+        assertEquals(
+            "{\"phylorefs\":{\"#phyloref0\":[\"#node1\"]}}\n",
+            output.toString("UTF-8"),
+            "Output with --reasoner " + reasoner);
+      }
     }
 
     @Test
