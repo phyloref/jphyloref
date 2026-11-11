@@ -5,10 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.eclipse.rdf4j.rio.RDFParser;
@@ -17,8 +15,6 @@ import org.phyloref.jphyloref.helpers.JSONLDHelper;
 import org.phyloref.jphyloref.helpers.PhylorefHelper;
 import org.phyloref.jphyloref.helpers.ReasonerHelper;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -112,6 +108,28 @@ public class ResolveCommand implements Command {
       throw new IllegalArgumentException("Error: no input ontology specified (use '-i input.owl')");
     }
 
+    // Look up the reasoner before loading anything, so that an unknown `--reasoner` name is
+    // reported as such, not as a problem with the ontology.
+    OWLReasonerFactory reasonerFactory;
+    try {
+      reasonerFactory = ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine);
+    } catch (IllegalArgumentException ex) {
+      if (flagErrorsAsJSON) {
+        System.out.println(
+            new JSONStringer()
+                .object()
+                .key("error")
+                .value("Unknown reasoner (IllegalArgumentException)")
+                .key("message")
+                .value(ex.toString())
+                .endObject()
+                .toString());
+        return 0;
+      }
+      System.err.println("Unknown reasoner: " + ex.getMessage());
+      return 1;
+    }
+
     // If the input filename is '-', we should read the ontology from STDIN instead.
     InputStream inputStreamToReadFrom = null;
     if (inputFilename.equals("-")) {
@@ -120,6 +138,18 @@ public class ResolveCommand implements Command {
       try {
         inputStreamToReadFrom = new FileInputStream(inputFilename);
       } catch (FileNotFoundException ex) {
+        if (flagErrorsAsJSON) {
+          System.out.println(
+              new JSONStringer()
+                  .object()
+                  .key("error")
+                  .value("Could not open input file (FileNotFoundException)")
+                  .key("message")
+                  .value(ex.toString())
+                  .endObject()
+                  .toString());
+          return 0;
+        }
         logger.error("Could not open input file '{}': {}", inputFilename, ex);
         return 1;
       }
@@ -160,38 +190,16 @@ public class ResolveCommand implements Command {
       // Ontology loaded.
       System.err.println("Loaded ontology: " + ontology);
 
-      // We have an ontology! Let's reason over it, and store the results as
-      // a map of a list of node IRIs matched by each phyloref IRI.
-      Map<String, Set<String>> nodesPerPhylorefAsString = new HashMap<>();
-
-      // Set up and start the reasoner.
-      OWLReasonerFactory factory = ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine);
-      OWLReasoner reasoner = factory.createReasoner(ontology);
-
-      // Go through all the phyloreferences, identifying all the nodes that have
-      // matched to that phyloreference.
-      for (OWLClass phyloref : PhylorefHelper.getPhyloreferences(ontology, reasoner)) {
-        IRI phylorefIRI = phyloref.getIRI();
-
-        // Identify all individuals contained in this phyloref class, but filter out
-        // everything that is not an IRI_CDAO_NODE.
-        Set<String> nodes =
-            PhylorefHelper.getNodesInClass(phyloref, ontology, reasoner)
-                .stream()
-                .map(indiv -> indiv.getIRI().toString())
-                // Strip the default prefix on the node URI if present.
-                .map(iri -> iri.replaceFirst("^" + DEFAULT_URI_PREFIX, ""))
-                .collect(Collectors.toSet());
-
-        // Strip the default prefix on the phyloref URI if present.
-        String nodeURI = phylorefIRI.toString();
-        nodeURI = nodeURI.replaceFirst("^" + DEFAULT_URI_PREFIX, "");
-
-        nodesPerPhylorefAsString.put(nodeURI, nodes);
+      // We have an ontology! Reason over it, and store the results as a map of
+      // the node IRIs matched by each phyloref IRI.
+      Map<String, Set<String>> nodesPerPhylorefAsString;
+      OWLReasoner reasoner = ReasonerHelper.createReasoner(reasonerFactory, ontology);
+      try {
+        nodesPerPhylorefAsString =
+            PhylorefHelper.resolvePhyloreferences(ontology, reasoner, DEFAULT_URI_PREFIX);
+      } finally {
+        if (reasoner != null) reasoner.dispose();
       }
-
-      // Dispose of the reasoner.
-      reasoner.dispose();
 
       // Write the JSON response to STDOUT.
       System.out.println(

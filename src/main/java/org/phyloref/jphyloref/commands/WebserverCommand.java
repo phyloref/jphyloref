@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
@@ -23,12 +22,11 @@ import org.eclipse.rdf4j.rio.RDFParseException;
 import org.eclipse.rdf4j.rio.RDFParser;
 import org.json.JSONObject;
 import org.phyloref.jphyloref.JPhyloRef;
+import org.phyloref.jphyloref.helpers.InvalidPhylorefOntologyException;
 import org.phyloref.jphyloref.helpers.JSONLDHelper;
 import org.phyloref.jphyloref.helpers.PhylorefHelper;
 import org.phyloref.jphyloref.helpers.ReasonerHelper;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -119,6 +117,12 @@ public class WebserverCommand implements Command {
     private final CommandLine cmdLine;
 
     /**
+     * The reasoner factory named by `--reasoner`, looked up once at startup so that an unknown name
+     * stops the server before it accepts requests. Null for `--reasoner null`.
+     */
+    private final OWLReasonerFactory reasonerFactory;
+
+    /**
      * Create and start the webserver. It starts in another thread, so execution will not stop.
      *
      * @param cmd The WebserverCommand that created this Webserver.
@@ -131,12 +135,12 @@ public class WebserverCommand implements Command {
 
       this.cmd = cmd;
       this.cmdLine = cmdLine;
+      this.reasonerFactory = ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine);
 
       start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
       logger.info(
           "Webserver started with reasoner {}. Try accessing it at http://{}:{}/",
-          ReasonerHelper.getReasonerNameAndVersion(
-              ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine)),
+          ReasonerHelper.getReasonerNameAndVersion(reasonerFactory),
           hostname,
           port);
     }
@@ -169,41 +173,21 @@ public class WebserverCommand implements Command {
       String DEFAULT_URI_PREFIX = "http://example.org/jphyloref";
       OWLOntology ontology = manager.createOntology();
       RDFParser parser = JSONLDHelper.createRDFParserForOntology(ontology);
-      parser.parse(new FileReader(jsonldFile), DEFAULT_URI_PREFIX);
+      try (FileReader reader = new FileReader(jsonldFile)) {
+        parser.parse(reader, DEFAULT_URI_PREFIX);
+      }
       response.put("ontology", ontology.toString());
 
-      // We have an ontology! Let's reason over it, and store the results as
-      // a map of a list of node IRIs matched by each phyloref IRI.
-      Map<String, Set<String>> nodesPerPhylorefAsString = new HashMap<>();
-
-      // Set up and start the reasoner.
-      OWLReasonerFactory factory = ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine);
-      OWLReasoner reasoner = factory.createReasoner(ontology);
-
-      // Go through all the phyloreferences, identifying all the nodes that have
-      // matched to that phyloreference.
-      for (OWLClass phyloref : PhylorefHelper.getPhyloreferences(ontology, reasoner)) {
-        IRI phylorefIRI = phyloref.getIRI();
-
-        // Identify all individuals contained in this phyloref class, but filter out
-        // everything that is not an IRI_CDAO_NODE.
-        Set<String> nodes =
-            PhylorefHelper.getNodesInClass(phyloref, ontology, reasoner)
-                .stream()
-                .map(indiv -> indiv.getIRI().toString())
-                // Strip the default prefix on the node URI if present.
-                .map(iri -> iri.replaceFirst("^" + DEFAULT_URI_PREFIX, ""))
-                .collect(Collectors.toSet());
-
-        // Strip the default prefix on the phyloref URI if present.
-        String nodeURI = phylorefIRI.toString();
-        nodeURI = nodeURI.replaceFirst("^" + DEFAULT_URI_PREFIX, "");
-
-        nodesPerPhylorefAsString.put(nodeURI, nodes);
+      // We have an ontology! Reason over it, and store the results as a map of
+      // the node IRIs matched by each phyloref IRI.
+      Map<String, Set<String>> nodesPerPhylorefAsString;
+      OWLReasoner reasoner = ReasonerHelper.createReasoner(reasonerFactory, ontology);
+      try {
+        nodesPerPhylorefAsString =
+            PhylorefHelper.resolvePhyloreferences(ontology, reasoner, DEFAULT_URI_PREFIX);
+      } finally {
+        if (reasoner != null) reasoner.dispose();
       }
-
-      // Dispose the reasoner.
-      reasoner.dispose();
 
       // Log reasoning results.
       logger.info("Phyloreferencing reasoning results: {}", nodesPerPhylorefAsString);
@@ -222,9 +206,7 @@ public class WebserverCommand implements Command {
       response.put("owlapiVersion", owlapiVersion);
 
       // Report reasoner version.
-      String reasonerVersion =
-          ReasonerHelper.getReasonerNameAndVersion(
-              ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine));
+      String reasonerVersion = ReasonerHelper.getReasonerNameAndVersion(reasonerFactory);
       response.put("reasonerVersion", reasonerVersion);
 
       // Report JPhyloRef version.
@@ -293,6 +275,9 @@ public class WebserverCommand implements Command {
         //  3. A form containing 'jsonldFile' as a JSON-LD file to read.
         // For simplicity's sake, we convert all the possible forms into a
         // File for processing.
+        // A temporary file we write the JSON-LD into, deleted once the request is answered.
+        // (An uploaded 'jsonldFile' is NanoHTTPD's own temporary file, which it deletes itself.)
+        File tempFile = null;
         try {
           File jsonldFile = null;
 
@@ -313,18 +298,26 @@ public class WebserverCommand implements Command {
               String jsonldgzBase64 = String.join("", params.get("jsonldGzipped"));
 
               // Convert to a byte stream using Base64.
-              byte[] jsonldGzipped = Base64.getDecoder().decode(jsonldgzBase64);
+              byte[] jsonldGzipped;
+              try {
+                jsonldGzipped = Base64.getDecoder().decode(jsonldgzBase64);
+              } catch (IllegalArgumentException ex) {
+                response.put("status", "error");
+                response.put(
+                    "error", "Field 'jsonldGzipped' is not valid Base64: " + ex.getMessage());
+                return createResponse(Status.BAD_REQUEST, response);
+              }
 
-              // Convert unzip byte stream.
-              GZIPInputStream gzis = new GZIPInputStream(new ByteArrayInputStream(jsonldGzipped));
-
-              // Read unzipped byte stream as a UTF-8 string, which has to be done line by line.
-              BufferedReader reader = new BufferedReader(new InputStreamReader(gzis, "UTF-8"));
+              // Unzip the byte stream and read it as a UTF-8 string, line by line.
               StringBuffer jsonldStringBuffer = new StringBuffer();
-
-              String buffer;
-              while ((buffer = reader.readLine()) != null) {
-                jsonldStringBuffer.append(buffer);
+              try (BufferedReader reader =
+                  new BufferedReader(
+                      new InputStreamReader(
+                          new GZIPInputStream(new ByteArrayInputStream(jsonldGzipped)), "UTF-8"))) {
+                String buffer;
+                while ((buffer = reader.readLine()) != null) {
+                  jsonldStringBuffer.append(buffer);
+                }
               }
 
               // Store UTF-8 string for further processing.
@@ -339,10 +332,11 @@ public class WebserverCommand implements Command {
 
             // Store the JSON-LD into a file for further processing.
             if (jsonld != null) {
-              jsonldFile = File.createTempFile("jphyloref", null);
-              FileWriter writer = new FileWriter(jsonldFile);
-              writer.write(String.join(";", jsonld));
-              writer.close();
+              tempFile = File.createTempFile("jphyloref", null);
+              jsonldFile = tempFile;
+              try (FileWriter writer = new FileWriter(jsonldFile)) {
+                writer.write(jsonld);
+              }
             }
           }
 
@@ -354,6 +348,25 @@ public class WebserverCommand implements Command {
           response.put("error", "Exception thrown: " + ex.getMessage());
           ex.printStackTrace();
           return createResponse(Status.INTERNAL_ERROR, response);
+        } catch (InvalidPhylorefOntologyException ex) {
+          // An ontology PhylorefHelper cannot search for phylorefs, such as one with no
+          // phyloref:Phyloreference class: a problem with the input, not the server. Other
+          // IllegalArgumentExceptions (from OWL API, ELK or rdf4j) fall through to the 500 below.
+          response.put("status", "error");
+          response.put("error", "Invalid input: " + ex.getMessage());
+          logger.warn("Rejected /reason request: {}", ex.getMessage());
+          return createResponse(Status.BAD_REQUEST, response);
+        } catch (RuntimeException ex) {
+          // Anything else would escape serve() and reach the client as NanoHTTPD's plain-text
+          // error page rather than the JSON every other /reason response uses.
+          response.put("status", "error");
+          response.put("error", "Unexpected exception: " + ex);
+          logger.error("Unexpected exception while reasoning", ex);
+          return createResponse(Status.INTERNAL_ERROR, response);
+        } finally {
+          if (tempFile != null && !tempFile.delete()) {
+            logger.warn("Could not delete temporary file {}", tempFile);
+          }
         }
 
       } else if (path.equals("/version")) {

@@ -113,6 +113,17 @@ public class TestCommand implements Command {
       throw new IllegalArgumentException("Error: no input ontology specified (use '-i input.owl')");
     }
 
+    // Expected nodes are the instances of a class expression (see below), which only a reasoner
+    // can compute, so this command cannot run with `--reasoner null`. Supporting it would mean
+    // reading expected nodes from assertions in a pre-reasoned ontology instead.
+    OWLReasonerFactory reasonerFactory = ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine);
+    if (reasonerFactory == null) {
+      logger.error(
+          "The 'test' command needs a reasoner to determine expected nodes; "
+              + "'--reasoner null' is only supported by 'resolve' and 'webserver'.");
+      return 1;
+    }
+
     // If the input filename is '-', we should read the ontology from STDIN instead.
     InputStream inputStreamToReadFrom = null;
     if (inputFilename.equals("-")) {
@@ -173,12 +184,29 @@ public class TestCommand implements Command {
     // Ontology loaded.
     logger.info("Loaded ontology: {}", ontology);
 
-    // Reason over the loaded ontology -- but only if the user wants that!
-    // Set up an OWLReasoner to work with.
-    OWLReasonerFactory reasonerFactory = ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine);
-    OWLReasoner reasoner = null;
-    if (reasonerFactory != null) reasoner = reasonerFactory.createReasoner(ontology);
+    // Set up an OWLReasoner to reason over the loaded ontology. It is not null: `--reasoner null`
+    // was rejected above.
+    OWLReasoner reasoner = reasonerFactory.createReasoner(ontology);
+    try {
+      return testPhyloreferences(
+          ontology, reasoner, reasonerFactory, inputFilename, defaultURIPrefix);
+    } finally {
+      reasoner.dispose();
+    }
+  }
 
+  /**
+   * Test every phyloreference in an ontology against its expected nodes, writing the results to
+   * stdout as TAP and a summary to stderr.
+   *
+   * @return The exit code: -1 if no phyloreference succeeded, otherwise the number of failures.
+   */
+  private int testPhyloreferences(
+      OWLOntology ontology,
+      OWLReasoner reasoner,
+      OWLReasonerFactory reasonerFactory,
+      String inputFilename,
+      String defaultURIPrefix) {
     // Get a list of all phyloreferences.
     Set<OWLClass> phylorefs = PhylorefHelper.getPhyloreferences(ontology, reasoner);
     logger.info("Phyloreferences identified: {}", phylorefs);
@@ -192,15 +220,10 @@ public class TestCommand implements Command {
     testSet.addComment(new Comment("From file: " + inputFilename));
     testSet.addComment(
         new Comment(
-            "Using reasoner: "
-                + ReasonerHelper.getReasonerNameAndVersion(
-                    ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine))));
+            "Using reasoner: " + ReasonerHelper.getReasonerNameAndVersion(reasonerFactory)));
 
     // Preload some terms we need to use in the following code.
-    OWLDataFactory dataFactory = manager.getOWLDataFactory();
-
-    // Some classes we will use.
-    OWLClass classCDAONode = dataFactory.getOWLClass(PhylorefHelper.IRI_CDAO_NODE);
+    OWLDataFactory dataFactory = ontology.getOWLOntologyManager().getOWLDataFactory();
 
     // Terms associated with phyloreferences
     OWLAnnotationProperty labelAnnotationProperty =
@@ -275,16 +298,9 @@ public class TestCommand implements Command {
                   dataFactory.getOWLObjectProperty(PhylorefHelper.IRI_OBI_HAS_SPECIFIED_INPUT),
                   phyloref));
 
-      Set<OWLNamedIndividual> expectedNodes = new HashSet<>();
-      if (reasoner == null) {
-        // If there's no reasoner, we could look for individuals specifically
-        // marked as expected (see PhylorefHelper for an example). However, we
-        // don't need to implement this until we actually have a need for this.
-        throw new RuntimeException("Testing without reasoner not yet implemented.");
-      }
-
       // Get direct and indirect instances of the expectedNodesExpr.
-      expectedNodes = reasoner.getInstances(expectedNodesExpr, false).getFlattened();
+      Set<OWLNamedIndividual> expectedNodes =
+          reasoner.getInstances(expectedNodesExpr, false).getFlattened();
       result.addComment(
           new Comment(
               "Expected nodes: " + removeDefaultURIPrefixes(expectedNodes, defaultURIPrefix)));
@@ -398,9 +414,6 @@ public class TestCommand implements Command {
             + " failures marked TODO, "
             + countSkipped
             + " skipped.");
-
-    // Dispose of the reasoner.
-    reasoner.dispose();
 
     // Exit with error unless we have zero failures.
     if (countSuccess == 0) return -1;
