@@ -59,8 +59,8 @@
 
     <!--
       Newer versions of transitive dependencies than our direct dependencies ask for,
-      because the versions they ask for have known vulnerabilities that end up in the
-      shaded JAR (and so in the Docker image's vulnerability scans). Check whether each
+      mostly because the versions they ask for have known vulnerabilities that end up in
+      the shaded JAR (and so in the Docker image's vulnerability scans). Check whether each
       of these is still needed when the dependency that pulls it in is upgraded.
     -->
     <dependencyManagement>
@@ -84,6 +84,18 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>33.8.0-jre</version>
+            </dependency>
+            <!-- From owlapi-api, which asks for 2.9.3. Caffeine 2.x reads object fields
+                 through sun.misc.Unsafe, which prints warnings on JDK 24 and later and is
+                 due to be removed from the JDK (JEP 471), which would break OWLAPI at run
+                 time. Caffeine 3.x uses VarHandles instead. OWLAPI 4.5.29 only calls
+                 Caffeine.newBuilder/weakKeys/maximumSize/maximumWeight/weigher/recordStats/
+                 build(CacheLoader) and LoadingCache.get/getIfPresent/invalidate/invalidateAll,
+                 which Caffeine 3.x keeps binary-compatible. -->
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>3.3.1</version>
             </dependency>
             <!-- owlapi-api asks for slf4j-api 2.0.x and jsonld-java for jcl-over-slf4j
                  1.7.x; keep both in step with slf4j-simple. -->

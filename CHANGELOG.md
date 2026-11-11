@@ -34,6 +34,12 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
   and slf4j to 2.0.20, replaced log4j 1.2.14 (from ELK) with reload4j 1.2.27, removed
   the unused Sesame 1.x `openrdf-model` dependency, and pinned newer Jackson,
   commons-io, Guava and SnakeYAML, so that no library in the JAR has a known advisory.
+- Pinned Caffeine (from OWLAPI) to 3.3.1, which no longer uses `sun.misc.Unsafe`.
+  Caffeine 2.9.3 printed warnings on JDK 24 and later, and fails once the JDK denies
+  `Unsafe` memory access, as a future release will by default.
+- The executable JAR now includes every parser that its dependencies register. It
+  previously kept only one library's list of each kind, so it was missing most of
+  rdf4j's RDF parsers and writers and OWLAPI's Rio and OBO format parsers.
 - The Docker image now runs on Temurin 25 (Ubuntu 26.04) with security updates applied
   at build time, and builds webhook from source with a current Go instead of using
   Ubuntu's package.
