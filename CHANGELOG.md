@@ -3,12 +3,15 @@
 Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
 ## [Unreleased]
-- JPhyloRef now requires Java 21 or later (previously Java 8). The tests now run on
-  JUnit 6.1.3 with Surefire 3.6.1.
-- Upgraded JaCoCo to 0.8.13 so that `mvn test` works on JDKs newer than 15.
+- Fixed `--reasoner null` crashing the `resolve` command and the webserver; it now skips
+  reasoning and reports the resolutions asserted in the ontology. The `test` command, which
+  needs a reasoner to determine expected nodes, now rejects it with an error message.
 - `JPhyloRef.VERSION` is now read from a Maven-filtered properties file instead of
   being hardcoded, so `help` and the webserver's `/version` endpoint report the
   version declared in pom.xml.
+- JPhyloRef now requires Java 21 or later (previously Java 8). The tests now run on
+  JUnit 6.1.3 with Surefire 3.6.1.
+- Upgraded JaCoCo to 0.8.13 so that `mvn test` works on JDKs newer than 15.
 - Upgraded org.json to 20260814 and the Spotless plugin to 1.20.0 to resolve four
   Dependabot advisories (three high-severity, one medium).
 - Upgraded OWLAPI to 4.5.29, rdf4j to 3.7.7, tap4j to 4.4.2, commons-cli to 1.11.0
@@ -20,7 +23,6 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
   Ubuntu's package.
 - The Maven CI workflow now builds on every Java LTS from 21 upwards (currently 21 and 25)
   rather than JDK 8 alone.
-- Corrected the JAR filename in README.md and Usage.md, which is `target/JPhyloRef.jar`.
 
 ## [1.1.1] - 2021-08-10
 - Fixed manuscript for submission to the Journal of Open Source Software (JOSS).

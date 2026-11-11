@@ -80,20 +80,21 @@ Development of JPhyloRef takes place in [our GitHub repository]. This includes [
 
 # Build and execution instructions
 
-You will need [Java] (version 21 or later) and [Apache Maven] to build the software from source, and Java 21
-or later to run it. We recommend installing these
+You will need [Java] and [Apache Maven] to build the software from source. We recommend installing these
 tools using a package manager, such as [Homebrew] on macOS. You can use [jEnv] instead if you want to install
 multiple Java versions on the same computer. Installation should set up the `JAVA_HOME` environment
 variable; if not, you will need to set it to point at the directory containing your Java installation.
 
 Once you have downloaded the source code to your computer, you can compile and test the code by running `mvn test`.
 
-JPhyloRef can be built from source by running `mvn package` from the root directory of this repository. This will create `target/JPhyloRef.jar`, which can be executed by running,
+JPhyloRef can be built from source by running `mvn package` from the root directory of this repository. This will create a JAR file in the `target/` directory, which can be executed by running,
 for example:
 
 ```
 $ java -jar target/JPhyloRef.jar test src/test/resources/phylorefs/dummy1.owl
 ```
+
+The JAR is always named `target/JPhyloRef.jar`, whatever version you are building.
 
 You can also download any published version of this software directly from Maven
 at https://search.maven.org/artifact/org.phyloref/jphyloref.
