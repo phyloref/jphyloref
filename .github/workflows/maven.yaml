@@ -14,10 +14,13 @@ jobs:
       # Report every JDK's result rather than cancelling the rest on the first failure.
       fail-fast: false
       matrix:
-        # 8 is the version this project targets; the others guard against build
-        # tooling that breaks on newer JDKs, which has bitten us before (JaCoCo
-        # could not instrument class files newer than Java 15).
-        java-version: ['8', '11', '17', '21', '25']
+        # Every Java LTS from the one this project targets (maven.compiler.release in
+        # pom.xml) upwards. Add each new LTS as soon as Temurin releases it (Java 29 is
+        # due in September 2027), so that breakage shows up while the older LTSes are
+        # still supported; drop one when it falls below the target. Newer JDKs have
+        # broken the build tooling before (JaCoCo could not instrument class files
+        # newer than Java 15).
+        java-version: ['21', '25']
 
     name: Build with JDK ${{ matrix.java-version }}
 
