@@ -44,6 +44,9 @@
         <!-- The rdf4j version that owlapi-rio is built against; see the rdf4j dependencies. -->
         <rdf4j.version>3.7.7</rdf4j.version>
         <slf4j.version>2.0.20</slf4j.version>
+
+        <!-- Whether to skip building the shaded (fat) JAR; the docker profile sets it. -->
+        <shade.skip>false</shade.skip>
     </properties>
 
     <distributionManagement>
@@ -369,8 +372,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.6.2</version>
                 <configuration>
+                    <!-- The docker profile sets this, to build a thin JAR plus target/lib instead. -->
+                    <skip>${shade.skip}</skip>
                     <transformers>
                         <transformer
                             implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -380,6 +385,12 @@
                                 <X-Compile-Target-JDK>${maven.compiler.release}</X-Compile-Target-JDK>
                             </manifestEntries>
                         </transformer>
+                        <!-- Several dependencies register the same services (OWLAPI's parser and
+                             storer factories, rdf4j's Rio parsers and writers) in files with the
+                             same META-INF/services name. Without this, shading keeps only the
+                             first copy of each, and the JAR silently loses most of those formats. -->
+                        <transformer
+                            implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                     </transformers>
                 </configuration>
                 <executions>
@@ -452,4 +463,56 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!--
+          `mvn -Pdocker package` builds what the Docker image runs: a thin target/JPhyloRef.jar
+          whose manifest puts every runtime dependency in target/lib on its classpath, instead
+          of the shaded JAR. `java -jar JPhyloRef.jar` works the same either way, as long as
+          lib/ sits next to it. The image then runs the same classpath the tests run against,
+          and the libraries get their own image layer, which only changes when they do.
+          The default build still produces the shaded JAR, for the CLI and Maven Central.
+        -->
+        <profile>
+            <id>docker</id>
+            <properties>
+                <shade.skip>true</shade.skip>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>${mainClass}</mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.11.0</version>
+                        <executions>
+                            <execution>
+                                <id>copy-runtime-dependencies</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <includeScope>runtime</includeScope>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
