@@ -25,7 +25,7 @@ env:
 
 jobs:
   push_to_registry:
-    name: Push Docker image to GitHub Packages tagged with its version number
+    name: Push the release's Docker image to GitHub Packages under its version
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -33,12 +33,7 @@ jobs:
     steps:
       # Image tags are worked out from the release, so refuse to build anything else, and
       # say why, rather than letting metadata-action produce no tags and the push fail.
-      # `latest` is only moved to the release GitHub marks as Latest: metadata-action's own
-      # rule (`latest=auto`) adds it to every non-prerelease version, so rebuilding an older
-      # release by hand would move `latest`, and the deployment that follows it, back to
-      # that release.
       - name: Check the release
-        id: release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
@@ -51,17 +46,9 @@ jobs:
             echo "::error::The tag '$TAG' is not of the form vX.Y.Z or vX.Y.Z-suffix, so no image version can be derived from it. Tag releases with all three version numbers, e.g. v1.3.0."
             exit 1
           fi
-          if ! prerelease=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isPrerelease --jq .isPrerelease); then
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json tagName >/dev/null; then
             echo "::error::'$TAG' is not a published GitHub release."
             exit 1
-          fi
-          latest=$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName)
-          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
-          if [ "$latest" = "$TAG" ]; then
-            echo "latest=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "latest=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::'$TAG' is not the latest release ('$latest'), so the image will not be tagged latest."
           fi
       - name: Check out the repo
         uses: actions/checkout@v7
@@ -76,17 +63,12 @@ jobs:
         with:
           images:
             ghcr.io/${{ github.repository }}
-          # Tag latest only as decided above.
+          # This job pushes only the release's own version (1.2.0 for v1.2.0, 1.3.0-rc.1
+          # for v1.3.0-rc.1). The floating tags, latest and X.Y, are moved by the next job.
           flavor: |
             latest=false
-          # A release tagged v1.2.0 is published as 1.2.0 and 1.2, and as latest if it is
-          # the latest release. A tag with a suffix, such as v1.3.0-rc.1, is published under
-          # that version alone; so is any GitHub prerelease, whatever its tag, so that it
-          # does not replace the image under X.Y.
           tags: |
             type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}},enable=${{ steps.release.outputs.prerelease == 'false' }}
-            type=raw,value=latest,enable=${{ steps.release.outputs.latest == 'true' }}
       - name: Login to ghcr
         uses: docker/login-action@v4
         with:
@@ -104,3 +86,41 @@ jobs:
           pull: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  # Points `latest` at the release GitHub marks as Latest, and each `X.Y` at the newest full
+  # release in its line, working them out from GitHub's releases when it runs rather than
+  # from the release this run built (see the script for details). That is what keeps a hand
+  # rebuild of an older release from moving them back to it, however runs overlap.
+  #
+  # Only one run at a time can be in this job. GitHub cancels a run that is still waiting
+  # for this group when a newer one starts waiting; that is harmless here, since the newer
+  # run works out every tag from scratch. Only this job is serialized: putting the build
+  # in the group too would let a rebuild cancel a waiting release's build, and with it the
+  # release's image.
+  move_floating_tags:
+    name: Point latest and X.Y at the releases they should name
+    needs: push_to_registry
+    runs-on: ubuntu-latest
+    concurrency:
+      group: docker-floating-tags
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+      - name: Login to ghcr
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Move latest and X.Y
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: .github/scripts/move-floating-tags.sh "${{ env.REGISTRY }}/${{ github.repository }}"
