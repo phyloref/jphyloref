@@ -42,6 +42,9 @@
         <!-- The rdf4j version that owlapi-rio is built against; see the rdf4j dependencies. -->
         <rdf4j.version>3.7.7</rdf4j.version>
         <slf4j.version>2.0.20</slf4j.version>
+
+        <!-- Whether to skip building the shaded (fat) JAR; the docker profile sets it. -->
+        <shade.skip>false</shade.skip>
     </properties>
 
     <distributionManagement>
@@ -367,8 +370,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.6.2</version>
                 <configuration>
+                    <!-- The docker profile sets this, to build a thin JAR plus target/lib instead. -->
+                    <skip>${shade.skip}</skip>
                     <transformers>
                         <transformer
                             implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -378,6 +383,12 @@
                                 <X-Compile-Target-JDK>${maven.compile.target}</X-Compile-Target-JDK>
                             </manifestEntries>
                         </transformer>
+                        <!-- Several dependencies register the same services (OWLAPI's parser and
+                             storer factories, rdf4j's Rio parsers and writers) in files with the
+                             same META-INF/services name. Without this, shading keeps only the
+                             first copy of each, and the JAR silently loses most of those formats. -->
+                        <transformer
+                            implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                     </transformers>
                 </configuration>
                 <executions>
