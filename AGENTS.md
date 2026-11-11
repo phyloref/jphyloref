@@ -6,16 +6,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```console
 mvn package                     # builds target/JPhyloRef.jar (shaded, executable)
+mvn -Pdocker package            # thin target/JPhyloRef.jar + target/lib/, as the Docker image runs it
 mvn test                        # unit tests + Spotless check + JaCoCo coverage check
 mvn spotless:apply              # fix formatting (google-java-format GOOGLE style)
 mvn test -Dtest='TestCommandTest*'   # single test class — the trailing * is required
 ```
 
 - **The trailing `*` in `-Dtest` is not optional.** Every test method lives inside a JUnit 5 `@Nested` inner class, so `-Dtest=TestCommandTest` matches nothing and Surefire 2.22.1 fails with "No tests were executed!".
-- Spotless runs in the `test` phase and **fails the build** on unformatted Java, XML, Markdown, or JSON. Run `mvn spotless:apply` before committing. The tree is currently Spotless-clean, so a run that reports no changes is the expected result. Note that `spotless:apply` rewrites file mtimes even when content is unchanged, which makes `git status` list files as modified while `git diff` shows nothing — trust `git diff`.
+- Spotless runs in the `test` phase and **fails the build** on unformatted Java, XML, Markdown, or JSON. Run `mvn spotless:apply` before committing. The tree is currently Spotless-clean, so a run that reports no changes is the expected result. Note that `spotless:apply` rewrites file mtimes even when content is unchanged, which makes `git status` list files as modified while `git diff` shows nothing — trust `git diff`. If `git update-index --refresh` won't clear them and that blocks a rebase ("You have unstaged changes"), `git restore` the listed files once `git diff --quiet` confirms nothing differs.
 - JaCoCo's coverage `check` has `haltOnFailure=false`, so coverage shortfalls only show up in the log.
 - Source/target is Java 8. CI builds on a matrix of JDK 8, 11, 17, 21 and 25 — keep it that way, since the build tooling (not the code) is what tends to break on newer JDKs. The Dockerfile builds and runs on Temurin 25, so keep its JDK in the matrix.
-- The shaded JAR is always `target/JPhyloRef.jar` (`<finalName>`), not a versioned filename.
+- The shaded JAR is always `target/JPhyloRef.jar` (`<finalName>`), not a versioned filename. It is what the CLI docs, the Maven Central artifact (shading replaces the main artifact) and the SLURM script use. The `docker` profile skips shading and instead writes the same filename as a thin JAR whose manifest puts `lib/*.jar` on the classpath.
+- **Tests never touch the shaded JAR** — Surefire runs on Maven's classpath — so CI smoke-tests it separately after `mvn package`. Shading needs `ServicesResourceTransformer`: OWLAPI and rdf4j register their parsers and writers in `META-INF/services` files that several JARs share, and without it the fat JAR kept only the first copy of each (6 of 18 OWLAPI parsers, 2 of 13 rdf4j ones) while every test still passed.
 
 Run the built JAR:
 
@@ -54,10 +56,10 @@ JPhyloRef reads an OWL ontology containing phyloreferences (clade definitions as
 
 ## Deployment
 
-`Dockerfile` is a multi-stage build producing an image that runs [webhook](https://github.com/adnanh/webhook) (not the built-in `webserver` command) invoking `webhook/exec_jphyloref.sh`, which calls `resolve ... -j --errors-as-json`. webhook is compiled from source with a current Go rather than installed from apt, because Ubuntu's package carries an outdated, statically linked Go standard library that vulnerability scanners flag and `apt-get upgrade` cannot fix; the Dockerfile's header comment explains where scan findings come from and how each kind is fixed. `webhook/exec_jphyloref_srun.sh` is the SLURM variant. See `webhook/README.md`.
+`Dockerfile` is a multi-stage build producing an image that runs [webhook](https://github.com/adnanh/webhook) (not the built-in `webserver` command) invoking `webhook/exec_jphyloref.sh`, which calls `resolve ... -j --errors-as-json`. It builds with `-Pdocker`, so the image holds `/app/lib/*.jar` and a thin `/app/JPhyloRef.jar` rather than the shaded JAR; the libraries are their own layer and `JPhyloRef.jar` is copied last, so a code-only release changes a single small layer. webhook is compiled from source with a current Go rather than installed from apt, because Ubuntu's package carries an outdated, statically linked Go standard library that vulnerability scanners flag and `apt-get upgrade` cannot fix; the Dockerfile's header comment explains where scan findings come from and how each kind is fixed. `webhook/exec_jphyloref_srun.sh` is the SLURM variant. See `webhook/README.md`.
 
 `webhook/klados-backend.container` is a Podman Quadlet with `AutoUpdate=registry` on `:latest`, so a deployment picks up a new image only when one is pushed under that tag. Images are only built by `.github/workflows/docker.yaml`, on a published release (tagged `X.Y.Z`, `X.Y` and `latest`) or by hand with `workflow_dispatch` on a release tag; an image that is never rebuilt never gets OS or Go security fixes.
 
-To smoke-test a built image the way the deployment calls it, POST `{"jsonldGzipped": "<base64 of a gzipped .jsonld>"}` to `http://localhost:8080/reason` (`start.sh` sets an empty URL prefix, so it is not `/hooks/reason`) with `X-Hub-Signature: sha1=<HMAC-SHA1 of the body>`; `hooks.json` uses the secret `undefined`. If you mount a tmpfs on `/data`, it must be writable by the image's `nru` user (uid 1001).
+`webhook/smoke-test.sh <image>` (run from the repo root; CI's `docker` job runs it on every PR) smoke-tests a built image the way the deployment calls it: it POSTs a gzipped, base64-encoded `dummy1.jsonld` to `/reason` — not `/hooks/reason`, since `start.sh` sets an empty URL prefix — signed with `hooks.json`'s secret, and checks the JSON returned. A tmpfs on `/data` must be writable by the image's `nru` user (uid 1001), which the script and the Quadlet's `U` option both arrange.
 
 Publishing to Sonatype OSSRH is `mvn clean deploy` and requires GPG settings in `~/.m2/settings.xml`.

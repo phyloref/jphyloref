@@ -43,4 +43,10 @@ phyloreferences to standard output. It calls JPhyloRef with particular settings 
   publishes it for every GitHub release, and can be run by hand on a release tag to rebuild
   that release with current security updates. `AutoUpdate=registry` then pulls the new image.
   It only does so for the tag named in `Image=`, so a deployment pinned to any other tag
-  (such as the old `add-docker`) stops receiving fixes.
+  (such as the old `add-docker`) stops receiving fixes. Inside the image, `/app/JPhyloRef.jar`
+  is a thin JAR that loads its dependencies from `/app/lib`, rather than the single shaded JAR
+  used when running JPhyloRef directly; `exec_jphyloref.sh` runs it the same way either way.
+* [smoke-test.sh](smoke-test.sh) checks a built image end to end: it starts the image, sends a
+  test file to `/reason` in the format `hooks.json` expects (gzipped, base64-encoded, signed),
+  and checks the result. Run it from
+  the repository root as `webhook/smoke-test.sh <image>`.

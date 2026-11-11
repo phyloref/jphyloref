@@ -16,7 +16,12 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 - The Docker image now runs on Temurin 25 (Ubuntu 26.04) with security updates applied
   at build time, and builds webhook from source with a current Go instead of using
   Ubuntu's package.
-- The Maven CI workflow now builds on JDK 8, 11, 17, 21 and 25 rather than JDK 8 alone.
+- The Docker image now runs a thin JPhyloRef.jar with its dependencies in `/app/lib`, built
+  by a new `docker` Maven profile, instead of the shaded JAR.
+- The shaded JAR now registers every OWLAPI and rdf4j parser and writer; previously only
+  the first of several same-named service files survived shading.
+- The Maven CI workflow now builds on JDK 8, 11, 17, 21 and 25 rather than JDK 8 alone,
+  smoke-tests the shaded JAR, and builds and smoke-tests the Docker image.
 - Corrected the JAR filename in README.md and Usage.md, which is `target/JPhyloRef.jar`.
 
 ## [1.1.1] - 2021-08-10
