@@ -30,6 +30,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.util.AutoIRIMapper;
 import org.semanticweb.owlapi.util.VersionInfo;
 import org.slf4j.Logger;
@@ -115,6 +116,12 @@ public class WebserverCommand implements Command {
     private final CommandLine cmdLine;
 
     /**
+     * The reasoner factory named by `--reasoner`, looked up once at startup so that an unknown name
+     * stops the server before it accepts requests. Null for `--reasoner null`.
+     */
+    private final OWLReasonerFactory reasonerFactory;
+
+    /**
      * Create and start the webserver. It starts in another thread, so execution will not stop.
      *
      * @param cmd The WebserverCommand that created this Webserver.
@@ -127,12 +134,12 @@ public class WebserverCommand implements Command {
 
       this.cmd = cmd;
       this.cmdLine = cmdLine;
+      this.reasonerFactory = ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine);
 
       start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
       logger.info(
           "Webserver started with reasoner {}. Try accessing it at http://{}:{}/",
-          ReasonerHelper.getReasonerNameAndVersion(
-              ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine)),
+          ReasonerHelper.getReasonerNameAndVersion(reasonerFactory),
           hostname,
           port);
     }
@@ -171,7 +178,7 @@ public class WebserverCommand implements Command {
       // We have an ontology! Reason over it, and store the results as a map of
       // the node IRIs matched by each phyloref IRI.
       Map<String, Set<String>> nodesPerPhylorefAsString;
-      OWLReasoner reasoner = ReasonerHelper.createReasonerFromCmdLine(cmdLine, ontology);
+      OWLReasoner reasoner = ReasonerHelper.createReasoner(reasonerFactory, ontology);
       try {
         nodesPerPhylorefAsString =
             PhylorefHelper.resolvePhyloreferences(ontology, reasoner, DEFAULT_URI_PREFIX);
@@ -196,9 +203,7 @@ public class WebserverCommand implements Command {
       response.put("owlapiVersion", owlapiVersion);
 
       // Report reasoner version.
-      String reasonerVersion =
-          ReasonerHelper.getReasonerNameAndVersion(
-              ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine));
+      String reasonerVersion = ReasonerHelper.getReasonerNameAndVersion(reasonerFactory);
       response.put("reasonerVersion", reasonerVersion);
 
       // Report JPhyloRef version.

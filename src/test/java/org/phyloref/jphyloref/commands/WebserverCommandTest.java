@@ -109,4 +109,10 @@ class WebserverCommandTest {
       }
     }
   }
+
+  @Test
+  @DisplayName("refuses to start with an unknown reasoner")
+  void refusesUnknownReasoner() {
+    assertThrows(IllegalArgumentException.class, () -> startWebserver("Elk"));
+  }
 }

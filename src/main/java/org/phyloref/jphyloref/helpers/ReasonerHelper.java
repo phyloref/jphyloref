@@ -109,17 +109,16 @@ public class ReasonerHelper {
   }
 
   /**
-   * Create the reasoner chosen on the command line for an ontology. This is the one place the
-   * commands turn `--reasoner` into a reasoner, so that `--reasoner null` is handled the same way
-   * everywhere.
+   * Create a reasoner for an ontology from a factory that getReasonerFactoryFromCmdLine() returned.
+   * Commands look the factory up before loading the ontology, so that an unknown `--reasoner` name
+   * is reported as such rather than as a problem with the ontology.
    *
-   * @return The reasoner, or null if the user chose `--reasoner null`. Callers must pass a null
-   *     reasoner on to PhylorefHelper (which then reads only asserted axioms), and must dispose of
-   *     a non-null one in a finally block: the webserver runs indefinitely, and ELK keeps worker
-   *     threads alive until its reasoner is disposed.
+   * @return The reasoner, or null if the factory is null (`--reasoner null`). Callers must pass a
+   *     null reasoner on to PhylorefHelper (which then reads only asserted axioms), and must
+   *     dispose of a non-null one in a finally block: the webserver runs indefinitely, and ELK
+   *     keeps worker threads alive until its reasoner is disposed.
    */
-  public static OWLReasoner createReasonerFromCmdLine(CommandLine cmdLine, OWLOntology ontology) {
-    OWLReasonerFactory factory = getReasonerFactoryFromCmdLine(cmdLine);
+  public static OWLReasoner createReasoner(OWLReasonerFactory factory, OWLOntology ontology) {
     if (factory == null) return null;
     return factory.createReasoner(ontology);
   }
