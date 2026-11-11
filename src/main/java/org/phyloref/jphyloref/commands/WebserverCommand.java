@@ -328,6 +328,19 @@ public class WebserverCommand implements Command {
           response.put("error", "Exception thrown: " + ex.getMessage());
           ex.printStackTrace();
           return createResponse(Status.INTERNAL_ERROR, response);
+        } catch (IllegalArgumentException ex) {
+          // PhylorefHelper throws this for an ontology it cannot find phylorefs in, such as one
+          // with no phyloref:Phyloreference class: a problem with the input, not the server.
+          response.put("status", "error");
+          response.put("error", "Invalid input: " + ex.getMessage());
+          return createResponse(Status.BAD_REQUEST, response);
+        } catch (RuntimeException ex) {
+          // Anything else would escape serve() and reach the client as NanoHTTPD's plain-text
+          // error page rather than the JSON every other /reason response uses.
+          response.put("status", "error");
+          response.put("error", "Unexpected exception: " + ex);
+          logger.error("Unexpected exception while reasoning", ex);
+          return createResponse(Status.INTERNAL_ERROR, response);
         }
 
       } else if (path.equals("/version")) {

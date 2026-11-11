@@ -10,6 +10,7 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -185,6 +186,36 @@ class ResolveCommandTest {
 
         // Reset everything else as well.
         resetIO();
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("can report errors as JSON")
+  class ErrorsAsJSON {
+    @Test
+    @DisplayName("reports an ontology without phyloref:Phyloreference as a JSON error")
+    void reportsMissingPhyloreferenceClass() throws UnsupportedEncodingException {
+      // Both the reasoned and the asserted-only paths must report this as JSON.
+      for (String reasoner : new String[] {"elk", "null"}) {
+        resetIO();
+        int exitCode =
+            jphyloref.execute(
+                new String[] {
+                  "resolve",
+                  "src/test/resources/phylorefs/no-phyloref-class.jsonld",
+                  "--errors-as-json",
+                  "--reasoner",
+                  reasoner
+                });
+
+        // --errors-as-json always exits 0; the error is in the JSON on stdout.
+        assertEquals(0, exitCode, "Exit code with --reasoner " + reasoner);
+        JSONObject result = new JSONObject(output.toString("UTF-8"));
+        assertTrue(result.has("error"), "Expected an 'error' key in: " + result);
+        assertTrue(
+            result.getString("message").contains("is not defined in ontology"),
+            "Unexpected error message with --reasoner " + reasoner + ": " + result);
       }
     }
   }
