@@ -194,6 +194,20 @@ class ResolveCommandTest {
   @DisplayName("can report errors as JSON")
   class ErrorsAsJSON {
     @Test
+    @DisplayName("reports an input file that cannot be opened as a JSON error")
+    void reportsMissingInputFile() throws UnsupportedEncodingException {
+      int exitCode =
+          jphyloref.execute(
+              new String[] {
+                "resolve", "src/test/resources/phylorefs/does-not-exist.jsonld", "--errors-as-json"
+              });
+
+      assertEquals(0, exitCode);
+      JSONObject result = new JSONObject(output.toString("UTF-8"));
+      assertEquals("Could not open input file (FileNotFoundException)", result.getString("error"));
+    }
+
+    @Test
     @DisplayName("reports an ontology without phyloref:Phyloreference as a JSON error")
     void reportsMissingPhyloreferenceClass() throws UnsupportedEncodingException {
       // Both the reasoned and the asserted-only paths must report this as JSON.

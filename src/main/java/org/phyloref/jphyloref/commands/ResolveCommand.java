@@ -115,6 +115,18 @@ public class ResolveCommand implements Command {
       try {
         inputStreamToReadFrom = new FileInputStream(inputFilename);
       } catch (FileNotFoundException ex) {
+        if (flagErrorsAsJSON) {
+          System.out.println(
+              new JSONStringer()
+                  .object()
+                  .key("error")
+                  .value("Could not open input file (FileNotFoundException)")
+                  .key("message")
+                  .value(ex.toString())
+                  .endObject()
+                  .toString());
+          return 0;
+        }
         logger.error("Could not open input file '{}': {}", inputFilename, ex);
         return 1;
       }
