@@ -461,4 +461,56 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!--
+          `mvn -Pdocker package` builds what the Docker image runs: a thin target/JPhyloRef.jar
+          whose manifest puts every runtime dependency in target/lib on its classpath, instead
+          of the shaded JAR. `java -jar JPhyloRef.jar` works the same either way, as long as
+          lib/ sits next to it. The image then runs the same classpath the tests run against,
+          and the libraries get their own image layer, which only changes when they do.
+          The default build still produces the shaded JAR, for the CLI and Maven Central.
+        -->
+        <profile>
+            <id>docker</id>
+            <properties>
+                <shade.skip>true</shade.skip>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>${mainClass}</mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.11.0</version>
+                        <executions>
+                            <execution>
+                                <id>copy-runtime-dependencies</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <includeScope>runtime</includeScope>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
