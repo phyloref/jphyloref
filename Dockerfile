@@ -7,8 +7,8 @@
 # needs a different fix:
 #   - OS packages from the runtime base image: rebuild the image, which picks up the
 #     current eclipse-temurin base and then applies any newer Ubuntu security updates.
-#   - Libraries shaded into JPhyloRef.jar: upgrade them in pom.xml (see its
-#     <dependencyManagement> section).
+#   - Java libraries, one JAR per library under /app/lib: upgrade them in pom.xml (see
+#     its <dependencyManagement> section).
 #   - The webhook binary: Go links its standard library statically, so rebuild it with a
 #     current Go (WEBHOOK_GO_VERSION below). apt-get upgrade cannot fix it.
 # Rebuilding regularly fixes the first and third without any change to this file.
@@ -23,8 +23,10 @@ WORKDIR /build
 COPY pom.xml .
 COPY src ./src
 
-# Build the application using Maven
-RUN mvn clean package -DskipTests
+# Build the application using Maven. The docker profile (see pom.xml) builds a thin
+# target/JPhyloRef.jar plus its runtime dependencies in target/lib, rather than the
+# shaded JAR that the default build makes for command-line use.
+RUN mvn -B -Pdocker clean package -DskipTests -Dmaven.javadoc.skip=true
 
 # Step 2. Build webhook (https://github.com/adnanh/webhook) from source.
 # Ubuntu's webhook package is compiled with the Go release that was current when that
@@ -79,11 +81,17 @@ VOLUME ${DATADIR}
 # Change to the nru user.
 USER nru
 
-# Copy the necessary files into the image.
-COPY --from=build /build/target/JPhyloRef.jar ${APPDIR}/JPhyloRef.jar
+# Copy the necessary files into the image, least frequently changed first. The libraries
+# get their own layer, so a release that changes only JPhyloRef's code leaves that layer's
+# digest unchanged and deployments don't download the libraries again. JPhyloRef.jar comes
+# last: each layer records /app's timestamp, so anything copied after it would get a new
+# layer whenever it changed, even with the same contents. JPhyloRef.jar's manifest names
+# each library on its Class-Path, so `java -jar` finds them in lib/ beside it.
+COPY --from=build /build/target/lib ${APPDIR}/lib
 COPY ./webhook/hooks.json ${APPDIR}/hooks.json
 COPY ./webhook/start.sh ${APPDIR}/webhook-start.sh
 COPY --chmod=755 ./webhook/exec_jphyloref.sh ${APPDIR}/exec_jphyloref.sh
+COPY --from=build /build/target/JPhyloRef.jar ${APPDIR}/JPhyloRef.jar
 
 EXPOSE ${PORT}/tcp
 CMD ["/usr/bin/bash", "webhook-start.sh"]
