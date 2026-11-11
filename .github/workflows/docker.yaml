@@ -1,5 +1,6 @@
 # This GitHub Action generates and publishes a Docker image of this repository
 # to the GitHub Packages repository. It is triggered when a new release is published.
+# docker-check.yaml builds and smoke-tests the same image on pull requests.
 #
 # Based on the NameRes release.yaml file at
 # https://github.com/TranslatorSRI/NameResolution/blob/a4f72e3c283dcb40a7280b55650dae63c5625e82/.github/workflows/release.yml
@@ -9,10 +10,14 @@ name: 'Release a new Docker image to Github Packages'
 on:
   release:
     types: [published]
-  # Run this by hand on a release tag (e.g. v1.2.0) to rebuild that release's image
-  # with current base images and security updates, without cutting a new release.
-  # The Docker image only picks up OS and Go security fixes when it is rebuilt, and
-  # vulnerability scans of deployed images will flag it if it isn't.
+  # Run this by hand on a release tag to rebuild that release's image with current base
+  # images and security updates, without cutting a new release. The Docker image only
+  # picks up OS and Go security fixes when it is rebuilt, and vulnerability scans of
+  # deployed images will flag it if it isn't.
+  #
+  # GitHub runs this file and builds the Dockerfile as they are at the chosen tag, so only
+  # releases whose tag includes this trigger can be rebuilt: 1.2.0 and later. Releases
+  # before 1.2.0 have no Dockerfile.
   workflow_dispatch:
 
 env:
@@ -20,12 +25,44 @@ env:
 
 jobs:
   push_to_registry:
-    name: Push Docker image to GitHub Packages tagged with "latest" and version number.
+    name: Push Docker image to GitHub Packages tagged with its version number
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
     steps:
+      # Image tags are worked out from the release, so refuse to build anything else, and
+      # say why, rather than letting metadata-action produce no tags and the push fail.
+      # `latest` is only moved to the release GitHub marks as Latest: metadata-action's own
+      # rule (`latest=auto`) adds it to every non-prerelease version, so rebuilding an older
+      # release by hand would move `latest`, and the deployment that follows it, back to
+      # that release.
+      - name: Check the release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if [ "$GITHUB_REF_TYPE" != tag ]; then
+            echo "::error::Run this workflow on a release tag, not on the branch '$TAG'."
+            exit 1
+          fi
+          if ! [[ "$TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::The tag '$TAG' is not of the form vX.Y.Z or vX.Y.Z-suffix, so no image version can be derived from it. Tag releases with all three version numbers, e.g. v1.3.0."
+            exit 1
+          fi
+          if ! prerelease=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isPrerelease --jq .isPrerelease); then
+            echo "::error::'$TAG' is not a published GitHub release."
+            exit 1
+          fi
+          latest=$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName)
+          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
+          if [ "$latest" = "$TAG" ]; then
+            echo "latest=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "latest=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::'$TAG' is not the latest release ('$latest'), so the image will not be tagged latest."
+          fi
       - name: Check out the repo
         uses: actions/checkout@v7
         # When debugging/bugfixing Babel, it's helpful to have the entire Git history
@@ -39,11 +76,17 @@ jobs:
         with:
           images:
             ghcr.io/${{ github.repository }}
-          # A release tagged v1.2.0 is published as 1.2.0, 1.2 and latest. These only
-          # work on a tag ref, so run workflow_dispatch on a release tag, not a branch.
+          # Tag latest only as decided above.
+          flavor: |
+            latest=false
+          # A release tagged v1.2.0 is published as 1.2.0 and 1.2, and as latest if it is
+          # the latest release. A tag with a suffix, such as v1.3.0-rc.1, is published under
+          # that version alone; so is any GitHub prerelease, whatever its tag, so that it
+          # does not replace the image under X.Y.
           tags: |
             type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}.{{minor}},enable=${{ steps.release.outputs.prerelease == 'false' }}
+            type=raw,value=latest,enable=${{ steps.release.outputs.latest == 'true' }}
       - name: Login to ghcr
         uses: docker/login-action@v4
         with:

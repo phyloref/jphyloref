@@ -43,6 +43,13 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 - The Docker image now runs on Temurin 25 (Ubuntu 26.04) with security updates applied
   at build time, and builds webhook from source with a current Go instead of using
   Ubuntu's package.
+- Docker images are now published for each release as `X.Y.Z` and `X.Y`, and as `latest`
+  only for the release GitHub marks as Latest. The release workflow can be run by hand on a
+  release tag to rebuild that release's image with current security updates, without moving
+  `latest` back to an older release. Pull requests that could affect the image now build it
+  and smoke-test it through webhook (`webhook/smoke-test.sh`).
+- The Quadlet in `webhook/klados-backend.container` now follows `latest` instead of the
+  `add-docker` tag. `latest` is first published by this release.
 - The Maven CI workflow now builds on every Java LTS from 21 upwards (currently 21 and 25)
   rather than JDK 8 alone.
 
