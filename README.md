@@ -80,7 +80,8 @@ Development of JPhyloRef takes place in [our GitHub repository]. This includes [
 
 # Build and execution instructions
 
-You will need [Java] and [Apache Maven] to build the software from source. We recommend installing these
+You will need [Java] (version 21 or later) and [Apache Maven] to build the software from source, and Java 21
+or later to run it. We recommend installing these
 tools using a package manager, such as [Homebrew] on macOS. You can use [jEnv] instead if you want to install
 multiple Java versions on the same computer. Installation should set up the `JAVA_HOME` environment
 variable; if not, you will need to set it to point at the directory containing your Java installation.

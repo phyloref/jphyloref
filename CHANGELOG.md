@@ -3,6 +3,8 @@
 Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
 ## [Unreleased]
+- JPhyloRef now requires Java 21 or later (previously Java 8). The tests now run on
+  JUnit 6.1.3 with Surefire 3.6.1.
 - Upgraded JaCoCo to 0.8.13 so that `mvn test` works on JDKs newer than 15.
 - `JPhyloRef.VERSION` is now read from a Maven-filtered properties file instead of
   being hardcoded, so `help` and the webserver's `/version` endpoint report the
@@ -16,7 +18,8 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 - The Docker image now runs on Temurin 25 (Ubuntu 26.04) with security updates applied
   at build time, and builds webhook from source with a current Go instead of using
   Ubuntu's package.
-- The Maven CI workflow now builds on JDK 8, 11, 17, 21 and 25 rather than JDK 8 alone.
+- The Maven CI workflow now builds on every Java LTS from 21 upwards (currently 21 and 25)
+  rather than JDK 8 alone.
 - Corrected the JAR filename in README.md and Usage.md, which is `target/JPhyloRef.jar`.
 
 ## [1.1.1] - 2021-08-10
