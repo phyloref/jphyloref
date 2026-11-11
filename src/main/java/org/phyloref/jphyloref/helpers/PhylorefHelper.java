@@ -5,8 +5,10 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.semanticweb.owlapi.model.AxiomType;
@@ -175,6 +177,36 @@ public class PhylorefHelper {
             .collect(Collectors.toSet());
 
     return classes;
+  }
+
+  /**
+   * Resolve every phyloreference in an ontology, as the `resolve` command and the webserver's
+   * `/reason` endpoint report it.
+   *
+   * @param ontology The ontology containing phyloreferences and phylogenies.
+   * @param reasoner The reasoner to use, or null to read only asserted axioms.
+   * @param uriPrefixToStrip A prefix to remove from the start of phyloref and node IRIs, so that a
+   *     JSON-LD document parsed against this base URI reports its local identifiers (such as
+   *     `#phyloref0`). May be null.
+   * @return A map from each phyloref IRI to the IRIs of the nodes it resolved to.
+   */
+  public static Map<String, Set<String>> resolvePhyloreferences(
+      OWLOntology ontology, OWLReasoner reasoner, String uriPrefixToStrip) {
+    Map<String, Set<String>> nodesPerPhyloref = new HashMap<>();
+    for (OWLClass phyloref : getPhyloreferences(ontology, reasoner)) {
+      Set<String> nodes =
+          getNodesInClass(phyloref, ontology, reasoner)
+              .stream()
+              .map(node -> stripPrefix(node.getIRI().toString(), uriPrefixToStrip))
+              .collect(Collectors.toSet());
+      nodesPerPhyloref.put(stripPrefix(phyloref.getIRI().toString(), uriPrefixToStrip), nodes);
+    }
+    return nodesPerPhyloref;
+  }
+
+  private static String stripPrefix(String iri, String prefix) {
+    if (prefix != null && iri.startsWith(prefix)) return iri.substring(prefix.length());
+    return iri;
   }
 
   /**

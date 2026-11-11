@@ -6,6 +6,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -105,6 +106,22 @@ public class ReasonerHelper {
       // No reasoner provided? Default to Elk.
       return new ElkReasonerFactory();
     }
+  }
+
+  /**
+   * Create the reasoner chosen on the command line for an ontology. This is the one place the
+   * commands turn `--reasoner` into a reasoner, so that `--reasoner null` is handled the same way
+   * everywhere.
+   *
+   * @return The reasoner, or null if the user chose `--reasoner null`. Callers must pass a null
+   *     reasoner on to PhylorefHelper (which then reads only asserted axioms), and must dispose of
+   *     a non-null one in a finally block: the webserver runs indefinitely, and ELK keeps worker
+   *     threads alive until its reasoner is disposed.
+   */
+  public static OWLReasoner createReasonerFromCmdLine(CommandLine cmdLine, OWLOntology ontology) {
+    OWLReasonerFactory factory = getReasonerFactoryFromCmdLine(cmdLine);
+    if (factory == null) return null;
+    return factory.createReasoner(ontology);
   }
 
   /** Add command line options that can be read by getReasonerFromCmdLine() */
