@@ -19,6 +19,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.util.AutoIRIMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,6 +108,28 @@ public class ResolveCommand implements Command {
       throw new IllegalArgumentException("Error: no input ontology specified (use '-i input.owl')");
     }
 
+    // Look up the reasoner before loading anything, so that an unknown `--reasoner` name is
+    // reported as such, not as a problem with the ontology.
+    OWLReasonerFactory reasonerFactory;
+    try {
+      reasonerFactory = ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine);
+    } catch (IllegalArgumentException ex) {
+      if (flagErrorsAsJSON) {
+        System.out.println(
+            new JSONStringer()
+                .object()
+                .key("error")
+                .value("Unknown reasoner (IllegalArgumentException)")
+                .key("message")
+                .value(ex.toString())
+                .endObject()
+                .toString());
+        return 0;
+      }
+      System.err.println("Unknown reasoner: " + ex.getMessage());
+      return 1;
+    }
+
     // If the input filename is '-', we should read the ontology from STDIN instead.
     InputStream inputStreamToReadFrom = null;
     if (inputFilename.equals("-")) {
@@ -170,7 +193,7 @@ public class ResolveCommand implements Command {
       // We have an ontology! Reason over it, and store the results as a map of
       // the node IRIs matched by each phyloref IRI.
       Map<String, Set<String>> nodesPerPhylorefAsString;
-      OWLReasoner reasoner = ReasonerHelper.createReasonerFromCmdLine(cmdLine, ontology);
+      OWLReasoner reasoner = ReasonerHelper.createReasoner(reasonerFactory, ontology);
       try {
         nodesPerPhylorefAsString =
             PhylorefHelper.resolvePhyloreferences(ontology, reasoner, DEFAULT_URI_PREFIX);

@@ -16,6 +16,12 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
   its reasoner, which previously leaked after a failed request.
 - `resolve --errors-as-json` now reports an input file that cannot be opened as a JSON error,
   like every other error, instead of exiting 1 with nothing on stdout.
+- An unknown `--reasoner` name is now reported as such by `resolve` (previously as "likely
+  because no phylorefs were present"), and stops the webserver at startup.
+- The webserver no longer leaks a file handle and a temporary file on every `/reason` request,
+  and reports invalid Base64 in `jsonldGzipped` as a 400. Only an ontology without
+  phyloreferences is reported as bad input; other unexpected errors are now logged and returned
+  as a 500.
 - `JPhyloRef.VERSION` is now read from a Maven-filtered properties file instead of
   being hardcoded, so `help` and the webserver's `/version` endpoint report the
   version declared in pom.xml.

@@ -194,6 +194,36 @@ class ResolveCommandTest {
   @DisplayName("can report errors as JSON")
   class ErrorsAsJSON {
     @Test
+    @DisplayName("reports an unknown reasoner as such, not as missing phylorefs")
+    void reportsUnknownReasoner() throws UnsupportedEncodingException {
+      int exitCode =
+          jphyloref.execute(
+              new String[] {
+                "resolve",
+                "src/test/resources/phylorefs/no-phyloref-class.jsonld",
+                "--errors-as-json",
+                "--reasoner",
+                "Elk"
+              });
+
+      assertEquals(0, exitCode);
+      JSONObject result = new JSONObject(output.toString("UTF-8"));
+      assertEquals("Unknown reasoner (IllegalArgumentException)", result.getString("error"));
+      assertTrue(
+          result.getString("message").contains("No reasoner named 'Elk'"), result.toString());
+
+      // Without --errors-as-json, it exits 1 with nothing on stdout.
+      resetIO();
+      exitCode =
+          jphyloref.execute(
+              new String[] {
+                "resolve", "src/test/resources/phylorefs/dummy1.owl", "--reasoner", "Elk"
+              });
+      assertEquals(1, exitCode);
+      assertEquals("", output.toString("UTF-8"));
+    }
+
+    @Test
     @DisplayName("reports an input file that cannot be opened as a JSON error")
     void reportsMissingInputFile() throws UnsupportedEncodingException {
       int exitCode =

@@ -120,17 +120,17 @@ public class PhylorefHelper {
   /**
    * Find the phyloref:Phyloreference class in an ontology.
    *
-   * @throws IllegalArgumentException if the ontology does not define it exactly once.
+   * @throws InvalidPhylorefOntologyException if the ontology does not define it exactly once.
    */
   private static OWLClass getPhyloreferenceClass(OWLOntology ontology) {
     Set<OWLEntity> set_phyloref_Phyloreference =
         ontology.getEntitiesInSignature(IRI_PHYLOREFERENCE);
     if (set_phyloref_Phyloreference.isEmpty()) {
-      throw new IllegalArgumentException(
+      throw new InvalidPhylorefOntologyException(
           "Class " + IRI_PHYLOREFERENCE + " is not defined in ontology.");
     }
     if (set_phyloref_Phyloreference.size() > 1) {
-      throw new IllegalArgumentException(
+      throw new InvalidPhylorefOntologyException(
           "Class " + IRI_PHYLOREFERENCE + " is defined multiple times in ontology.");
     }
     return set_phyloref_Phyloreference.iterator().next().asOWLClass();
