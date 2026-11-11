@@ -10,6 +10,7 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -63,10 +64,11 @@ class ResolveCommandTest {
     }
 
     @Test
-    @DisplayName("resolves phylorefs from asserted class assertions with '--reasoner null'")
+    @DisplayName("does not report expected nodes as resolved with '--reasoner null'")
     void resolveOWLFilesWithoutReasoner() throws UnsupportedEncodingException {
-      // dummy1.owl already asserts which node each phyloref resolves to, so skipping the reasoner
-      // should give the same answer.
+      // dummy1.owl is not pre-reasoned: it only says which node phyloref0 is *expected* to
+      // resolve to, through a class expression that mentions phyloref0. Without a reasoner,
+      // phyloref0 therefore resolves to nothing.
       int exitCode =
           jphyloref.execute(
               new String[] {
@@ -74,7 +76,7 @@ class ResolveCommandTest {
               });
 
       assertEquals(0, exitCode);
-      assertEquals(EXPECTED_DUMMY1_RESOLUTION, output.toString("UTF-8"));
+      assertEquals("{\"phylorefs\":{\"#phyloref0\":[]}}\n", output.toString("UTF-8"));
     }
   }
 
@@ -115,6 +117,30 @@ class ResolveCommandTest {
       assertEquals(0, exitCode);
       assertEquals(EXPECTED_DUMMY1_RESOLUTION, outputStr);
       resetIO();
+    }
+
+    @Test
+    @DisplayName("resolves a pre-reasoned JSON-LD file the same with or without a reasoner")
+    void resolvePrereasonedJSONLDFile() throws UnsupportedEncodingException {
+      // prereasoned.jsonld asserts that node1 is in phyloref0, and that node2 is the node
+      // phyloref0 is expected to resolve to. Only node1 has resolved to phyloref0.
+      for (String reasoner : new String[] {"null", "elk"}) {
+        resetIO();
+        int exitCode =
+            jphyloref.execute(
+                new String[] {
+                  "resolve",
+                  "src/test/resources/phylorefs/prereasoned.jsonld",
+                  "--reasoner",
+                  reasoner
+                });
+
+        assertEquals(0, exitCode, "Exit code with --reasoner " + reasoner);
+        assertEquals(
+            "{\"phylorefs\":{\"#phyloref0\":[\"#node1\"]}}\n",
+            output.toString("UTF-8"),
+            "Output with --reasoner " + reasoner);
+      }
     }
 
     @Test
@@ -160,6 +186,36 @@ class ResolveCommandTest {
 
         // Reset everything else as well.
         resetIO();
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("can report errors as JSON")
+  class ErrorsAsJSON {
+    @Test
+    @DisplayName("reports an ontology without phyloref:Phyloreference as a JSON error")
+    void reportsMissingPhyloreferenceClass() throws UnsupportedEncodingException {
+      // Both the reasoned and the asserted-only paths must report this as JSON.
+      for (String reasoner : new String[] {"elk", "null"}) {
+        resetIO();
+        int exitCode =
+            jphyloref.execute(
+                new String[] {
+                  "resolve",
+                  "src/test/resources/phylorefs/no-phyloref-class.jsonld",
+                  "--errors-as-json",
+                  "--reasoner",
+                  reasoner
+                });
+
+        // --errors-as-json always exits 0; the error is in the JSON on stdout.
+        assertEquals(0, exitCode, "Exit code with --reasoner " + reasoner);
+        JSONObject result = new JSONObject(output.toString("UTF-8"));
+        assertTrue(result.has("error"), "Expected an 'error' key in: " + result);
+        assertTrue(
+            result.getString("message").contains("is not defined in ontology"),
+            "Unexpected error message with --reasoner " + reasoner + ": " + result);
       }
     }
   }

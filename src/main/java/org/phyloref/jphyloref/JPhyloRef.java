@@ -38,14 +38,17 @@ public class JPhyloRef {
   /**
    * Read the project version from the filtered jphyloref.properties resource.
    *
-   * @return The version string, or "(unknown)" if the resource is missing or unreadable.
+   * @return The version string, or "(unknown)" if the resource is missing, unreadable or was not
+   *     filtered by Maven (as when an IDE copies resources without filtering them).
    */
   private static String readVersion() {
     try (InputStream is = JPhyloRef.class.getResourceAsStream("/jphyloref.properties")) {
       if (is == null) return "(unknown)";
       Properties props = new Properties();
       props.load(is);
-      return props.getProperty("version", "(unknown)");
+      String version = props.getProperty("version", "(unknown)");
+      if (version.startsWith("${")) return "(unknown)";
+      return version;
     } catch (IOException ex) {
       logger.error("Could not read jphyloref.properties: {}", ex.toString());
       return "(unknown)";

@@ -44,7 +44,8 @@ class AppTest {
         JPhyloRef.VERSION,
         "VERSION fell back to its default, so jphyloref.properties was missing or unfiltered");
     assertTrue(
-        JPhyloRef.VERSION.matches("\\d+\\.\\d+\\.\\d+(-SNAPSHOT)?"),
+        // Any Maven version: 1.2, 1.2.0, 1.2.0-SNAPSHOT, 1.2.0-RC1, 1.2.0-beta.1 and so on.
+        JPhyloRef.VERSION.matches("\\d+(\\.\\d+)*(-[0-9A-Za-z.-]+)?"),
         "VERSION should look like a Maven version, but was: " + JPhyloRef.VERSION);
   }
 

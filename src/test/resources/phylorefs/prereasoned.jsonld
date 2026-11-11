@@ -1,0 +1,43 @@
+{
+  "@context": {
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "obo": "http://purl.obolibrary.org/obo/",
+    "phyloref": "http://ontology.phyloref.org/phyloref.owl#"
+  },
+  "@graph": [
+    {
+      "@id": "#prereasoned",
+      "rdfs:comment": "A pre-reasoned ontology: #node1 is asserted to be a member of #phyloref0, while #node2 carries only the assertion that it is the node #phyloref0 is expected to resolve to. Without a reasoner, only #node1 should be reported.",
+      "rdf:type": { "@id": "owl:Ontology" }
+    },
+    { "@id": "phyloref:Phyloreference", "rdf:type": { "@id": "owl:Class" } },
+    { "@id": "obo:OBI_0000312", "rdf:type": { "@id": "owl:ObjectProperty" } },
+    { "@id": "obo:OBI_0000293", "rdf:type": { "@id": "owl:ObjectProperty" } },
+    {
+      "@id": "#phyloref0",
+      "rdf:type": { "@id": "owl:Class" },
+      "rdfs:subClassOf": { "@id": "phyloref:Phyloreference" }
+    },
+    {
+      "@id": "#node1",
+      "rdf:type": [{ "@id": "owl:NamedIndividual" }, { "@id": "#phyloref0" }]
+    },
+    {
+      "@id": "#node2",
+      "rdf:type": [
+        { "@id": "owl:NamedIndividual" },
+        {
+          "@type": "owl:Restriction",
+          "owl:onProperty": { "@id": "obo:OBI_0000312" },
+          "owl:someValuesFrom": {
+            "@type": "owl:Restriction",
+            "owl:onProperty": { "@id": "obo:OBI_0000293" },
+            "owl:someValuesFrom": { "@id": "#phyloref0" }
+          }
+        }
+      ]
+    }
+  ]
+}
