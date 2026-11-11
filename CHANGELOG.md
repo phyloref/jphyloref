@@ -27,7 +27,7 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
   version declared in pom.xml.
 - JPhyloRef now requires Java 21 or later (previously Java 8). The tests now run on
   JUnit 6.1.3 with Surefire 3.6.1.
-- Upgraded JaCoCo to 0.8.13 so that `mvn test` works on JDKs newer than 15.
+- Upgraded JaCoCo to 0.8.16 so that `mvn test` works on JDKs newer than 15.
 - Upgraded org.json to 20260814 and the Spotless plugin to 1.20.0 to resolve four
   Dependabot advisories (three high-severity, one medium).
 - Upgraded OWLAPI to 4.5.29, rdf4j to 3.7.7, tap4j to 4.4.2, commons-cli to 1.11.0
