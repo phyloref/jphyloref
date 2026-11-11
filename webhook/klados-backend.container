@@ -3,7 +3,10 @@ Description=Klados Backend
 After=network.target
 
 [Container]
-Image=ghcr.io/phyloref/jphyloref:add-docker
+# `latest` is the newest release, and is moved by .github/workflows/docker.yaml when a
+# release is published or rebuilt. Release 1.2.0 is the first to publish an image, so
+# this tag does not exist on ghcr.io until 1.2.0 is released.
+Image=ghcr.io/phyloref/jphyloref:latest
 ContainerName=klados-backend
 PublishPort=19703:8080
 Tmpfs=/data:rw,U,size=20G

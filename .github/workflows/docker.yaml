@@ -1,5 +1,6 @@
 # This GitHub Action generates and publishes a Docker image of this repository
-# to the GitHub Packages repository. It is triggered when a new package is released.
+# to the GitHub Packages repository. It is triggered when a new release is published.
+# docker-check.yaml builds and smoke-tests the same image on pull requests.
 #
 # Based on the NameRes release.yaml file at
 # https://github.com/TranslatorSRI/NameResolution/blob/a4f72e3c283dcb40a7280b55650dae63c5625e82/.github/workflows/release.yml
@@ -9,42 +10,117 @@ name: 'Release a new Docker image to Github Packages'
 on:
   release:
     types: [published]
+  # Run this by hand on a release tag to rebuild that release's image with current base
+  # images and security updates, without cutting a new release. The Docker image only
+  # picks up OS and Go security fixes when it is rebuilt, and vulnerability scans of
+  # deployed images will flag it if it isn't.
+  #
+  # GitHub runs this file and builds the Dockerfile as they are at the chosen tag, so only
+  # releases whose tag includes this trigger can be rebuilt: 1.2.0 and later. Releases
+  # before 1.2.0 have no Dockerfile.
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
 
 jobs:
   push_to_registry:
-    name: Push Docker image to GitHub Packages tagged with "latest" and version number.
+    name: Push the release's Docker image to GitHub Packages under its version
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
+      # Image tags are worked out from the release, so refuse to build anything else, and
+      # say why, rather than letting metadata-action produce no tags and the push fail.
+      - name: Check the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if [ "$GITHUB_REF_TYPE" != tag ]; then
+            echo "::error::Run this workflow on a release tag, not on the branch '$TAG'."
+            exit 1
+          fi
+          if ! [[ "$TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::The tag '$TAG' is not of the form vX.Y.Z or vX.Y.Z-suffix, so no image version can be derived from it. Tag releases with all three version numbers, e.g. v1.3.0."
+            exit 1
+          fi
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json tagName >/dev/null; then
+            echo "::error::'$TAG' is not a published GitHub release."
+            exit 1
+          fi
       - name: Check out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         # When debugging/bugfixing Babel, it's helpful to have the entire Git history
         # with you (fetch-depth: 0). But for publishing the Docker image, just the
         # latest history should be fine.
         with:
           fetch-depth: 1
-      - name: Get the version
-        id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v6
         with:
           images:
             ghcr.io/${{ github.repository }}
+          # This job pushes only the release's own version (1.2.0 for v1.2.0, 1.3.0-rc.1
+          # for v1.3.0-rc.1). The floating tags, latest and X.Y, are moved by the next job.
+          flavor: |
+            latest=false
+          tags: |
+            type=semver,pattern={{version}}
       - name: Login to ghcr
-        uses: docker/login-action@v1
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
       - name: Push to GitHub Packages
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: true
+          # Always pull the base images, so a rebuild picks up their security fixes.
+          pull: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: BRANCH_NAME=${{ github.event.release.target_commitish }}
+
+  # Points `latest` at the release GitHub marks as Latest, and each `X.Y` at the newest full
+  # release in its line, working them out from GitHub's releases when it runs rather than
+  # from the release this run built (see the script for details). That is what keeps a hand
+  # rebuild of an older release from moving them back to it, however runs overlap.
+  #
+  # Only one run at a time can be in this job. GitHub cancels a run that is still waiting
+  # for this group when a newer one starts waiting; that is harmless here, since the newer
+  # run works out every tag from scratch. Only this job is serialized: putting the build
+  # in the group too would let a rebuild cancel a waiting release's build, and with it the
+  # release's image.
+  move_floating_tags:
+    name: Point latest and X.Y at the releases they should name
+    needs: push_to_registry
+    runs-on: ubuntu-latest
+    concurrency:
+      group: docker-floating-tags
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+      - name: Login to ghcr
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Move latest and X.Y
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: .github/scripts/move-floating-tags.sh "${{ env.REGISTRY }}/${{ github.repository }}"

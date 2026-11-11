@@ -25,6 +25,33 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 - `JPhyloRef.VERSION` is now read from a Maven-filtered properties file instead of
   being hardcoded, so `help` and the webserver's `/version` endpoint report the
   version declared in pom.xml.
+- JPhyloRef now requires Java 21 or later (previously Java 8). The tests now run on
+  JUnit 6.1.3 with Surefire 3.6.1.
+- Upgraded JaCoCo to 0.8.16 so that `mvn test` works on JDKs newer than 15.
+- Upgraded org.json to 20260814 and the Spotless plugin to 1.20.0 to resolve four
+  Dependabot advisories (three high-severity, one medium).
+- Upgraded OWLAPI to 4.5.29, rdf4j to 3.7.7, tap4j to 4.4.2, commons-cli to 1.11.0
+  and slf4j to 2.0.20, replaced log4j 1.2.14 (from ELK) with reload4j 1.2.27, removed
+  the unused Sesame 1.x `openrdf-model` dependency, and pinned newer Jackson,
+  commons-io, Guava and SnakeYAML, so that no library in the JAR has a known advisory.
+- Pinned Caffeine (from OWLAPI) to 3.3.1, which no longer uses `sun.misc.Unsafe`.
+  Caffeine 2.9.3 printed warnings on JDK 24 and later, and fails once the JDK denies
+  `Unsafe` memory access, as a future release will by default.
+- The executable JAR now includes every parser that its dependencies register. It
+  previously kept only one library's list of each kind, so it was missing most of
+  rdf4j's RDF parsers and writers and OWLAPI's Rio and OBO format parsers.
+- The Docker image now runs on Temurin 25 (Ubuntu 26.04) with security updates applied
+  at build time, and builds webhook from source with a current Go instead of using
+  Ubuntu's package.
+- Docker images are now published for each release as `X.Y.Z`. `X.Y` names the newest
+  release in its line, and `latest` the release GitHub marks as Latest. The release workflow
+  can be run by hand on a release tag to rebuild that release's image with current security
+  updates, without moving `latest` or `X.Y` back to an older release. Pull requests that could affect the image now build it
+  and smoke-test it through webhook (`webhook/smoke-test.sh`).
+- The Quadlet in `webhook/klados-backend.container` now follows `latest` instead of the
+  `add-docker` tag. `latest` is first published by this release.
+- The Maven CI workflow now builds on every Java LTS from 21 upwards (currently 21 and 25)
+  rather than JDK 8 alone.
 
 ## [1.1.1] - 2021-08-10
 - Fixed manuscript for submission to the Journal of Open Source Software (JOSS).
