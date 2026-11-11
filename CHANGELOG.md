@@ -6,6 +6,9 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 - Fixed `--reasoner null` crashing the `resolve` command and the webserver; it now skips
   reasoning and reports the resolutions asserted in the ontology. The `test` command, which
   needs a reasoner to determine expected nodes, now rejects it with an error message.
+- `JPhyloRef.VERSION` is now read from a Maven-filtered properties file instead of
+  being hardcoded, so `help` and the webserver's `/version` endpoint report the
+  version declared in pom.xml.
 
 ## [1.1.1] - 2021-08-10
 - Fixed manuscript for submission to the Journal of Open Source Software (JOSS).

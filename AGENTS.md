@@ -53,7 +53,7 @@ Exit code: `-1` if no phyloref succeeded, otherwise the number of failures (so `
 
 ## Gotchas
 
-- The version number lives in four places that are not linked, and they have drifted apart before: `JPhyloRef.VERSION` (a hardcoded string), `<version>` in pom.xml, `version` and `date-released` in CITATION.cff (plus its versioned DOI), and CHANGELOG.md. Update all four on release.
+- `JPhyloRef.VERSION` is read at class-load time from `src/main/resources/jphyloref.properties`, which Maven filters with `${project.version}`, so `help` and `/version` report the version in pom.xml. It falls back to `"(unknown)"` if the resource is missing, which `AppTest` catches. On release, bump `<version>` in pom.xml (the properties file needs no edit), and update by hand `version`, `date-released` and the versioned DOI in CITATION.cff, and CHANGELOG.md.
 - Tests in `TestCommandTest`/`ResolveCommandTest` assert against **exact stdout strings**, including the reasoner version line (`# Using reasoner: ELK/2016-01-11T13:41:15Z`). Any change to TAP output, log wording, or the ELK dependency version breaks them.
 - `ReasonerHelper.getReasonerNameAndVersion()` parses ELK's version out of a `NumberFormatException` message — ELK throws when asked for its own version. Not a bug to "fix".
 - Test fixtures live in `src/test/resources/phylorefs/`; `dummy1.*` resolve correctly, `failing1.*` exercise failure/skip paths.
