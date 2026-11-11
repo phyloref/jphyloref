@@ -178,7 +178,9 @@ public class WebserverCommand implements Command {
 
       // Set up and start the reasoner.
       OWLReasonerFactory factory = ReasonerHelper.getReasonerFactoryFromCmdLine(cmdLine);
-      OWLReasoner reasoner = factory.createReasoner(ontology);
+      // `--reasoner null` gives a null factory: skip reasoning and read only the class
+      // assertions already in the ontology (see PhylorefHelper.getNodesInClass()).
+      OWLReasoner reasoner = (factory == null) ? null : factory.createReasoner(ontology);
 
       // Go through all the phyloreferences, identifying all the nodes that have
       // matched to that phyloreference.
@@ -203,7 +205,7 @@ public class WebserverCommand implements Command {
       }
 
       // Dispose the reasoner.
-      reasoner.dispose();
+      if (reasoner != null) reasoner.dispose();
 
       // Log reasoning results.
       logger.info("Phyloreferencing reasoning results: {}", nodesPerPhylorefAsString);
