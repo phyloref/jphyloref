@@ -120,10 +120,10 @@ class PhylorefHelperTest {
     void rejectsOntologyWithoutPhyloreferenceClass() throws OWLOntologyCreationException {
       OWLOntology empty = ontologyManager.createOntology();
       assertThrows(
-          IllegalArgumentException.class,
+          InvalidPhylorefOntologyException.class,
           () -> PhylorefHelper.getPhyloreferencesWithoutReasoning(empty));
       assertThrows(
-          IllegalArgumentException.class,
+          InvalidPhylorefOntologyException.class,
           () ->
               PhylorefHelper.getPhyloreferences(
                   empty, new ElkReasonerFactory().createNonBufferingReasoner(empty)));
