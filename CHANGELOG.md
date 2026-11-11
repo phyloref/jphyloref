@@ -14,6 +14,8 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 - The webserver's `/reason` endpoint now answers every error with JSON (400 for an ontology
   without phyloreferences) instead of letting some exceptions escape, and always disposes of
   its reasoner, which previously leaked after a failed request.
+- `resolve --errors-as-json` now reports an input file that cannot be opened as a JSON error,
+  like every other error, instead of exiting 1 with nothing on stdout.
 - `JPhyloRef.VERSION` is now read from a Maven-filtered properties file instead of
   being hardcoded, so `help` and the webserver's `/version` endpoint report the
   version declared in pom.xml.
