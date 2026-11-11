@@ -7,8 +7,8 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 - `JPhyloRef.VERSION` is now read from a Maven-filtered properties file instead of
   being hardcoded, so `help` and the webserver's `/version` endpoint report the
   version declared in pom.xml.
-- Upgraded org.json to 20250517 and the Spotless plugin to 1.20.0 to resolve three
-  high-severity Dependabot advisories.
+- Upgraded org.json to 20260814 and the Spotless plugin to 1.20.0 to resolve four
+  Dependabot advisories (three high-severity, one medium).
 - The Maven CI workflow now builds on JDK 8, 11, 17 and 21 rather than JDK 8 alone.
 - Corrected the JAR filename in README.md and Usage.md, which is `target/JPhyloRef.jar`.
 
