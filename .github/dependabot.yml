@@ -1,0 +1,25 @@
+# Dependabot version updates: pull requests that move dependencies to newer versions on a
+# schedule. Security updates (pull requests for Dependabot alerts) are a separate,
+# repository-level setting and need nothing here.
+#
+# Only GitHub Actions are covered:
+#   - Maven: pom.xml couples versions that Dependabot would bump independently (rdf4j must
+#     match owlapi-rio's, slf4j-simple must share slf4j-api's major version), and major
+#     upgrades such as OWLAPI 5 need code changes. Alerts and security updates still cover it.
+#   - Docker: the Dockerfile's base images are floating tags (eclipse-temurin:25-jre), which
+#     rebuilds keep current, and the Go image's tag comes from an ARG, which Dependabot
+#     cannot update. Dependabot would also propose non-LTS JDKs. Vulnerabilities in the
+#     image are found by Grype instead (image-scan.yaml, docker-check.yaml).
+
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    # One pull request a week for all actions, rather than one per action. This also keeps
+    # the commit pins on the Grype and code-scanning actions current.
+    groups:
+      actions:
+        patterns:
+          - '*'
