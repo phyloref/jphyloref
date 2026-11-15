@@ -53,7 +53,7 @@ Exit code: `-1` if no phyloref succeeded, otherwise the number of failures (so `
 
 ## Gotchas
 
-- `JPhyloRef.VERSION` is read at class-load time from `src/main/resources/jphyloref.properties`, which Maven filters with `${project.version}`, so `help` and `/version` report the version in pom.xml. It falls back to `"(unknown)"` if the resource is missing or unfiltered (an IDE build that skips Maven's resource filtering), which `AppTest` catches. On release, bump `<version>` in pom.xml (the properties file needs no edit), and update by hand `version`, `date-released` and the versioned DOI in CITATION.cff, and CHANGELOG.md.
+- `JPhyloRef.VERSION` is read at class-load time from `src/main/resources/jphyloref.properties`, which Maven filters with `${project.version}`, so `help` and `/version` report the version in pom.xml. It falls back to `"(unknown)"` if the resource is missing or unfiltered (an IDE build that skips Maven's resource filtering), which `AppTest` catches. On release, bump `<version>` in pom.xml (the properties file needs no edit), and update by hand `version` and `date-released` in CITATION.cff, and CHANGELOG.md. See **Releasing** below for the order.
 - Tests in `TestCommandTest`/`ResolveCommandTest` assert against **exact stdout strings**, including the reasoner version line (`# Using reasoner: ELK/2016-01-11T13:41:15Z`). Any change to TAP output, log wording, or the ELK dependency version breaks them.
 - `ReasonerHelper.getReasonerNameAndVersion()` parses ELK's version out of a `NumberFormatException` message — ELK throws when asked for its own version. Not a bug to "fix".
 - **Dependency versions are coupled in two places**, both commented in pom.xml. `rdf4j.version` must match the rdf4j that `owlapi-rio` is built against, or two rdf4j releases end up in the shaded JAR. `slf4j-simple` must share a major version with `slf4j-api` (which OWLAPI pulls in): slf4j-api 2.x silently ignores a 1.7.x binding and discards all logging, which shows up only as `AppTest`/`TestCommandTest` failures on empty stderr. The `<dependencyManagement>` block pins transitive libraries past vulnerable versions; recheck each pin when upgrading the dependency that brings it in.
@@ -72,4 +72,14 @@ Exit code: `-1` if no phyloref succeeded, otherwise the number of failures (so `
 
 `.github/workflows/docker-check.yaml` builds the image without pushing it on pull requests that touch the Dockerfile, pom.xml, `webhook/` or the Docker workflows, and runs `webhook/smoke-test.sh` on it. That script is also the quickest way to check an image locally (`docker build -t jphyloref:test . && webhook/smoke-test.sh jphyloref:test`). To do the same by hand, POST `{"jsonldGzipped": "<base64 of a gzipped .jsonld>"}` to `http://localhost:8080/reason` (`start.sh` sets an empty URL prefix, so it is not `/hooks/reason`) with `X-Hub-Signature: sha1=<HMAC-SHA1 of the body>`; `hooks.json` uses the secret `undefined`. If you mount a tmpfs on `/data`, it must be writable by the image's `nru` user (uid 1001).
 
-Publishing to Sonatype OSSRH is `mvn clean deploy` and requires GPG settings in `~/.m2/settings.xml`.
+## Releasing
+
+Releases are cut from a `release/vX.Y.Z` branch, and the release is tagged and published *before* its PR merges, so that a broken image can be fixed on the same branch:
+
+1. On the release branch, set the version in pom.xml, CHANGELOG.md and CITATION.cff (see Gotchas). Remove the previous release's versioned DOI from CITATION.cff rather than leaving it under the new version.
+2. Tag the branch head and publish the GitHub release (`gh release create vX.Y.Z --target release/vX.Y.Z`). `docker.yaml` then builds and pushes the image (see Deployment), and Zenodo's GitHub integration mints a versioned DOI. That DOI can't be reserved beforehand, which is why it is added afterwards.
+3. Check the image (`webhook/smoke-test.sh ghcr.io/phyloref/jphyloref:X.Y.Z`). If something is wrong, fix it on the branch and release the next patch version. Don't delete the release and reuse the version: Zenodo's DOI for it is permanent, and so would a Maven Central version be.
+4. Add the versioned DOI to CITATION.cff, and set the next `-SNAPSHOT` version.
+5. Merge the PR with a **merge commit**, not a squash, so that the release tag stays in master's history. Every earlier release tag is.
+
+Maven Central has 1.1.1 and nothing later. pom.xml still configures publishing through Sonatype OSSRH (`nexus-staging-maven-plugin`, `oss.sonatype.org`), which Sonatype shut down on 30 June 2025: publishing again needs the Central Publisher Portal (`central-publishing-maven-plugin`). Until then, the `coursier launch` example in README.md stays on 1.1.1.
