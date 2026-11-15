@@ -178,8 +178,10 @@ public class WebserverCommand implements Command {
       }
       response.put("ontology", ontology.toString());
 
-      // We have an ontology! Reason over it, and store the results as a map of
-      // the node IRIs matched by each phyloref IRI.
+      // We have an ontology! Resolve its phyloreferences as a map of the node IRIs
+      // matched by each phyloref IRI. With `--reasoner null`, reasoner is null and
+      // this still runs: PhylorefHelper then reports the resolutions asserted in the
+      // input, so a pre-reasoned ontology can be read without reasoning over it again.
       Map<String, Set<String>> nodesPerPhylorefAsString;
       OWLReasoner reasoner = ReasonerHelper.createReasoner(reasonerFactory, ontology);
       try {
