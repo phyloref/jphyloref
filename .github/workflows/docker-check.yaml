@@ -1,10 +1,15 @@
-# Builds the Docker image, without pushing it, on pull requests that could break it, and
-# smoke-tests it the way the deployment calls it (webhook/smoke-test.sh).
+# Builds the Docker image, without pushing it, on pull requests that could break it,
+# smoke-tests it the way the deployment calls it (webhook/smoke-test.sh), and scans it for
+# known vulnerabilities.
 # docker.yaml only builds the image when a release is published, so without this a broken
 # Dockerfile, an unresolvable base image or Go module version, or a webhook script that no
 # longer works would first show up as a release with no image.
+#
+# It also runs weekly on master, alongside image-scan.yaml's scan of the published image:
+# base images and Ubuntu's updates change under an unchanged Dockerfile, so a fresh build
+# can break, or gain a finding that only a change here can fix.
 
-name: Build and smoke-test the Docker image
+name: Build, smoke-test and scan the Docker image
 
 on:
   pull_request:
@@ -14,11 +19,14 @@ on:
       - pom.xml
       - webhook/**
       - .github/workflows/docker*.yaml
+  schedule:
+    # Mondays, 06:17 UTC, with image-scan.yaml.
+    - cron: '17 6 * * 1'
   workflow_dispatch:
 
 jobs:
   build:
-    name: Build and smoke-test the Docker image
+    name: Build, smoke-test and scan the Docker image
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -38,3 +46,14 @@ jobs:
           tags: jphyloref:ci
       - name: Smoke-test the image
         run: webhook/smoke-test.sh jphyloref:ci
+      - name: Scan the image for vulnerabilities
+        # Grype, pinned to a commit as in image-scan.yaml, which explains why. Fails on a
+        # critical or high finding that has a fix, and prints every fixable finding in the
+        # log. Results go to code scanning only from image-scan.yaml, so that the Security
+        # tab tracks the published image rather than each pull request's build.
+        uses: anchore/scan-action@27805bf3b4e84b4a5c980df22ed233c00390a439 # v7.4.2
+        with:
+          image: jphyloref:ci
+          only-fixed: true
+          severity-cutoff: high
+          output-format: table
