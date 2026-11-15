@@ -10,12 +10,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    strategy:
+      # Report every JDK's result rather than cancelling the rest on the first failure.
+      fail-fast: false
+      matrix:
+        # Every Java LTS from the one this project targets (maven.compiler.release in
+        # pom.xml) upwards. Add each new LTS as soon as Temurin releases it (Java 29 is
+        # due in September 2027), so that breakage shows up while the older LTSes are
+        # still supported; drop one when it falls below the target. Newer JDKs have
+        # broken the build tooling before (JaCoCo could not instrument class files
+        # newer than Java 15).
+        java-version: ['21', '25']
+
+    name: Build with JDK ${{ matrix.java-version }}
+
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v4
+    - uses: actions/checkout@v7
+    - name: Set up JDK ${{ matrix.java-version }}
+      uses: actions/setup-java@v6
       with:
-        java-version: '8'
+        java-version: ${{ matrix.java-version }}
         distribution: temurin
         cache: maven
     - name: Build with Maven

@@ -1,0 +1,40 @@
+# Builds the Docker image, without pushing it, on pull requests that could break it, and
+# smoke-tests it the way the deployment calls it (webhook/smoke-test.sh).
+# docker.yaml only builds the image when a release is published, so without this a broken
+# Dockerfile, an unresolvable base image or Go module version, or a webhook script that no
+# longer works would first show up as a release with no image.
+
+name: Build and smoke-test the Docker image
+
+on:
+  pull_request:
+    paths:
+      - Dockerfile
+      - .dockerignore
+      - pom.xml
+      - webhook/**
+      - .github/workflows/docker*.yaml
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and smoke-test the Docker image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Build the image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: false
+          # Make the image available to `docker run` in the next step.
+          load: true
+          # Pull the base images, as docker.yaml does, so this builds what a release would.
+          pull: true
+          tags: jphyloref:ci
+      - name: Smoke-test the image
+        run: webhook/smoke-test.sh jphyloref:ci

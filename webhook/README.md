@@ -39,4 +39,14 @@ phyloreferences to standard output. It calls JPhyloRef with particular settings 
   * Some settings (the name of the input file) are sent to JPhyloRef for processing.
 * [klados-backend.container](klados-backend.container) is a Quadlet description for adding to
   systemd to run the Klados Backend using webhook. The Image is the one built from the
-  Dockerfile at the root of this repository.
+  Dockerfile at the root of this repository, tagged `latest`: `.github/workflows/docker.yaml`
+  publishes an image for every GitHub release, and tags it `latest` if GitHub marks that
+  release as Latest. It can be run by hand on the tag of release 1.2.0 or later to rebuild
+  that release with current security updates. `AutoUpdate=registry` then pulls the new image.
+  It only does so for the tag named in `Image=`, so a deployment pinned to any other tag
+  (such as the old `add-docker`) stops receiving fixes. Release 1.2.0 is the first to
+  publish an image, so `latest` does not exist until it is released; until then, keep a
+  deployment on the tag it already uses.
+* [smoke-test.sh](smoke-test.sh) checks a built image by sending it a request the way
+  the deployment does. Run it from the root of the repository:
+  `docker build -t jphyloref:test . && webhook/smoke-test.sh jphyloref:test`.
