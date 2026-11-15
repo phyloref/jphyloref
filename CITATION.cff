@@ -10,7 +10,7 @@ title: "JPhyloRef: a tool for testing and resolving phyloreferences"
 type: software
 license: MIT
 date-released: 2026-11-15
-version: 1.2.0
+version: 1.2.1
 identifiers:
   - type: doi
     value: 10.5281/zenodo.4697964

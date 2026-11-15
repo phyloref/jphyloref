@@ -4,6 +4,11 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-11-15
+- No changes to JPhyloRef itself. This release exists so that Zenodo archives
+  it: Zenodo's GitHub integration was switched off when 1.2.0 was released, so 1.2.0
+  has no Zenodo record or versioned DOI. See 1.2.0 below for what changed since 1.1.1.
+
 ## [1.2.0] - 2026-11-15
 - Fixed `--reasoner null` crashing the `resolve` command and the webserver; it now skips
   reasoning and reports the resolutions asserted in the ontology. The `test` command, which
@@ -118,7 +123,8 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 - Initial release, with support for testing phyloreferences expressed in OWL
   and stored in RDF/XML.
 
-[Unreleased]: https://github.com/phyloref/jphyloref/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/phyloref/jphyloref/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/phyloref/jphyloref/releases/tag/v1.2.1
 [1.2.0]: https://github.com/phyloref/jphyloref/releases/tag/v1.2.0
 [1.1.1]: https://github.com/phyloref/jphyloref/releases/tag/v1.1.1
 [1.1.0]: https://github.com/phyloref/jphyloref/releases/tag/v1.1.0
