@@ -1,0 +1,62 @@
+# Scans the published Docker image, the one the deployment runs, for known vulnerabilities
+# every week, and reports what it finds in the repository's Security tab (code scanning).
+#
+# The image only picks up OS and Go security fixes when it is rebuilt (see the header of
+# the Dockerfile), so a published image accumulates findings even when nothing in this
+# repository changes. A failing run means the image has a critical or high finding with a
+# fix available. docker-check.yaml scans a fresh build from master on the same schedule:
+#   - If that one passes, a rebuild fixes it: run docker.yaml by hand on the latest
+#     release tag.
+#   - If it fails too, the fix needs a change here (pom.xml, the Dockerfile's Go version or
+#     pins), then a release.
+#
+# The scanner is Grype. Third-party actions here are pinned to a commit, not a tag, since a
+# tag can be moved to point at other code (as happened to trivy-action in March 2026);
+# Dependabot keeps the pins current (.github/dependabot.yml).
+#
+# GitHub disables scheduled workflows in a public repository after 60 days without
+# activity, and emails the failure of a scheduled run to whoever last changed its cron line.
+
+name: Scan the published Docker image
+
+on:
+  schedule:
+    # Mondays, 06:17 UTC: off the hour, when scheduled runs are least likely to be delayed.
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image tag to scan, such as latest, 1.2 or 1.2.0'
+        required: true
+        default: latest
+
+jobs:
+  scan:
+    name: Scan ghcr.io/phyloref/jphyloref
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Upload the results to code scanning.
+      security-events: write
+    steps:
+      # upload-sarif needs the repository checked out to attribute the results to a commit.
+      - uses: actions/checkout@v7
+      - name: Scan the image
+        id: scan
+        uses: anchore/scan-action@27805bf3b4e84b4a5c980df22ed233c00390a439 # v7.4.2
+        with:
+          # The image is public, so Grype pulls it from the registry without logging in.
+          image: ghcr.io/phyloref/jphyloref:${{ inputs.tag || 'latest' }}
+          # Report only what a rebuild or an upgrade can fix, and fail on critical and high.
+          only-fixed: true
+          severity-cutoff: high
+          output-format: sarif
+          output-file: grype.sarif
+      - name: Upload the results to code scanning
+        # Upload even when the scan step failed on findings: that is when they matter.
+        # hashFiles() is empty if Grype failed before writing a report (an unknown tag).
+        if: ${{ !cancelled() && hashFiles('grype.sarif') != '' }}
+        uses: github/codeql-action/upload-sarif@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          sarif_file: grype.sarif
+          category: ghcr-image
