@@ -74,12 +74,12 @@ Exit code: `-1` if no phyloref succeeded, otherwise the number of failures (so `
 
 ## Releasing
 
-Releases are cut from a `release/vX.Y.Z` branch, and the release is tagged and published *before* its PR merges, so that a broken image can be fixed on the same branch:
+1. **Release PR.** On a `release/vX.Y.Z` branch, set the version in pom.xml, CHANGELOG.md and CITATION.cff (see Gotchas), and open a PR. Remove the previous release's versioned DOI from CITATION.cff rather than leaving it under the new version. The PR changes pom.xml, so `docker-check.yaml` builds and smoke-tests the image it would release.
+2. **Review and merge it.** Any merge method works, since the tag goes on master afterwards.
+3. **Tag the merged commit on master and publish the GitHub release** (`gh release create vX.Y.Z --target <the merge commit's SHA>`). Name the commit rather than `master`, so that the tag can't land on something merged in the meantime. `docker.yaml` then builds and pushes the image (see Deployment), and Zenodo's GitHub integration mints a versioned DOI. That DOI can't be reserved beforehand.
+4. **Check the image**: `webhook/smoke-test.sh ghcr.io/phyloref/jphyloref:X.Y.Z` locally, and the same signed request against the deployed reasoner once it has picked up `latest`. A broken release is fixed in a new PR and released as the next patch version. Don't delete the release and reuse its version: Zenodo's DOI for it is permanent, and a Maven Central version would be too.
+5. **Post-release PR**: add the versioned DOI to CITATION.cff, and set the next `-SNAPSHOT` version in pom.xml.
 
-1. On the release branch, set the version in pom.xml, CHANGELOG.md and CITATION.cff (see Gotchas). Remove the previous release's versioned DOI from CITATION.cff rather than leaving it under the new version.
-2. Tag the branch head and publish the GitHub release (`gh release create vX.Y.Z --target release/vX.Y.Z`). `docker.yaml` then builds and pushes the image (see Deployment), and Zenodo's GitHub integration mints a versioned DOI. That DOI can't be reserved beforehand, which is why it is added afterwards.
-3. Check the image (`webhook/smoke-test.sh ghcr.io/phyloref/jphyloref:X.Y.Z`). If something is wrong, fix it on the branch and release the next patch version. Don't delete the release and reuse the version: Zenodo's DOI for it is permanent, and so would a Maven Central version be.
-4. Add the versioned DOI to CITATION.cff, and set the next `-SNAPSHOT` version.
-5. Merge the PR with a **merge commit**, not a squash, so that the release tag stays in master's history. Every earlier release tag is.
+1.2.0 was released differently: tagged on its release branch before the PR merged, so the image could be fixed on that branch if needed. Its PR had to be merged with a merge commit to keep the tag in master's history.
 
 Maven Central has 1.1.1 and nothing later. pom.xml still configures publishing through Sonatype OSSRH (`nexus-staging-maven-plugin`, `oss.sonatype.org`), which Sonatype shut down on 30 June 2025: publishing again needs the Central Publisher Portal (`central-publishing-maven-plugin`). Until then, the `coursier launch` example in README.md stays on 1.1.1.
