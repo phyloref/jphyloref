@@ -12,6 +12,15 @@
 #   - The webhook binary: Go links its standard library statically, so rebuild it with a
 #     current Go (WEBHOOK_GO_VERSION below). apt-get upgrade cannot fix it.
 # Rebuilding regularly fixes the first and third without any change to this file.
+#
+# CI scans the image with Grype (.github/workflows/image-scan.yaml, docker-check.yaml). To
+# do the same locally: docker build -t jphyloref:scan . && grype jphyloref:scan --only-fixed
+# Two findings there need no fix (checked 2026-11-15 on Ubuntu 26.04):
+#   - `coreutils`: Ubuntu 26.04's coreutils package is an empty placeholder whose version
+#     starts with 9.5, and Grype matches GNU coreutils advisories against that. The real
+#     GNU tools are the gnu-coreutils package, which apt-get upgrade keeps patched.
+#   - The Go standard library in /usr/bin/pebble: Canonical's service manager, which the
+#     ubuntu base image ships outside dpkg. This image never runs it; a newer base fixes it.
 
 # The Go release used to build webhook (step 2). An ARG used in a FROM line has to be
 # declared before the first FROM.
