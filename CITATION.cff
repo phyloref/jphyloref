@@ -15,6 +15,9 @@ identifiers:
   - type: doi
     value: 10.5281/zenodo.4697964
     description: The concept DOI for JPhyloRef.
+  - type: doi
+    value: 10.5281/zenodo.24265689
+    description: The versioned DOI for version 1.2.1 of JPhyloRef.
 url: "https://github.com/phyloref/jphyloref"
 repository-code: "https://github.com/phyloref/jphyloref"
 preferred-citation:
