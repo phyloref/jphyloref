@@ -1,0 +1,7 @@
+{
+  "@context": {
+    "owl": "http://www.w3.org/2002/07/owl#"
+  },
+  "@id": "http://example.org/no-phyloref-class",
+  "@type": "owl:Ontology"
+}

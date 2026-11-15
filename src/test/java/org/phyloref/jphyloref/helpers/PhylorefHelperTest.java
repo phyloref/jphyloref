@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,6 +19,7 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -83,6 +85,48 @@ class PhylorefHelperTest {
       assertTrue(
           phylorefs.contains(phyloref),
           "Phyloref 'phyloref1' has been retrieved without reasoning");
+    }
+
+    @Test
+    @DisplayName("skip anonymous subclasses and the Phyloref ontology's own metaclasses")
+    void skipsAnonymousSubclassesAndMetaclasses() {
+      OWLDataFactory df = ontologyManager.getOWLDataFactory();
+      OWLClass phyloref_Phyloreference =
+          df.getOWLClass(IRI.create("http://ontology.phyloref.org/phyloref.owl#Phyloreference"));
+      OWLClass metaclass =
+          df.getOWLClass(
+              IRI.create(
+                  "http://ontology.phyloref.org/phyloref.owl#PhyloreferenceUsingMinimumClade"));
+      OWLClassExpression anonymous =
+          df.getOWLObjectIntersectionOf(
+              df.getOWLClass(IRI.create("http://example.org/A")),
+              df.getOWLClass(IRI.create("http://example.org/B")));
+      ontologyManager.addAxiom(
+          testOntology, df.getOWLSubClassOfAxiom(metaclass, phyloref_Phyloreference));
+      ontologyManager.addAxiom(
+          testOntology, df.getOWLSubClassOfAxiom(anonymous, phyloref_Phyloreference));
+
+      Set<OWLClass> expected =
+          Collections.singleton(df.getOWLClass(IRI.create("http://example.org/phyloref1")));
+      assertEquals(expected, PhylorefHelper.getPhyloreferencesWithoutReasoning(testOntology));
+      assertEquals(
+          expected,
+          PhylorefHelper.getPhyloreferences(
+              testOntology, new ElkReasonerFactory().createNonBufferingReasoner(testOntology)));
+    }
+
+    @Test
+    @DisplayName("reject an ontology without phyloref:Phyloreference, with or without reasoning")
+    void rejectsOntologyWithoutPhyloreferenceClass() throws OWLOntologyCreationException {
+      OWLOntology empty = ontologyManager.createOntology();
+      assertThrows(
+          InvalidPhylorefOntologyException.class,
+          () -> PhylorefHelper.getPhyloreferencesWithoutReasoning(empty));
+      assertThrows(
+          InvalidPhylorefOntologyException.class,
+          () ->
+              PhylorefHelper.getPhyloreferences(
+                  empty, new ElkReasonerFactory().createNonBufferingReasoner(empty)));
     }
 
     @Test
@@ -172,6 +216,33 @@ class PhylorefHelperTest {
       assertTrue(
           nodes.contains(node1),
           "Phyloref 'phyloref1' contains 'node1' as expected without reasoning");
+    }
+
+    @Test
+    @DisplayName("count only assertions of the phyloref itself when not reasoning")
+    void ignoresAssertionsThatOnlyMentionThePhyloref() {
+      OWLDataFactory df = ontologyManager.getOWLDataFactory();
+      OWLClass phyloref1 = df.getOWLClass(IRI.create("http://example.org/phyloref1"));
+      OWLNamedIndividual node1 = df.getOWLNamedIndividual(IRI.create("http://example.org/node1"));
+      OWLNamedIndividual node3 = df.getOWLNamedIndividual(IRI.create("http://example.org/node3"));
+      OWLNamedIndividual node4 = df.getOWLNamedIndividual(IRI.create("http://example.org/node4"));
+
+      // node3 is asserted to be *outside* phyloref1, and node4 to have a descendant in it;
+      // neither is a member of phyloref1.
+      ontologyManager.addAxiom(
+          testOntology,
+          df.getOWLClassAssertionAxiom(df.getOWLObjectComplementOf(phyloref1), node3));
+      ontologyManager.addAxiom(
+          testOntology,
+          df.getOWLClassAssertionAxiom(
+              df.getOWLObjectSomeValuesFrom(
+                  df.getOWLObjectProperty(IRI.create("http://example.org/has_Descendant")),
+                  phyloref1),
+              node4));
+
+      assertEquals(
+          Collections.singleton(node1),
+          PhylorefHelper.getNodesInClass(phyloref1, testOntology, null));
     }
 
     @Test

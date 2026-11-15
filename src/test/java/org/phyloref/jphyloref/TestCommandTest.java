@@ -95,6 +95,21 @@ class TestCommandTest {
           outputStr,
           errorStr);
     }
+
+    @Test
+    @DisplayName("refuses to run with '--reasoner null'")
+    void testWithoutReasoner() throws UnsupportedEncodingException {
+      // Expected nodes can only be computed by a reasoner, so 'test' rejects a null reasoner
+      // before doing any work, rather than failing partway through.
+      int exitCode =
+          jphyloref.execute(
+              new String[] {
+                "test", "src/test/resources/phylorefs/dummy1.owl", "--reasoner", "null"
+              });
+
+      assertEquals(1, exitCode);
+      assertEquals("", output.toString("UTF-8"));
+    }
   }
 
   @Nested

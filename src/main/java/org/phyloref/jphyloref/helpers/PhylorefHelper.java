@@ -5,8 +5,10 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.semanticweb.owlapi.model.AxiomType;
@@ -96,30 +98,53 @@ public class PhylorefHelper {
    * reasoner, and so will only find classes asserted to be subclasses of phyloref:Phyloreference.
    */
   public static Set<OWLClass> getPhyloreferencesWithoutReasoning(OWLOntology ontology) {
-    // Get a list of all phyloreferences. First, we need to know what a Phyloreference is.
-    Set<OWLEntity> set_phyloref_Phyloreference =
-        ontology.getEntitiesInSignature(IRI_PHYLOREFERENCE);
-    if (set_phyloref_Phyloreference.isEmpty()) {
-      throw new RuntimeException("Class 'phyloref:Phyloreference' is not defined in ontology.");
-    }
-    if (set_phyloref_Phyloreference.size() > 1) {
-      throw new RuntimeException(
-          "Class 'phyloref:Phyloreference' is defined multiple times in ontology.");
-    }
-
-    OWLClass phyloref_Phyloreference = set_phyloref_Phyloreference.iterator().next().asOWLClass();
+    OWLClass phyloref_Phyloreference = getPhyloreferenceClass(ontology);
     Set<OWLClass> phylorefs = new HashSet<>();
     Set<OWLSubClassOfAxiom> subClassOfAxioms = ontology.getAxioms(AxiomType.SUBCLASS_OF);
 
     for (OWLSubClassOfAxiom subClassOfAxiom : subClassOfAxioms) {
-      // Is the superclass phyloref:Phyloreference?
-      if (subClassOfAxiom.getSuperClass().equals(phyloref_Phyloreference.asOWLClass())) {
-        // If so, then the subclass is a phyloreference!
+      // Is the superclass phyloref:Phyloreference? Only a named subclass can be a phyloreference:
+      // an anonymous class expression (such as an intersection) has no IRI to report.
+      if (subClassOfAxiom.getSuperClass().equals(phyloref_Phyloreference)
+          && !subClassOfAxiom.getSubClass().isAnonymous()) {
         phylorefs.add(subClassOfAxiom.getSubClass().asOWLClass());
       }
     }
 
-    return phylorefs;
+    return phylorefs
+        .stream()
+        .filter(c -> !isPhyloreferenceMetaclass(c))
+        .collect(Collectors.toSet());
+  }
+
+  /**
+   * Find the phyloref:Phyloreference class in an ontology.
+   *
+   * @throws InvalidPhylorefOntologyException if the ontology does not define it exactly once.
+   */
+  private static OWLClass getPhyloreferenceClass(OWLOntology ontology) {
+    Set<OWLEntity> set_phyloref_Phyloreference =
+        ontology.getEntitiesInSignature(IRI_PHYLOREFERENCE);
+    if (set_phyloref_Phyloreference.isEmpty()) {
+      throw new InvalidPhylorefOntologyException(
+          "Class " + IRI_PHYLOREFERENCE + " is not defined in ontology.");
+    }
+    if (set_phyloref_Phyloreference.size() > 1) {
+      throw new InvalidPhylorefOntologyException(
+          "Class " + IRI_PHYLOREFERENCE + " is defined multiple times in ontology.");
+    }
+    return set_phyloref_Phyloreference.iterator().next().asOWLClass();
+  }
+
+  /**
+   * Is this one of the Phyloref ontology's own classes-of-phyloreferences, such as
+   * phyloref:PhyloreferenceUsingMaximumClade or phyloref:PhyloreferenceWithReferenceTree? These are
+   * subclasses of phyloref:Phyloreference but not phyloreferences to test or resolve.
+   */
+  private static boolean isPhyloreferenceMetaclass(OWLClass c) {
+    return c.getIRI()
+        .toString()
+        .startsWith("http://ontology.phyloref.org/phyloref.owl#Phyloreference");
   }
 
   /**
@@ -133,19 +158,7 @@ public class PhylorefHelper {
     // If no reasoner is provided, fall back to stated subclasses.
     if (reasoner == null) return PhylorefHelper.getPhyloreferencesWithoutReasoning(ontology);
 
-    // Get a list of all phyloreferences. First, we need to know what a Phyloreference is.
-    Set<OWLEntity> set_phyloref_Phyloreference =
-        ontology.getEntitiesInSignature(IRI_PHYLOREFERENCE);
-    if (set_phyloref_Phyloreference.isEmpty()) {
-      throw new IllegalArgumentException(
-          "Class " + IRI_PHYLOREFERENCE + " is not defined in ontology.");
-    }
-    if (set_phyloref_Phyloreference.size() > 1) {
-      throw new IllegalArgumentException(
-          "Class " + IRI_PHYLOREFERENCE + " is defined multiple times in ontology.");
-    }
-
-    OWLClass phyloref_Phyloreference = set_phyloref_Phyloreference.iterator().next().asOWLClass();
+    OWLClass phyloref_Phyloreference = getPhyloreferenceClass(ontology);
 
     // In Model 2.0, we need to look for both direct subclasses of
     // phyloref:Phyloreference as well as indirect subclasses, since a
@@ -167,14 +180,40 @@ public class PhylorefHelper {
         classes
             .stream()
             .filter(c -> !bottomNodes.contains(c)) // remove owl:Nothing
-            .filter(
-                c ->
-                    !c.getIRI()
-                        .toString()
-                        .startsWith("http://ontology.phyloref.org/phyloref.owl#Phyloreference"))
+            .filter(c -> !isPhyloreferenceMetaclass(c))
             .collect(Collectors.toSet());
 
     return classes;
+  }
+
+  /**
+   * Resolve every phyloreference in an ontology, as the `resolve` command and the webserver's
+   * `/reason` endpoint report it.
+   *
+   * @param ontology The ontology containing phyloreferences and phylogenies.
+   * @param reasoner The reasoner to use, or null to read only asserted axioms.
+   * @param uriPrefixToStrip A prefix to remove from the start of phyloref and node IRIs, so that a
+   *     JSON-LD document parsed against this base URI reports its local identifiers (such as
+   *     `#phyloref0`). May be null.
+   * @return A map from each phyloref IRI to the IRIs of the nodes it resolved to.
+   */
+  public static Map<String, Set<String>> resolvePhyloreferences(
+      OWLOntology ontology, OWLReasoner reasoner, String uriPrefixToStrip) {
+    Map<String, Set<String>> nodesPerPhyloref = new HashMap<>();
+    for (OWLClass phyloref : getPhyloreferences(ontology, reasoner)) {
+      Set<String> nodes =
+          getNodesInClass(phyloref, ontology, reasoner)
+              .stream()
+              .map(node -> stripPrefix(node.getIRI().toString(), uriPrefixToStrip))
+              .collect(Collectors.toSet());
+      nodesPerPhyloref.put(stripPrefix(phyloref.getIRI().toString(), uriPrefixToStrip), nodes);
+    }
+    return nodesPerPhyloref;
+  }
+
+  private static String stripPrefix(String iri, String prefix) {
+    if (prefix != null && iri.startsWith(prefix)) return iri.substring(prefix.length());
+    return iri;
   }
 
   /**
@@ -202,14 +241,18 @@ public class PhylorefHelper {
 
     // No reasoner? We can also determine which nodes have been directly stated to
     // be members of this phyloref as a class. This allows us to read a pre-reasoned
-    // OWL file and test whether phyloreferences resolved as expected.
+    // OWL file and report how its phyloreferences resolved.
+    //
+    // Only assertions of the class itself count. An assertion whose class expression merely
+    // mentions it, such as `node : not phyloref` or `node : (has_Descendant some phyloref)`,
+    // does not make the node a member of the phyloref.
     Set<OWLNamedIndividual> nodes = new HashSet<>();
     Set<OWLClassAssertionAxiom> classAssertions = ontology.getAxioms(AxiomType.CLASS_ASSERTION);
 
     for (OWLClassAssertionAxiom classAssertion : classAssertions) {
-      // Does this assertion involve this phyloreference as a class and a named individual?
+      // Does this assertion state that a named individual is a member of this phyloreference?
       if (classAssertion.getIndividual().isNamed()
-          && classAssertion.getClassesInSignature().contains(owlClass)) {
+          && classAssertion.getClassExpression().equals(owlClass)) {
         // If so, then the individual is a node that is included in this phyloreference.
         nodes.add(classAssertion.getIndividual().asOWLNamedIndividual());
       }

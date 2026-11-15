@@ -144,6 +144,27 @@
 
     <build>
         <finalName>JPhyloRef</finalName>
+
+        <!--
+          jphyloref.properties is filtered so that JPhyloRef.VERSION can report the
+          version declared above, rather than a hand-maintained copy of it.
+        -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>jphyloref.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>jphyloref.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
         <plugins>
             <!-- We use Surefire to run testing using JUnit Jupiter Engine -->
             <plugin>

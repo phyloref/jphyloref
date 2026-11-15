@@ -3,6 +3,28 @@
 Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
 ## [Unreleased]
+- Fixed `--reasoner null` crashing the `resolve` command and the webserver; it now skips
+  reasoning and reports the resolutions asserted in the ontology. The `test` command, which
+  needs a reasoner to determine expected nodes, now rejects it with an error message.
+- Without a reasoner, a node now counts as resolved only if it is asserted to be a member of
+  the phyloreference itself. Previously any class assertion mentioning the phyloreference
+  counted, including the assertion of which node it is *expected* to resolve to. Anonymous
+  subclasses of phyloref:Phyloreference and the Phyloref ontology's own metaclasses are no
+  longer reported as phyloreferences.
+- The webserver's `/reason` endpoint now answers every error with JSON (400 for an ontology
+  without phyloreferences) instead of letting some exceptions escape, and always disposes of
+  its reasoner, which previously leaked after a failed request.
+- `resolve --errors-as-json` now reports an input file that cannot be opened as a JSON error,
+  like every other error, instead of exiting 1 with nothing on stdout.
+- An unknown `--reasoner` name is now reported as such by `resolve` (previously as "likely
+  because no phylorefs were present"), and stops the webserver at startup.
+- The webserver no longer leaks a file handle and a temporary file on every `/reason` request,
+  and reports invalid Base64 in `jsonldGzipped` as a 400. Only an ontology without
+  phyloreferences is reported as bad input; other unexpected errors are now logged and returned
+  as a 500.
+- `JPhyloRef.VERSION` is now read from a Maven-filtered properties file instead of
+  being hardcoded, so `help` and the webserver's `/version` endpoint report the
+  version declared in pom.xml.
 
 ## [1.1.1] - 2021-08-10
 - Fixed manuscript for submission to the Journal of Open Source Software (JOSS).

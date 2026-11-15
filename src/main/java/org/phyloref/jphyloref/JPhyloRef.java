@@ -1,8 +1,11 @@
 package org.phyloref.jphyloref;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
@@ -26,8 +29,31 @@ public class JPhyloRef {
   /** Set up a logger to use for providing logging. */
   private static final Logger logger = LoggerFactory.getLogger(JPhyloRef.class);
 
-  /** Version of JPhyloRef. */
-  public static final String VERSION = "1.0.0";
+  /**
+   * Version of JPhyloRef. This is read from jphyloref.properties, which Maven filters so that it
+   * reports the version declared in pom.xml rather than a copy that has to be kept in sync by hand.
+   */
+  public static final String VERSION = readVersion();
+
+  /**
+   * Read the project version from the filtered jphyloref.properties resource.
+   *
+   * @return The version string, or "(unknown)" if the resource is missing, unreadable or was not
+   *     filtered by Maven (as when an IDE copies resources without filtering them).
+   */
+  private static String readVersion() {
+    try (InputStream is = JPhyloRef.class.getResourceAsStream("/jphyloref.properties")) {
+      if (is == null) return "(unknown)";
+      Properties props = new Properties();
+      props.load(is);
+      String version = props.getProperty("version", "(unknown)");
+      if (version.startsWith("${")) return "(unknown)";
+      return version;
+    } catch (IOException ex) {
+      logger.error("Could not read jphyloref.properties: {}", ex.toString());
+      return "(unknown)";
+    }
+  }
 
   /** List of all commands included in JPhyloRef. */
   private List<Command> commands =
