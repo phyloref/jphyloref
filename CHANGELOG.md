@@ -3,6 +3,13 @@
 Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 
 ## [Unreleased]
+
+## [1.2.1] - 2026-11-15
+- No changes to JPhyloRef itself. This release exists so that Zenodo archives
+  it: Zenodo's GitHub integration was switched off when 1.2.0 was released, so 1.2.0
+  has no Zenodo record or versioned DOI. See 1.2.0 below for what changed since 1.1.1.
+
+## [1.2.0] - 2026-11-15
 - Fixed `--reasoner null` crashing the `resolve` command and the webserver; it now skips
   reasoning and reports the resolutions asserted in the ontology. The `test` command, which
   needs a reasoner to determine expected nodes, now rejects it with an error message.
@@ -46,8 +53,9 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 - Docker images are now published for each release as `X.Y.Z`. `X.Y` names the newest
   release in its line, and `latest` the release GitHub marks as Latest. The release workflow
   can be run by hand on a release tag to rebuild that release's image with current security
-  updates, without moving `latest` or `X.Y` back to an older release. Pull requests that could affect the image now build it
-  and smoke-test it through webhook (`webhook/smoke-test.sh`).
+  updates, without moving `latest` or `X.Y` back to an older release. Pull requests that
+  could affect the image now build it and smoke-test it through webhook
+  (`webhook/smoke-test.sh`).
 - The Quadlet in `webhook/klados-backend.container` now follows `latest` instead of the
   `add-docker` tag. `latest` is first published by this release.
 - The Maven CI workflow now builds on every Java LTS from 21 upwards (currently 21 and 25)
@@ -115,7 +123,9 @@ Based on the suggestion at https://keepachangelog.com/en/1.0.0/.
 - Initial release, with support for testing phyloreferences expressed in OWL
   and stored in RDF/XML.
 
-[Unreleased]: https://github.com/phyloref/jphyloref/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/phyloref/jphyloref/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/phyloref/jphyloref/releases/tag/v1.2.1
+[1.2.0]: https://github.com/phyloref/jphyloref/releases/tag/v1.2.0
 [1.1.1]: https://github.com/phyloref/jphyloref/releases/tag/v1.1.1
 [1.1.0]: https://github.com/phyloref/jphyloref/releases/tag/v1.1.0
 [1.0.0]: https://github.com/phyloref/jphyloref/releases/tag/v1.0.0
